@@ -1,0 +1,64 @@
+[gd_scene load_steps=2 format=3 uid="uid://subject_info_ui"]
+
+[ext_resource type="Script" path="res://scripts/presentation/ui/subject_info_ui.gd" id="1_subinfo"]
+
+[node name="SubjectInfoUI" type="Control"]
+script = ExtResource("1_subinfo")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -160.0
+offset_right = 200.0
+offset_bottom = 160.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "피험자 정보 입력"
+horizontal_alignment = 1
+
+[node name="IDLabel" type="Label" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "피험자 ID *"
+
+[node name="IDInput" type="LineEdit" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+placeholder_text = "피험자 ID를 입력하세요"
+
+[node name="ExperienceLabel" type="Label" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "경력 (년수)"
+
+[node name="ExperienceInput" type="SpinBox" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+min_value = 0.0
+max_value = 50.0
+step = 1.0
+value = 0.0
+suffix = "년"
+
+[node name="WarningLabel" type="Label" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "피험자 ID는 필수 입력 항목입니다."
+modulate = Color(1, 0.3, 0.3, 1)
+visible = false
+
+[node name="SubmitButton" type="Button" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "시뮬레이션 시작"
+disabled = true

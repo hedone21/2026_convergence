@@ -1,0 +1,34 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; but it can also be manually edited if needed.
+
+[application]
+
+config/name="VR Construction Safety Simulation"
+config/description="VR 건설 현장 안전 점검 시뮬레이션"
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.3", "GL Compatibility")
+
+[autoload]
+
+GameManager="*res://scripts/application/game_manager.gd"
+HazardManager="*res://scripts/application/hazard_manager.gd"
+InputManager="*res://scripts/application/input_manager.gd"
+EvaluationManager="*res://scripts/application/evaluation_manager.gd"
+ScenarioManager="*res://scripts/application/scenario_manager.gd"
+SessionManager="*res://scripts/application/session_manager.gd"
+
+[xr]
+
+openxr/enabled=true
+openxr/environment_blend_mode=0
+shaders/enabled=true
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+
+[display]
+
+window/vsync/vsync_mode=0

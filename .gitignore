@@ -1,0 +1,10 @@
+# Godot
+.godot/
+*.uid
+
+# Test output data
+data/sessions/
+
+# OS
+.DS_Store
+Thumbs.db

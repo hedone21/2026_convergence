@@ -1,0 +1,52 @@
+{
+  "_comment": "SPEC-SCN-001 / SPEC-HAZ-002: MVP 쉬운 시나리오 — 크랙 3개, difficulty 0.2~0.4 (큰 크랙, 높은 가시성)",
+  "scenario_id": "mvp_easy",
+  "site_type": "building_frame",
+  "time_limit_seconds": 300,
+  "random_placement": false,
+  "random_seed": 0,
+  "random_config": {
+    "hazard_count": 3,
+    "types": ["crack"],
+    "min_spacing": 3.0,
+    "difficulty_range": [0.2, 0.4]
+  },
+  "hazards": [
+    {
+      "id": "crack_01",
+      "type": "crack",
+      "position": [2.0, 1.5, -3.0],
+      "rotation": [0.0, 0.0, 0.0],
+      "difficulty": 0.2,
+      "params": {
+        "length": 0.8,
+        "width": 0.03,
+        "branches": 3
+      }
+    },
+    {
+      "id": "crack_02",
+      "type": "crack",
+      "position": [-3.0, 2.0, 1.0],
+      "rotation": [0.0, 90.0, 0.0],
+      "difficulty": 0.3,
+      "params": {
+        "length": 0.7,
+        "width": 0.025,
+        "branches": 3
+      }
+    },
+    {
+      "id": "crack_03",
+      "type": "crack",
+      "position": [0.0, 3.0, 4.0],
+      "rotation": [0.0, 180.0, 0.0],
+      "difficulty": 0.4,
+      "params": {
+        "length": 0.6,
+        "width": 0.02,
+        "branches": 2
+      }
+    }
+  ]
+}

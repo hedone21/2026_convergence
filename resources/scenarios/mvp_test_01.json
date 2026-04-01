@@ -1,0 +1,14 @@
+{
+	"scenario_id": "scenario_mvp_01",
+	"site_type": "building_frame",
+	"time_limit_seconds": 300,
+	"random_placement": true,
+	"random_seed": 42,
+	"random_config": {
+		"hazard_count": 3,
+		"types": ["crack"],
+		"min_spacing": 3.0,
+		"difficulty_range": [0.3, 0.8]
+	},
+	"hazards": []
+}

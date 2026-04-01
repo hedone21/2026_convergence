@@ -1,0 +1,54 @@
+{
+  "_comment": "SPEC-SCN-001: 시나리오 설정 파일 템플릿 — 이 파일을 복사하여 새 시나리오를 만드세요.",
+  "scenario_id": "scenario_template",
+  "site_type": "building_frame",
+  "time_limit_seconds": 300,
+  "random_placement": false,
+  "random_seed": 0,
+  "random_config": {
+    "_comment": "random_placement=true일 때만 사용됩니다.",
+    "hazard_count": 5,
+    "types": ["crack"],
+    "min_spacing": 3.0,
+    "difficulty_range": [0.3, 0.8]
+  },
+  "hazards": [
+    {
+      "_comment": "SPEC-HAZ-002: difficulty 0.0(쉬움, 큰 크랙) ~ 1.0(어려움, 미세 크랙)",
+      "id": "crack_01",
+      "type": "crack",
+      "position": [0.0, 1.5, -3.0],
+      "rotation": [0.0, 0.0, 0.0],
+      "difficulty": 0.5,
+      "params": {
+        "length": 0.4,
+        "width": 0.015,
+        "branches": 2
+      }
+    },
+    {
+      "id": "crack_02",
+      "type": "crack",
+      "position": [3.0, 2.0, 0.0],
+      "rotation": [0.0, 90.0, 0.0],
+      "difficulty": 0.5,
+      "params": {
+        "length": 0.4,
+        "width": 0.015,
+        "branches": 2
+      }
+    },
+    {
+      "id": "crack_03",
+      "type": "crack",
+      "position": [-3.0, 2.5, 2.0],
+      "rotation": [0.0, 45.0, 0.0],
+      "difficulty": 0.5,
+      "params": {
+        "length": 0.4,
+        "width": 0.015,
+        "branches": 2
+      }
+    }
+  ]
+}

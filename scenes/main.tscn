@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://cmain_scene_001"]
+
+[node name="Main" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment"]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 10, 0)
+shadow_enabled = true
+
+[node name="PlayerRig" type="Node3D" parent="."]
+
+[node name="SiteContainer" type="Node3D" parent="."]
+
+[node name="HazardContainer" type="Node3D" parent="."]
+
+[node name="UILayer" type="CanvasLayer" parent="."]
