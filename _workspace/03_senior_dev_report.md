@@ -691,3 +691,227 @@ BuildingFrameSite (Node3D)
 4. **EventLogger**: SessionManager.state_changed 구독하여 상태 전환 타임스탬프 기록
 5. **SiteContainer 동적 로딩**: ScenarioManager.get_site_type()에 따라 적절한 현장 씬 동적 로드
 6. **고정 배치 모드 테스트**: random_placement=false인 시나리오 JSON으로 위험 요소 수동 배치 테스트
+
+---
+
+# Senior Dev 구현 리포트 -- Phase 5: 시각 품질 개선
+
+## 구현 일자
+2026-04-01
+
+## 개선 요약
+
+건물 골조 현장의 시각 품질을 3개 축으로 개선하였다:
+1. PBR 콘크리트 텍스처 적용 (프로시저럴 NoiseTexture2D 기반)
+2. 크랙 비주얼을 Decal 노드 기반으로 교체 (SurfaceTool 메시 -> Decal 투영)
+3. 환경 조명 전면 개선 (SSAO, SSIL, ProceduralSky, Fog, Glow, ACES 톤매핑)
+
+---
+
+## 1. PBR 콘크리트 텍스처 시스템
+
+### ConcreteMaterial 팩토리 (신규)
+
+`scripts/presentation/environment/concrete_material.gd`
+
+외부 이미지 파일 없이 NoiseTexture2D + FastNoiseLite만으로 PBR 콘크리트 머티리얼을 생성하는 팩토리 클래스.
+
+**머티리얼 유형 3가지:**
+
+| 메서드 | 용도 | Albedo 색상 | Roughness | UV Scale |
+|--------|------|-------------|-----------|----------|
+| `create_concrete_material()` | 기둥, 벽체, 슬래브 | Color(0.75, 0.73, 0.70) | 0.88 | 2.0x |
+| `create_floor_material()` | 바닥 | Color(0.62, 0.60, 0.58) | 0.95 | 3.0x |
+| `create_rebar_material()` | 보, 철근 구조물 | Color(0.80, 0.78, 0.76) | 0.82 | 1.5x |
+
+**PBR 텍스처 구성:**
+
+| 채널 | 노이즈 유형 | 주파수 | 프랙탈 | 해상도 |
+|------|------------|--------|--------|--------|
+| Albedo | Simplex Smooth FBM | 0.015 | 4 octave | 256px |
+| Roughness | Cellular (Distance) | 0.025 | 없음 | 256px |
+| Normal | Simplex Smooth FBM | 0.03 | 3 octave | 256px |
+
+- Albedo: Gradient 색상 램프(Color(0.65,0.63,0.61) ~ Color(0.85,0.83,0.80))로 회색 톤 범위 제한
+- Normal: as_normal_map=true, bump_strength=4.0으로 미세한 표면 요철 표현
+- 모든 텍스처: seamless=true, seamless_blend_skirt=0.15로 타일링 경계 제거
+
+**성능 고려:**
+- 텍스처 해상도 256px (Quest 72fps 유지 목표)
+- 머티리얼 캐싱: BuildingFrameSite._init_materials()에서 3종 머티리얼을 1회 생성 후 모든 구조물이 공유 -> 드로우콜 절감
+
+### BuildingFrameSite 적용
+
+`scripts/presentation/environment/building_frame_site.gd` 수정:
+
+- `_init_materials()` 추가: `_ready()`에서 PBR 머티리얼 사전 캐시
+- `_create_structural_element_pbr()` / `_create_box_mesh_pbr()` 추가: PBR 머티리얼을 받는 새 헬퍼
+- 기존 단색 헬퍼(`_create_structural_element`, `_create_box_mesh`) 유지 (폴백/하위호환)
+- 모든 구조물 생성 호출을 PBR 버전으로 전환:
+  - 기둥 8개, 슬래브 1개, 벽체 5개: `_mat_concrete`
+  - 보 12개: `_mat_rebar` (약간 더 밝은 톤)
+  - 바닥 1개: `_mat_floor` (더 어둡고 거친)
+
+---
+
+## 2. 크랙 비주얼 Decal 교체
+
+### CrackTextureGenerator (신규)
+
+`scripts/presentation/hazards/crack_texture_generator.gd`
+
+Decal에 사용할 크랙 패턴 텍스처를 프로시저럴로 생성하는 유틸리티.
+
+**핵심 기법:**
+- Cellular 노이즈 + `RETURN_DISTANCE2_SUB`: 셀 경계에서 얇은 선을 생성하여 크랙 패턴 표현
+- Gradient 색상 램프: 셀 경계(값 0.0~0.15) = 어두운 크랙색(불투명), 셀 내부(값 0.35~1.0) = 완전 투명
+- 노멀맵: 동일 Cellular 패턴에 bump_strength=8.0으로 크랙 깊이감 표현
+
+| 메서드 | 반환 | 설명 |
+|--------|------|------|
+| `create_crack_albedo_texture()` | `NoiseTexture2D` | 크랙 albedo (Cellular, Gradient 투명 처리) |
+| `create_crack_normal_texture()` | `NoiseTexture2D` | 크랙 노멀맵 (깊이감) |
+
+### CrackHazard Decal 전환
+
+`scripts/presentation/hazards/crack_hazard.gd` 수정:
+
+**변경 전:** MeshInstance3D + SurfaceTool 기반 삼각형 스트립 메시
+**변경 후:** Decal 노드 기반 표면 투영
+
+**주요 변경:**
+- `_crack_visual: MeshInstance3D` -> `_crack_decal: Decal`
+- `_generator: CrackGenerator` -> `_texture_generator: CrackTextureGenerator`
+- `_build_visual()`: Decal.new() 생성, texture_albedo/texture_normal 설정, upper_fade/lower_fade/normal_fade 설정
+- `_apply_difficulty()`: Decal.size(XZ) 스케일 + Decal.modulate(alpha) 투명도로 난이도 표현
+- `_show_discovered_feedback()`: Decal.modulate를 녹색으로 변경
+- `_rebuild_visual()`: 텍스처 재생성(랜덤 시드 변경)
+
+**유지된 인터페이스 (하위호환):**
+- `apply_hazard_data(data: HazardData)` 시그니처 동일
+- `_apply_difficulty()` 시그니처 동일
+- `_show_discovered_feedback()` 시그니처 동일
+- `_build_collision()`, `_build_discovered_indicator()` 변경 없음
+- `crack_length`, `crack_width`, `crack_branches` 프로퍼티 유지
+- BaseHazard 상속 구조 및 시그널 유지
+
+**Decal 이점:**
+- Z-fighting 문제 근본 해결 (메시 대신 투영 방식)
+- 구조물 곡면/모서리에도 자연스럽게 표시 가능
+- GPU 프로젝션 기반으로 메시 생성 오버헤드 제거
+
+---
+
+## 3. 환경 조명 개선
+
+### 조명 구성
+
+`scripts/presentation/environment/building_frame_site.gd`의 `_create_lighting()` 전면 개선:
+
+**DirectionalLight3D (태양광):**
+- 에너지: 1.2 -> 1.3
+- 색상: Color(1.0, 0.98, 0.95) -> Color(1.0, 0.96, 0.90) (약간 더 따뜻한 톤)
+- shadow_blur = 1.0 (부드러운 그림자)
+- directional_shadow_max_distance = 50.0
+
+**FillLight (보조광, 신규):**
+- 반대편 방향(-150도), 에너지 0.3, 쿨톤 Color(0.85, 0.90, 1.0)
+- 그림자 없음 (성능 절감)
+- 그림자 영역의 디테일 보존
+
+**WorldEnvironment:**
+
+| 설정 | 변경 전 | 변경 후 |
+|------|---------|---------|
+| 배경 | BG_COLOR (단색 하늘색) | BG_SKY (ProceduralSkyMaterial) |
+| 앰비언트 소스 | AMBIENT_SOURCE_COLOR | AMBIENT_SOURCE_SKY |
+| 톤매핑 | ACES | ACES (유지, tonemap_white=6.0 추가) |
+| SSAO | 비활성 | 활성 (radius=1.0, intensity=2.0) |
+| SSIL | 비활성 | 활성 (radius=5.0, intensity=1.0) |
+| Glow | 비활성 | 활성 (intensity=0.3, SOFTLIGHT) |
+| Fog | 비활성 | 활성 (density=0.002, 대기 원근감) |
+| 반사광 | 없음 | REFLECTION_SOURCE_SKY |
+
+**ProceduralSkyMaterial 설정:**
+- sky_top: Color(0.35, 0.55, 0.85), sky_horizon: Color(0.65, 0.75, 0.88)
+- ground_bottom: Color(0.35, 0.30, 0.25), ground_horizon: Color(0.65, 0.70, 0.72)
+- radiance_size = RADIANCE_SIZE_256 (Quest 성능 고려)
+
+### main.tscn 동기화
+
+`scenes/main.tscn` 업데이트:
+- WorldEnvironment에 동일 Environment 설정 (SSAO, SSIL, ProceduralSky, ACES, Glow, Fog)
+- DirectionalLight3D에 따뜻한 톤 + 그림자 품질 설정
+- BuildingFrameSite가 자체 WorldEnvironment를 생성하므로, main.tscn의 설정은 BuildingFrameSite 미사용 시 폴백
+
+---
+
+## 생성된 파일 목록
+
+### Presentation Layer (신규)
+| 파일 | 클래스명 | 설명 |
+|------|---------|------|
+| `scripts/presentation/environment/concrete_material.gd` | ConcreteMaterial | PBR 콘크리트 머티리얼 팩토리. NoiseTexture2D 기반 albedo/roughness/normal 생성 |
+| `scripts/presentation/hazards/crack_texture_generator.gd` | CrackTextureGenerator | Decal용 크랙 텍스처 생성기. Cellular 노이즈 + Gradient 기반 |
+
+### Presentation Layer (수정)
+| 파일 | 변경 내용 |
+|------|----------|
+| `scripts/presentation/environment/building_frame_site.gd` | PBR 머티리얼 적용, 조명 전면 개선 (SSAO, SSIL, ProceduralSky, FillLight) |
+| `scripts/presentation/hazards/crack_hazard.gd` | SurfaceTool 메시 -> Decal 기반 크랙 비주얼로 전환 |
+
+### Scenes (수정)
+| 파일 | 변경 내용 |
+|------|----------|
+| `scenes/main.tscn` | WorldEnvironment에 SSAO/SSIL/ProceduralSky/Glow/Fog 설정 추가 |
+| `scenes/hazards/crack_hazard.tscn` | 변경 없음 (스크립트 레벨에서 Decal 전환) |
+
+---
+
+## 공개 인터페이스
+
+### ConcreteMaterial (RefCounted)
+
+| 메서드 | 반환 | 설명 |
+|--------|------|------|
+| `create_concrete_material()` | `StandardMaterial3D` | 일반 콘크리트 PBR (기둥, 벽체, 슬래브) |
+| `create_floor_material()` | `StandardMaterial3D` | 바닥용 PBR (어둡고 거친) |
+| `create_rebar_material()` | `StandardMaterial3D` | 보/철근 PBR (밝고 매끈) |
+
+### CrackTextureGenerator (RefCounted)
+
+| 메서드 | 반환 | 설명 |
+|--------|------|------|
+| `create_crack_albedo_texture()` | `NoiseTexture2D` | Decal albedo (Cellular + Gradient 투명) |
+| `create_crack_normal_texture()` | `NoiseTexture2D` | Decal 노멀맵 (깊이감) |
+
+### CrackHazard (변경된 내부)
+
+| 항목 | 변경 전 | 변경 후 |
+|------|---------|---------|
+| 비주얼 노드 | `_crack_visual: MeshInstance3D` | `_crack_decal: Decal` |
+| 생성기 | `_generator: CrackGenerator` | `_texture_generator: CrackTextureGenerator` |
+| 난이도 조절 | mesh.scale + material.albedo_color.a | Decal.size + Decal.modulate.a |
+| 발견 피드백 | material_override 교체 | Decal.modulate 색상 변경 |
+
+**공개 인터페이스 변경 없음** (BaseHazard 계약 유지):
+- `apply_hazard_data(data)`, `discover()`, `is_discovered()`, `state_changed` 시그널 등 모두 동일
+
+---
+
+## 아키텍처 준수 사항
+
+- **레이어 분리**: ConcreteMaterial, CrackTextureGenerator 모두 Presentation Layer에 위치. Domain/Application 레이어에 의존 없음
+- **의존 방향**: BuildingFrameSite -> ConcreteMaterial, CrackHazard -> CrackTextureGenerator. 역방향 없음
+- **개방-폐쇄**: ConcreteMaterial을 확장하여 새 머티리얼 유형 추가 가능. CrackTextureGenerator도 독립 확장 가능
+- **리스코프 치환**: CrackHazard는 여전히 BaseHazard 자리에 투명 교체 가능 (Decal 전환이 외부 인터페이스에 영향 없음)
+- **성능**: 텍스처 256px, 머티리얼 캐싱, Sky radiance 256으로 Quest VR 성능 고려
+
+---
+
+## 다음 Phase에서 연결할 사항
+
+1. **WorldEnvironment 충돌 해소**: main.tscn과 BuildingFrameSite 양쪽에 WorldEnvironment가 있으므로, ScenarioManager가 현장 로드 시 main.tscn의 WorldEnvironment를 비활성화하는 로직 필요
+2. **Decal cull_mask 설정**: 크랙 Decal이 특정 구조물에만 투영되도록 cull_mask 레이어 분리 고려
+3. **LOD 시스템**: 원거리 구조물에 대해 텍스처 해상도를 동적으로 낮추는 LOD 검토
+4. **VR 성능 프로파일링**: Quest 실기기에서 SSAO/SSIL 활성 상태의 프레임 레이트 측정 후, 필요 시 비활성화 옵션 제공
