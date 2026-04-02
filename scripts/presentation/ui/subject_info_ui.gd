@@ -24,6 +24,9 @@ func _ready() -> void:
 	_update_submit_state()
 	warning_label.visible = false
 
+	## 이름(ID) 필드에 초기 포커스를 설정하여 바로 입력 가능하게 한다
+	id_input.grab_focus()
+
 
 ## SPEC-SES-001: ID 입력값이 변경될 때마다 제출 버튼 상태를 갱신한다
 func _on_id_changed(_new_text: String) -> void:
