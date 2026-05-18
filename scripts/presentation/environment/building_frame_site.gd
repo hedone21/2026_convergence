@@ -30,10 +30,6 @@ const BEAM_HEIGHT: float = 0.5
 ## 슬래브 — 천장/상층 바닥판
 const SLAB_THICKNESS: float = 0.2
 
-## 벽체
-const WALL_THICKNESS: float = 0.2
-const WALL_HEIGHT: float = 3.5
-
 ## 콘크리트 색상 (밝은 회색 계열) — PBR 머티리얼 생성 불가 시 폴백용
 const COLOR_CONCRETE: Color = Color(0.78, 0.76, 0.74)
 const COLOR_CONCRETE_DARK: Color = Color(0.65, 0.63, 0.61)
@@ -47,9 +43,7 @@ const COLOR_SLAB: Color = Color(0.72, 0.70, 0.68)
 var _columns_node: Node3D
 var _beams_node: Node3D
 var _slabs_node: Node3D
-var _walls_node: Node3D
 var _floor_body: StaticBody3D
-var _environment: WorldEnvironment
 
 ## PBR 콘크리트 머티리얼 팩토리
 var _concrete_material: ConcreteMaterial = ConcreteMaterial.new()
@@ -109,8 +103,6 @@ func _build_site() -> void:
 	_create_columns()
 	_create_beams()
 	_create_slabs()
-	_create_walls()
-	_create_lighting()
 
 
 # -- 바닥 ------------------------------------------------------------------
@@ -280,157 +272,6 @@ func _create_slabs() -> void:
 			Vector3(SITE_WIDTH, SLAB_THICKNESS, SITE_DEPTH)
 		)
 	})
-
-
-# -- 벽체 ------------------------------------------------------------------
-
-func _create_walls() -> void:
-	_walls_node = Node3D.new()
-	_walls_node.name = "Walls"
-	add_child(_walls_node)
-
-	var wall_y: float = WALL_HEIGHT / 2.0
-	var half_w: float = SITE_WIDTH / 2.0
-	var half_d: float = SITE_DEPTH / 2.0
-
-	# 남쪽 벽 (Z+ 방향) — 출입구 개구부를 위해 2개로 분할
-	var door_width: float = 2.0
-	var south_wall_segment: float = (SITE_WIDTH - door_width) / 2.0
-
-	var wall_south_left: StaticBody3D = _create_structural_element_pbr(
-		"Wall_South_Left",
-		Vector3(south_wall_segment, WALL_HEIGHT, WALL_THICKNESS),
-		Vector3(-half_w + south_wall_segment / 2.0, wall_y, half_d - WALL_THICKNESS / 2.0),
-		_mat_concrete
-	)
-	_walls_node.add_child(wall_south_left)
-
-	var wall_south_right: StaticBody3D = _create_structural_element_pbr(
-		"Wall_South_Right",
-		Vector3(south_wall_segment, WALL_HEIGHT, WALL_THICKNESS),
-		Vector3(half_w - south_wall_segment / 2.0, wall_y, half_d - WALL_THICKNESS / 2.0),
-		_mat_concrete
-	)
-	_walls_node.add_child(wall_south_right)
-
-	# 북쪽 벽 (Z- 방향) — 전체 벽
-	var wall_north: StaticBody3D = _create_structural_element_pbr(
-		"Wall_North",
-		Vector3(SITE_WIDTH, WALL_HEIGHT, WALL_THICKNESS),
-		Vector3(0.0, wall_y, -half_d + WALL_THICKNESS / 2.0),
-		_mat_concrete
-	)
-	_walls_node.add_child(wall_north)
-
-	# 동쪽 벽 (X+ 방향)
-	var wall_east: StaticBody3D = _create_structural_element_pbr(
-		"Wall_East",
-		Vector3(WALL_THICKNESS, WALL_HEIGHT, SITE_DEPTH),
-		Vector3(half_w - WALL_THICKNESS / 2.0, wall_y, 0.0),
-		_mat_concrete
-	)
-	_walls_node.add_child(wall_east)
-
-	# 서쪽 벽 (X- 방향)
-	var wall_west: StaticBody3D = _create_structural_element_pbr(
-		"Wall_West",
-		Vector3(WALL_THICKNESS, WALL_HEIGHT, SITE_DEPTH),
-		Vector3(-half_w + WALL_THICKNESS / 2.0, wall_y, 0.0),
-		_mat_concrete
-	)
-	_walls_node.add_child(wall_west)
-
-	# 벽체를 표면 목록에 등록
-	for wall: Node in _walls_node.get_children():
-		_surfaces.append({
-			"node": wall,
-			"surface_type": "wall",
-			"aabb": AABB(wall.position - Vector3(0.1, 0.0, 0.1), Vector3(0.2, WALL_HEIGHT, 0.2))
-		})
-
-
-# -- 조명 ------------------------------------------------------------------
-
-func _create_lighting() -> void:
-	# DirectionalLight3D — 태양광 시뮬레이션 (약간 따뜻한 톤, 그림자 품질 개선)
-	var sun: DirectionalLight3D = DirectionalLight3D.new()
-	sun.name = "SunLight"
-	sun.rotation_degrees = Vector3(-45.0, 30.0, 0.0)
-	sun.light_energy = 2.5
-	sun.shadow_enabled = true
-	sun.light_color = Color(1.0, 0.96, 0.90)  # 약간 따뜻한 톤
-	sun.shadow_blur = 1.0
-	sun.directional_shadow_max_distance = 50.0
-	add_child(sun)
-
-	# 보조 조명 — 반대편에서 약한 쿨톤 필 라이트
-	var fill_light: DirectionalLight3D = DirectionalLight3D.new()
-	fill_light.name = "FillLight"
-	fill_light.rotation_degrees = Vector3(-30.0, -150.0, 0.0)
-	fill_light.light_energy = 0.6
-	fill_light.shadow_enabled = false
-	fill_light.light_color = Color(0.85, 0.90, 1.0)  # 쿨톤 필 라이트
-	add_child(fill_light)
-
-	# WorldEnvironment — ProceduralSky + SSAO + SSIL + ACES 톤매핑
-	_environment = WorldEnvironment.new()
-	_environment.name = "SiteEnvironment"
-	var env: Environment = Environment.new()
-
-	# -- 배경: ProceduralSky --
-	env.background_mode = Environment.BG_SKY
-	var sky: Sky = Sky.new()
-	var sky_material: ProceduralSkyMaterial = ProceduralSkyMaterial.new()
-	sky_material.sky_top_color = Color(0.35, 0.55, 0.85)
-	sky_material.sky_horizon_color = Color(0.65, 0.75, 0.88)
-	sky_material.ground_bottom_color = Color(0.35, 0.30, 0.25)
-	sky_material.ground_horizon_color = Color(0.65, 0.70, 0.72)
-	sky_material.sun_angle_max = 30.0
-	sky_material.sun_curve = 0.15
-	sky.sky_material = sky_material
-	sky.radiance_size = Sky.RADIANCE_SIZE_256  # Quest 성능 고려
-	env.sky = sky
-
-	# -- 앰비언트 라이트: 하늘에서 자동 추출 --
-	env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
-	env.ambient_light_energy = 1.0
-	env.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
-
-	# -- 톤매핑: ACES Filmic --
-	env.tonemap_mode = Environment.TONE_MAPPER_ACES
-	env.tonemap_white = 6.0
-	env.tonemap_exposure = 1.6
-
-	# -- SSAO (Screen-Space Ambient Occlusion) --
-	env.ssao_enabled = true
-	env.ssao_radius = 1.0
-	env.ssao_intensity = 1.2
-	env.ssao_power = 1.5
-	env.ssao_detail = 0.5
-	env.ssao_light_affect = 0.3
-
-	# -- SSIL (Screen-Space Indirect Lighting) --
-	env.ssil_enabled = true
-	env.ssil_radius = 5.0
-	env.ssil_intensity = 1.0
-	env.ssil_normal_rejection = 1.0
-
-	# -- Glow (미세한 블룸) --
-	env.glow_enabled = true
-	env.glow_intensity = 0.3
-	env.glow_strength = 0.8
-	env.glow_bloom = 0.1
-	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
-
-	# -- Fog (대기 원근감) --
-	env.fog_enabled = true
-	env.fog_light_color = Color(0.70, 0.75, 0.82)
-	env.fog_light_energy = 0.5
-	env.fog_density = 0.002
-	env.fog_sky_affect = 0.5
-
-	_environment.environment = env
-	add_child(_environment)
 
 
 # ---------------------------------------------------------------------------

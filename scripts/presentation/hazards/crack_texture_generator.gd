@@ -1,24 +1,26 @@
 class_name CrackTextureGenerator
 extends RefCounted
 
-## 크랙 Decal용 프로시저럴 텍스처 생성기
+## 크랙 Decal용 텍스처 생성기
 ##
-## NoiseTexture2D와 Gradient를 조합하여 코드만으로 크랙 패턴 텍스처를 생성한다.
-## Decal.texture_albedo에 사용할 albedo 텍스처와
-## Decal.texture_normal에 사용할 노멀맵을 생성한다.
-## Quest 성능을 위해 해상도를 256px로 제한한다.
+## ambientCG CC0 AsphaltDamageSet001(albedo+alpha / normal)을 우선 사용하고,
+## 텍스처 파일이 없으면 NoiseTexture2D 기반 프로시저럴 폴백으로 동작한다.
+## Decal.texture_albedo / Decal.texture_normal에 사용한다.
 
 # ---------------------------------------------------------------------------
-# 상수
+# 텍스처 리소스 경로 (이미지 우선)
 # ---------------------------------------------------------------------------
 
-## 크랙 텍스처 해상도 (정사각형)
+const TEX_ALBEDO_PATH: String = "res://assets/textures/cracks/crack_set001_albedo.png"
+const TEX_NORMAL_PATH: String = "res://assets/textures/cracks/crack_set001_normal.png"
+
+
+# ---------------------------------------------------------------------------
+# 프로시저럴 폴백 상수
+# ---------------------------------------------------------------------------
+
 const CRACK_TEXTURE_SIZE: int = 256
-
-## 크랙 기본 색상 (어두운 갈색-회색)
 const CRACK_COLOR_DARK: Color = Color(0.12, 0.10, 0.09, 1.0)
-
-## 크랙 가장자리 색상 (약간 밝은)
 const CRACK_COLOR_EDGE: Color = Color(0.25, 0.22, 0.20, 0.6)
 
 
@@ -26,20 +28,48 @@ const CRACK_COLOR_EDGE: Color = Color(0.25, 0.22, 0.20, 0.6)
 # 공개 API
 # ---------------------------------------------------------------------------
 
-## 크랙 Decal용 albedo 텍스처를 생성한다.
-## Cellular 노이즈의 가장자리 패턴을 활용하여 갈라진 모양을 표현한다.
-func create_crack_albedo_texture() -> NoiseTexture2D:
+## 크랙 Decal용 albedo 텍스처를 반환한다.
+## 이미지 파일이 있으면 PBR PNG(알파 마스크 포함), 없으면 프로시저럴 셀룰러 노이즈.
+func create_crack_albedo_texture() -> Texture2D:
+	var tex: Texture2D = _load_texture(TEX_ALBEDO_PATH)
+	if tex != null:
+		return tex
+	return _create_procedural_albedo()
+
+
+## 크랙 Decal용 노멀맵 텍스처를 반환한다.
+## 이미지 파일이 있으면 GL 노멀맵 PNG, 없으면 프로시저럴 노멀맵.
+func create_crack_normal_texture() -> Texture2D:
+	var tex: Texture2D = _load_texture(TEX_NORMAL_PATH)
+	if tex != null:
+		return tex
+	return _create_procedural_normal()
+
+
+# ---------------------------------------------------------------------------
+# 내부 구현
+# ---------------------------------------------------------------------------
+
+func _load_texture(path: String) -> Texture2D:
+	if not ResourceLoader.exists(path):
+		return null
+	return load(path) as Texture2D
+
+
+# ---------------------------------------------------------------------------
+# 프로시저럴 폴백 (이미지 없을 때만 사용)
+# ---------------------------------------------------------------------------
+
+func _create_procedural_albedo() -> NoiseTexture2D:
 	var noise_tex: NoiseTexture2D = NoiseTexture2D.new()
 	noise_tex.width = CRACK_TEXTURE_SIZE
 	noise_tex.height = CRACK_TEXTURE_SIZE
-	noise_tex.seamless = false  # 크랙은 타일링 불필요
+	noise_tex.seamless = false
 
 	var noise: FastNoiseLite = FastNoiseLite.new()
-	# Cellular 노이즈 — 셀 경계가 크랙 패턴처럼 보임
 	noise.noise_type = FastNoiseLite.TYPE_CELLULAR
 	noise.frequency = 0.04
 	noise.cellular_distance_function = FastNoiseLite.DISTANCE_EUCLIDEAN
-	# RETURN_DISTANCE2_SUB: 두 번째-첫 번째 거리 차이 -> 셀 경계에서 얇은 선 생성
 	noise.cellular_return_type = FastNoiseLite.RETURN_DISTANCE2_SUB
 	noise.cellular_jitter = 1.0
 	noise.fractal_type = FastNoiseLite.FRACTAL_NONE
@@ -47,14 +77,10 @@ func create_crack_albedo_texture() -> NoiseTexture2D:
 
 	noise_tex.noise = noise
 
-	# Gradient로 크랙 선만 어두운 색으로, 나머지는 투명하게
 	var gradient: Gradient = Gradient.new()
-	# 낮은 값(셀 경계) = 어두운 크랙 색상, 불투명
 	gradient.set_offset(0, 0.0)
 	gradient.set_color(0, CRACK_COLOR_DARK)
-	# 중간값 = 가장자리 반투명
 	gradient.add_point(0.15, CRACK_COLOR_EDGE)
-	# 높은 값(셀 내부) = 완전 투명
 	gradient.add_point(0.35, Color(0.0, 0.0, 0.0, 0.0))
 	gradient.set_offset(1, 1.0)
 	gradient.set_color(1, Color(0.0, 0.0, 0.0, 0.0))
@@ -64,15 +90,13 @@ func create_crack_albedo_texture() -> NoiseTexture2D:
 	return noise_tex
 
 
-## 크랙 Decal용 노멀맵 텍스처를 생성한다.
-## 크랙 패턴의 깊이감을 표현한다.
-func create_crack_normal_texture() -> NoiseTexture2D:
+func _create_procedural_normal() -> NoiseTexture2D:
 	var noise_tex: NoiseTexture2D = NoiseTexture2D.new()
 	noise_tex.width = CRACK_TEXTURE_SIZE
 	noise_tex.height = CRACK_TEXTURE_SIZE
 	noise_tex.seamless = false
 	noise_tex.as_normal_map = true
-	noise_tex.bump_strength = 8.0  # 크랙의 깊이감을 강조
+	noise_tex.bump_strength = 8.0
 
 	var noise: FastNoiseLite = FastNoiseLite.new()
 	noise.noise_type = FastNoiseLite.TYPE_CELLULAR
@@ -81,7 +105,6 @@ func create_crack_normal_texture() -> NoiseTexture2D:
 	noise.cellular_return_type = FastNoiseLite.RETURN_DISTANCE2_SUB
 	noise.cellular_jitter = 1.0
 	noise.fractal_type = FastNoiseLite.FRACTAL_NONE
-	# 동일 시드를 사용하면 albedo와 정렬되지만, 별도로 생성하므로 랜덤
 	noise.seed = randi()
 
 	noise_tex.noise = noise
