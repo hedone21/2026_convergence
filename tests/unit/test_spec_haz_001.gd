@@ -118,15 +118,15 @@ func test_crack_hazard_scene_instantiation() -> void:
 	assert_eq(node.hazard_type, "crack", "hazard_type == crack")
 
 
-## TEST-HAZ-001-9: CrackHazard에 CrackVisual, DetectionArea, DiscoveredIndicator 자식 노드 존재
+## TEST-HAZ-001-9: CrackHazard에 CrackDecal, DetectionArea, DiscoveredIndicator 자식 노드 존재
 func test_crack_hazard_child_nodes() -> void:
 	var scene: PackedScene = load("res://scenes/hazards/crack_hazard.tscn")
 	var hazard: CrackHazard = scene.instantiate() as CrackHazard
 	add_child_autoqfree(hazard)
 
-	var crack_visual: MeshInstance3D = hazard.get_node_or_null("CrackVisual") as MeshInstance3D
-	assert_not_null(crack_visual, "CrackVisual 노드 존재")
-	assert_not_null(crack_visual.mesh, "CrackVisual에 메시 할당됨")
+	var crack_decal: Decal = hazard.get_node_or_null("CrackDecal") as Decal
+	assert_not_null(crack_decal, "CrackDecal 노드 존재")
+	assert_not_null(crack_decal.texture_albedo, "CrackDecal에 albedo 텍스처 할당됨")
 
 	var detection_area: CollisionShape3D = hazard.get_node_or_null("DetectionArea") as CollisionShape3D
 	assert_not_null(detection_area, "DetectionArea 노드 존재")
