@@ -8,7 +8,8 @@ extends RefCounted
 ## 순수 GDScript 클래스 (RefCounted): 씬 트리 없이 인스턴스화 가능.
 
 ## 허용되는 현장 유형 목록
-var VALID_SITE_TYPES: Array[String] = ["building_frame"]
+## SPEC-ENV-003: parliament_village (Texas Woman's University South Hall 평면도 기반)
+var VALID_SITE_TYPES: Array[String] = ["building_frame", "parliament_village"]
 
 ## 허용되는 위험 요소 유형 목록
 var VALID_HAZARD_TYPES: Array[String] = ["crack"]

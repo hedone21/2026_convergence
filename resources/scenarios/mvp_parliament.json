@@ -1,0 +1,15 @@
+{
+  "_comment": "SPEC-ENV-003 / SPEC-SCN-002: Parliament Village South Hall 도면 기반 시나리오 — 새 site에서 random_placement로 위험 요소 자동 배치",
+  "scenario_id": "mvp_parliament",
+  "site_type": "parliament_village",
+  "time_limit_seconds": 600,
+  "random_placement": true,
+  "random_seed": 0,
+  "random_config": {
+    "hazard_count": 5,
+    "types": ["crack"],
+    "min_spacing": 6.0,
+    "difficulty_range": [0.2, 0.5]
+  },
+  "hazards": []
+}
