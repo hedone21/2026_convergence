@@ -37,7 +37,7 @@ const INNER_WALL_THICKNESS: float = 0.18
 const WALL_RENDER_HEIGHT: float = FLOOR_HEIGHT - SLAB_THICKNESS
 
 ## 짧은 segment 노이즈 제외 임계값 (미터)
-const MIN_WALL_LENGTH: float = 0.15
+const MIN_WALL_LENGTH: float = 0.08
 
 # ---------------------------------------------------------------------------
 # 내부 참조
@@ -216,7 +216,7 @@ func _create_walls(walls: Array, pt_to_m: float, cx: float, cy: float) -> void:
 			length,
 			thickness,
 			material,
-			kind == "outer"
+			true  # 모든 wall에 collision 부여 (내벽 통과 방지)
 		)
 
 
