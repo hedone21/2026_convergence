@@ -38,6 +38,13 @@ const TINT_FLOOR: Color = Color(0.78, 0.76, 0.72)
 ## 철근/구조물 — 약간 밝게
 const TINT_REBAR: Color = Color(1.1, 1.08, 1.05)
 
+## 명도 분기 — 오브젝트 구분용 (외벽 0.75 / 내벽 0.65 / 기둥·천장 0.55)
+## hazard(crack) 가시성을 위해 표면 명도는 0.55~0.75 범위로 제한.
+const TINT_OUTER_WALL: Color = Color(1.00, 0.98, 0.95)  # 외벽: 외부 노출, 가장 밝음
+const TINT_INNER_WALL: Color = Color(0.87, 0.85, 0.82)  # 내벽: 중간
+const TINT_COLUMN: Color = Color(0.73, 0.72, 0.70)      # 기둥: 짙어 구조 강조
+const TINT_CEILING: Color = Color(0.73, 0.72, 0.70)     # 천장: 그림자 영역
+
 
 # ---------------------------------------------------------------------------
 # 공개 API
@@ -53,6 +60,24 @@ func create_floor_material() -> StandardMaterial3D:
 
 func create_rebar_material() -> StandardMaterial3D:
 	return _build_material(TINT_REBAR, 0.9, Vector3(1.5, 1.5, 1.5))
+
+
+func create_outer_wall_material() -> StandardMaterial3D:
+	return _build_material(TINT_OUTER_WALL, 1.0, Vector3(2.0, 2.0, 2.0))
+
+
+func create_inner_wall_material() -> StandardMaterial3D:
+	return _build_material(TINT_INNER_WALL, 1.0, Vector3(2.0, 2.0, 2.0))
+
+
+func create_column_material() -> StandardMaterial3D:
+	# 기둥: 살짝 다른 UV scale로 거푸집 패턴 차별감
+	return _build_material(TINT_COLUMN, 0.95, Vector3(1.8, 1.8, 1.8))
+
+
+func create_ceiling_material() -> StandardMaterial3D:
+	# 천장: UV scale 키워 슬래브와 같은 텍스처여도 패턴 빈도 다름
+	return _build_material(TINT_CEILING, 1.05, Vector3(3.5, 3.5, 3.5))
 
 
 # ---------------------------------------------------------------------------
