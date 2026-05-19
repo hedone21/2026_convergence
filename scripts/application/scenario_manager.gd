@@ -20,7 +20,8 @@ signal hazards_placed
 var current_scenario: ScenarioData = null
 
 ## 기본 시나리오 경로
-var default_scenario_path: String = "res://resources/scenarios/mvp_test_01.json"
+## SPEC-ENV-003: Parliament Village South Hall 도면 기반 사이트 사용
+var default_scenario_path: String = "res://resources/scenarios/mvp_parliament.json"
 
 ## SPEC-SCN-002: 랜덤 시드 (0이면 시스템 시간 기반)
 var random_seed: int = 0
