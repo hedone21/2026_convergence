@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import sys
 from pathlib import Path
@@ -35,6 +36,19 @@ OUTER_WALL_WIDTH_MIN_PT = 1.3
 INNER_WALL_WIDTH_MIN_PT = 0.9
 ## stroke 2.5pt 이상은 page frame(도면 외곽 frame). 빌딩 외벽 최대 1.92pt.
 MAX_WALL_WIDTH_PT = 2.5
+
+## 외벽 평행 line 병합 임계값 (pt 단위). 도면은 벽 1개당 평행 line 2개로 표현됨.
+## PT_TO_M ≈ 0.034 → 30pt ≈ 1.0m (외벽 두께 가능 범위)
+WALL_MERGE_MIN_GAP_PT = 3.0     # 너무 가까우면(<0.1m) 노이즈
+WALL_MERGE_MAX_GAP_PT = 30.0    # 1.0m 초과는 별개 벽
+WALL_MERGE_ANGLE_TOL_DEG = 3.0
+WALL_MERGE_MIN_OVERLAP = 0.4    # projection 길이 비율
+
+## 문 호(arc) 추출 임계값. 표준 문 폭 0.9m (PDF 25~35pt).
+DOOR_ARC_MIN_BBOX_PT = 18.0
+DOOR_ARC_MAX_BBOX_PT = 45.0
+DOOR_ARC_MAX_ASPECT = 1.5       # 정사각에 가까운 호만
+DOOR_ARC_STROKE_MAX_PT = 1.0    # 굵은 stroke는 문 아님
 ## 빌딩 본체 단일 벽 segment 한계 길이 (pt). 35m 넘으면 frame/배경.
 MAX_SINGLE_WALL_LEN_PT = 1050.0
 # Legend(우상단 미니맵 + 타이틀블록) 영역 — 이 안에 들어가는 walls는 제외
@@ -44,6 +58,17 @@ BUILDING_BBOX_PAD_PT = 60.0
 GRID_X_LABELS = ("1", "2", "3", "4", "5", "6", "7", "8")
 GRID_Y_LABELS = ("A", "B", "C", "D", "E", "F")
 CORE_LABELS = ("STAIRS", "ELEVATOR")
+
+## 방 라벨 패턴 → kind 매핑 (corridor / bedroom / service)
+ROOM_LABEL_PATTERNS = (
+    (re.compile(r"^BEDROOM"), "bedroom"),
+    (re.compile(r"^CORRIDOR$"), "corridor"),
+    (re.compile(r"^JANITOR$"), "service"),
+    (re.compile(r"^ELECTRICAL$"), "service"),
+    (re.compile(r"^ELEC$"), "service"),
+    (re.compile(r"^ELEC[\s\-]*EQUIPMENT"), "service"),
+    (re.compile(r"^ELEV[\s\-]*EQUIPMENT"), "service"),
+)
 GRID_X_BAND_PT = 60.0   # X 라벨: 페이지 상/하 가장자리 띠
 GRID_Y_LEFT_BAND_PT = 150.0  # Y 라벨: 페이지 좌측 띠. 우측은 Legend라 제외
 GRID_LABEL_FONT_SIZE_MAX = 11.5  # 도면 외곽 grid 라벨은 ~11pt. 우상단 Legend는 12.6pt
@@ -132,6 +157,176 @@ def extract_walls(
     return walls
 
 
+def _line_props(w: dict[str, Any]) -> dict[str, float] | None:
+    """wall dict에서 기하 속성 추출. 0길이 line이면 None."""
+    ax, ay = w["a_pt"]
+    bx, by = w["b_pt"]
+    dx = bx - ax
+    dy = by - ay
+    length = math.hypot(dx, dy)
+    if length < 1e-6:
+        return None
+    # 방향 무관 각도 (0~pi)
+    angle = math.atan2(dy, dx) % math.pi
+    nx = -dy / length  # unit normal
+    ny = dx / length
+    return {
+        "ax": ax, "ay": ay, "bx": bx, "by": by,
+        "L": length, "angle": angle, "nx": nx, "ny": ny,
+        "dx": dx, "dy": dy,
+    }
+
+
+def _angle_diff(a: float, b: float) -> float:
+    d = abs(a - b)
+    return min(d, math.pi - d)
+
+
+def merge_collinear_walls_by_kind(
+    walls: list[dict[str, Any]], target_kind: str
+) -> list[dict[str, Any]]:
+    """같은 kind의 wall 중 같은 직선 위 인접 fragment를 chain으로 병합.
+    한 벽이 짧은 segment 여러 개로 표현될 때 "벽이 기둥들 줄로 보이는" 현상 제거.
+
+    1. target_kind walls를 (angle_bin, perpendicular_offset_bin) 키로 그룹화
+    2. 같은 bin 안에서 직선 방향 projection 정렬
+    3. 인접 interval(gap < CHAIN_MAX_GAP_PT)을 merge한 chain 생성
+    """
+    CHAIN_ANGLE_BIN_DEG = 3.0
+    CHAIN_PERP_BIN_PT = 2.0    # 같은 직선으로 간주하는 perpendicular tolerance
+    CHAIN_MAX_GAP_PT = 8.0     # 0.27m 이내 gap이면 같은 wall로 chain
+
+    outer_walls: list[dict[str, Any]] = [w for w in walls if w.get("kind") == target_kind]
+    other_walls: list[dict[str, Any]] = [w for w in walls if w.get("kind") != target_kind]
+
+    bins: dict[tuple[int, int], list[tuple[dict, dict]]] = {}
+    for w in outer_walls:
+        p = _line_props(w)
+        if p is None:
+            continue
+        ang_idx = int(p["angle"] / math.radians(CHAIN_ANGLE_BIN_DEG))
+        # perpendicular offset from origin: -nx*ax - ny*ay (signed)
+        # 같은 직선이면 이 값이 같음
+        perp_off = p["ax"] * p["nx"] + p["ay"] * p["ny"]
+        perp_idx = round(perp_off / CHAIN_PERP_BIN_PT)
+        bins.setdefault((ang_idx, perp_idx), []).append((w, p))
+
+    merged: list[dict[str, Any]] = []
+    for key, group in bins.items():
+        if len(group) == 1:
+            merged.append(group[0][0])
+            continue
+        # 그룹 내 첫 line을 reference로 projection 계산
+        ref = group[0][1]
+        dir_x = ref["dx"] / ref["L"]
+        dir_y = ref["dy"] / ref["L"]
+        intervals: list[tuple[float, float, dict]] = []
+        for w, p in group:
+            t_a = (p["ax"] - ref["ax"]) * dir_x + (p["ay"] - ref["ay"]) * dir_y
+            t_b = (p["bx"] - ref["ax"]) * dir_x + (p["by"] - ref["ay"]) * dir_y
+            intervals.append((min(t_a, t_b), max(t_a, t_b), w))
+        intervals.sort(key=lambda iv: iv[0])
+        chains: list[list[float]] = [[intervals[0][0], intervals[0][1]]]
+        chain_templates: list[dict[str, Any]] = [intervals[0][2]]
+        for lo, hi, tw in intervals[1:]:
+            if lo - chains[-1][1] < CHAIN_MAX_GAP_PT:
+                chains[-1][1] = max(chains[-1][1], hi)
+            else:
+                chains.append([lo, hi])
+                chain_templates.append(tw)
+        for (lo, hi), tw in zip(chains, chain_templates):
+            new_ax = ref["ax"] + dir_x * lo
+            new_ay = ref["ay"] + dir_y * lo
+            new_bx = ref["ax"] + dir_x * hi
+            new_by = ref["ay"] + dir_y * hi
+            new_w: dict[str, Any] = dict(tw)
+            new_w["a_pt"] = [round(new_ax, 3), round(new_ay, 3)]
+            new_w["b_pt"] = [round(new_bx, 3), round(new_by, 3)]
+            merged.append(new_w)
+
+    return merged + other_walls
+
+
+def merge_parallel_outer_walls(walls: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """도면의 외벽은 평행 line 2개로 표현된다. 같은 외벽을 표현하는 짝을 찾아
+    중심선 + thickness_pt로 병합한다. inner는 그대로 통과.
+
+    알고리즘 (단순 pair-merge):
+    1. 외벽만 선별
+    2. wall A에 대해 평행하고(angle_tol_deg 이내) perpendicular 거리가
+       [MIN_GAP, MAX_GAP] 범위인 wall B 중에서 가장 가까운 것을 짝으로
+    3. 양쪽 끝점 평균을 새 a_pt/b_pt로, gap을 thickness_pt로 기록
+    4. 짝 없는 외벽 line은 그대로 유지 (단독 외벽 line일 수 있음)
+    """
+    outer_idx = [i for i, w in enumerate(walls) if w.get("kind") == "outer"]
+    other = [w for w in walls if w.get("kind") != "outer"]
+    outer = [walls[i] for i in outer_idx]
+    props = [_line_props(w) for w in outer]
+
+    angle_tol = math.radians(WALL_MERGE_ANGLE_TOL_DEG)
+    used = [False] * len(outer)
+    merged: list[dict[str, Any]] = []
+
+    for i in range(len(outer)):
+        if used[i]:
+            continue
+        p = props[i]
+        if p is None:
+            merged.append(outer[i])
+            used[i] = True
+            continue
+
+        best_j = -1
+        best_gap = float("inf")
+        for j in range(i + 1, len(outer)):
+            if used[j]:
+                continue
+            q = props[j]
+            if q is None:
+                continue
+            if _angle_diff(p["angle"], q["angle"]) > angle_tol:
+                continue
+            # perpendicular distance: q의 중심점을 p의 normal에 projection
+            qcx = (q["ax"] + q["bx"]) * 0.5
+            qcy = (q["ay"] + q["by"]) * 0.5
+            gap = abs((qcx - p["ax"]) * p["nx"] + (qcy - p["ay"]) * p["ny"])
+            if gap < WALL_MERGE_MIN_GAP_PT or gap > WALL_MERGE_MAX_GAP_PT:
+                continue
+            # overlap: q의 끝점들을 p 방향으로 projection → [0,1] 비율
+            t_qa = ((q["ax"] - p["ax"]) * p["dx"] + (q["ay"] - p["ay"]) * p["dy"]) / (p["L"] ** 2)
+            t_qb = ((q["bx"] - p["ax"]) * p["dx"] + (q["by"] - p["ay"]) * p["dy"]) / (p["L"] ** 2)
+            t_lo = max(0.0, min(t_qa, t_qb))
+            t_hi = min(1.0, max(t_qa, t_qb))
+            overlap = max(0.0, t_hi - t_lo)
+            if overlap < WALL_MERGE_MIN_OVERLAP:
+                continue
+            if gap < best_gap:
+                best_gap = gap
+                best_j = j
+
+        if best_j >= 0:
+            q = props[best_j]
+            # 두 line의 끝점 평균 — 양 wall이 거의 평행이면 OK 근사
+            new_ax = (p["ax"] + q["ax"]) * 0.5
+            new_ay = (p["ay"] + q["ay"]) * 0.5
+            new_bx = (p["bx"] + q["bx"]) * 0.5
+            new_by = (p["by"] + q["by"]) * 0.5
+            merged.append({
+                "a_pt": [round(new_ax, 3), round(new_ay, 3)],
+                "b_pt": [round(new_bx, 3), round(new_by, 3)],
+                "width_pt": round((outer[i]["width_pt"] + outer[best_j]["width_pt"]) * 0.5, 3),
+                "kind": "outer",
+                "thickness_pt": round(best_gap, 3),
+            })
+            used[i] = True
+            used[best_j] = True
+        else:
+            merged.append(outer[i])
+            used[i] = True
+
+    return merged + other
+
+
 def extract_text_spans(page: fitz.Page) -> list[dict[str, Any]]:
     spans: list[dict[str, Any]] = []
     for block in page.get_text("dict").get("blocks", []):
@@ -146,6 +341,94 @@ def extract_text_spans(page: fitz.Page) -> list[dict[str, Any]]:
                     "size": span.get("size"),
                 })
     return spans
+
+
+def extract_doors(
+    drawings: list[dict[str, Any]],
+    building_bbox: tuple[float, float, float, float] | None,
+) -> list[dict[str, Any]]:
+    """PDF의 문 호(arc) 추출. arc bbox center + 반경. 벽 cut에 사용."""
+    bx0 = by0 = bx1 = by1 = None
+    if building_bbox is not None:
+        bx0, by0, bx1, by1 = building_bbox
+
+    doors: list[dict[str, Any]] = []
+    for d in drawings:
+        width_pt = d.get("width") or 0.0
+        if width_pt > DOOR_ARC_STROKE_MAX_PT:
+            continue
+        # arc/curve가 있는 path인지
+        has_curve = any(it[0] in ("c", "qu") for it in d.get("items", []))
+        if not has_curve:
+            continue
+        # path bbox
+        xs: list[float] = []
+        ys: list[float] = []
+        for it in d.get("items", []):
+            for p in it[1:]:
+                if hasattr(p, "x"):
+                    xs.append(p.x)
+                    ys.append(p.y)
+        if not xs:
+            continue
+        bw = max(xs) - min(xs)
+        bh = max(ys) - min(ys)
+        if bw < DOOR_ARC_MIN_BBOX_PT or bh < DOOR_ARC_MIN_BBOX_PT:
+            continue
+        if bw > DOOR_ARC_MAX_BBOX_PT or bh > DOOR_ARC_MAX_BBOX_PT:
+            continue
+        aspect = max(bw, bh) / max(1e-3, min(bw, bh))
+        if aspect > DOOR_ARC_MAX_ASPECT:
+            continue
+        cx = (min(xs) + max(xs)) / 2
+        cy = (min(ys) + max(ys)) / 2
+        if bx0 is not None and not (bx0 <= cx <= bx1 and by0 <= cy <= by1):
+            continue
+        # 문 폭 = bbox 평균 (호의 반경이 곧 문 폭).
+        # cut radius는 width의 0.75배. fragment merge로 wall이 long line이 된 후 적용.
+        # 0.6은 door 18개가 wall과 hit 안 되어 출입구 미생성. 0.75로 reach 증가.
+        door_width_pt = (bw + bh) * 0.5
+        doors.append({
+            "center_pt": [round(cx, 3), round(cy, 3)],
+            "width_pt": round(door_width_pt, 3),
+            "cut_radius_pt": round(door_width_pt * 0.7, 3),
+        })
+    return doors
+
+
+def extract_rooms(
+    spans: list[dict[str, Any]],
+    building_bbox: tuple[float, float, float, float] | None,
+) -> list[dict[str, Any]]:
+    """PDF의 방 라벨 텍스트를 kind(corridor/bedroom/service)로 분류해 위치와 함께 반환."""
+    rooms: list[dict[str, Any]] = []
+    bx0 = by0 = bx1 = by1 = None
+    if building_bbox is not None:
+        bx0, by0, bx1, by1 = building_bbox
+
+    for s in spans:
+        upper = s["text"].strip().upper()
+        if not upper:
+            continue
+        matched_kind: str | None = None
+        for pat, kind in ROOM_LABEL_PATTERNS:
+            if pat.match(upper):
+                matched_kind = kind
+                break
+        if matched_kind is None:
+            continue
+        sb = s["bbox"]
+        cx = (sb[0] + sb[2]) / 2
+        cy = (sb[1] + sb[3]) / 2
+        if bx0 is not None and not (bx0 <= cx <= bx1 and by0 <= cy <= by1):
+            continue
+        rooms.append({
+            "label": s["text"].strip(),
+            "kind": matched_kind,
+            "bbox_pt": list(sb),
+            "center_pt": [round(cx, 3), round(cy, 3)],
+        })
+    return rooms
 
 
 def extract_cores(spans: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -216,6 +499,14 @@ def process_page(page: fitz.Page, page_index: int) -> dict[str, Any]:
             max(gys) + BUILDING_BBOX_PAD_PT,
         )
     walls = extract_walls(drawings, building_bbox)
+    walls_before_merge = len(walls)
+    # 1. outer & inner walls fragment를 collinear chain으로 병합 (긴 line으로)
+    walls = merge_collinear_walls_by_kind(walls, "outer")
+    walls = merge_collinear_walls_by_kind(walls, "inner")
+    # 2. 외벽 평행 line 2개를 중심선 + thickness로 병합 (도면 양면 표현 처리)
+    walls = merge_parallel_outer_walls(walls)
+    rooms = extract_rooms(spans, building_bbox)
+    doors = extract_doors(drawings, building_bbox)
 
     title_match = next((s["text"] for s in spans if "FLOOR PLAN" in s["text"].upper()), None)
 
@@ -244,8 +535,16 @@ def process_page(page: fitz.Page, page_index: int) -> dict[str, Any]:
         "wall_counts": {
             "outer": sum(1 for w in walls if w["kind"] == "outer"),
             "inner": sum(1 for w in walls if w["kind"] == "inner"),
+            "raw_total_before_merge": walls_before_merge,
         },
         "cores": cores,
+        "doors": doors,
+        "rooms": rooms,
+        "room_counts": {
+            "corridor": sum(1 for r in rooms if r["kind"] == "corridor"),
+            "bedroom": sum(1 for r in rooms if r["kind"] == "bedroom"),
+            "service": sum(1 for r in rooms if r["kind"] == "service"),
+        },
         "grid": grid,
     }
 

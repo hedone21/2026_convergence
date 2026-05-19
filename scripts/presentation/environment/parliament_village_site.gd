@@ -17,6 +17,9 @@ extends BaseSite
 ## 표시할 층 번호 (1~4). 4층 전체 동시 표시는 mesh 폭증으로 미지원.
 @export var floor_to_show: int = 1
 
+## 천장 슬래브 생성 여부. 디버깅/도면 비교 시 false로 두면 top-down에서 도면 구조가 보인다.
+@export var show_ceiling: bool = true
+
 ## floor JSON 경로 템플릿
 const FLOOR_JSON_TEMPLATE: String = "res://data/parliament_village/floor_%02d.json"
 
@@ -36,14 +39,10 @@ const INNER_WALL_THICKNESS: float = 0.18
 ## 구조물 시각화 높이 (바닥 슬래브 위, 천장 슬래브 아래)
 const STRUCTURE_HEIGHT: float = FLOOR_HEIGHT - SLAB_THICKNESS
 
-## 외벽 분할 — 가운데 띠가 창문 영역
-const OUTER_WALL_BOTTOM_HEIGHT: float = 0.95  # 허리벽
-const OUTER_WALL_TOP_HEIGHT: float = 0.55     # 인방
-const WINDOW_BAND_BOTTOM_Y: float = OUTER_WALL_BOTTOM_HEIGHT
-const WINDOW_BAND_TOP_Y: float = STRUCTURE_HEIGHT - OUTER_WALL_TOP_HEIGHT
-
-## 내벽 높이 — 천장과 갭을 둬 방 사이 빛/공기 흐름 확보 (답답함 완화)
-const INNER_WALL_HEIGHT: float = 2.55
+## 내벽 높이 — 천장까지 완전히 닿게 (방 폐쇄성 확보).
+## 이전엔 2.55m로 천장과 0.7m 갭을 뒀으나, 모든 방이 위로 연결되어
+## "방"이 인지되지 않는 부작용. 폐쇄성이 인지 본질.
+const INNER_WALL_HEIGHT: float = STRUCTURE_HEIGHT
 
 ## 슬래브가 grid 라벨 좌표 밖으로 확장되는 패딩 (외주부 처마)
 const SLAB_EDGE_PADDING_M: float = 1.5
@@ -90,6 +89,7 @@ var _concrete_material: ConcreteMaterial = ConcreteMaterial.new()
 var _mat_outer_wall: StandardMaterial3D = null
 var _mat_inner_wall: StandardMaterial3D = null
 var _mat_slab: StandardMaterial3D = null
+var _mat_ceiling: StandardMaterial3D = null
 var _mat_column: StandardMaterial3D = null
 var _mat_elevator_shaft: StandardMaterial3D = null
 var _mat_elevator_door: StandardMaterial3D = null
@@ -131,10 +131,12 @@ func get_site_type() -> String:
 # ---------------------------------------------------------------------------
 
 func _init_materials() -> void:
-	_mat_outer_wall = _concrete_material.create_concrete_material()
-	_mat_inner_wall = _concrete_material.create_concrete_material()
+	# 명도 분기로 오브젝트 구분 (외벽 밝음 / 내벽 중간 / 기둥·천장 짙음).
+	_mat_outer_wall = _concrete_material.create_outer_wall_material()
+	_mat_inner_wall = _concrete_material.create_inner_wall_material()
 	_mat_slab = _concrete_material.create_floor_material()
-	_mat_column = _concrete_material.create_concrete_material()
+	_mat_ceiling = _concrete_material.create_ceiling_material()
+	_mat_column = _concrete_material.create_column_material()
 	_mat_elevator_shaft = _make_simple_material(COLOR_ELEVATOR_SHAFT)
 	_mat_elevator_door = _make_simple_material(COLOR_ELEVATOR_DOOR)
 	_mat_stairs_step = _make_simple_material(COLOR_STAIRS_STEP)
@@ -201,8 +203,13 @@ func _build_from_floor(data: Dictionary) -> void:
 	)
 
 	_create_floor_slab(slab_size, slab_center)
-	_create_ceiling_slab(slab_size, slab_center)
-	_create_walls(data.get("walls", []), pt_to_m, origin_x_pt, origin_y_pt)
+	if show_ceiling:
+		_create_ceiling_slab(slab_size, slab_center)
+	# door 위치에서 wall을 cut해 출입구 생성. 가설 A 검증.
+	var walls_raw: Array = data.get("walls", [])
+	var doors_raw: Array = data.get("doors", [])
+	var walls_cut: Array = _cut_walls_at_doors(walls_raw, doors_raw)
+	_create_walls(walls_cut, pt_to_m, origin_x_pt, origin_y_pt)
 	_create_columns(data.get("grid", {}), pt_to_m, origin_x_pt, origin_y_pt)
 	_create_core_markers(data.get("cores", []), pt_to_m, origin_x_pt, origin_y_pt)
 	_create_ceiling_lights(slab_size, slab_center)
@@ -265,11 +272,85 @@ func _create_ceiling_slab(size: Vector3, center: Vector3) -> void:
 	_ceiling_body = StaticBody3D.new()
 	_ceiling_body.name = "CeilingSlab"
 	add_child(_ceiling_body)
-	_ceiling_body.add_child(_make_box_mesh(size, _mat_slab))
+	_ceiling_body.add_child(_make_box_mesh(size, _mat_ceiling))
 	_ceiling_body.add_child(_make_box_collision(size))
 	_ceiling_body.position = Vector3(
 		center.x, STRUCTURE_HEIGHT + SLAB_THICKNESS * 0.5, center.z
 	)
+
+
+# ---------------------------------------------------------------------------
+# 출입구 처리 — door 위치에서 wall segment를 cut
+# ---------------------------------------------------------------------------
+
+func _cut_walls_at_doors(walls: Array, doors: Array) -> Array:
+	if doors.is_empty():
+		return walls
+	# door 중심+반경을 미리 Vector2/float로 변환
+	var door_circles: Array = []
+	for raw in doors:
+		if not (raw is Dictionary):
+			continue
+		var dc: Array = raw.get("center_pt", [])
+		var r: float = float(raw.get("cut_radius_pt", 0.0))
+		if dc.size() != 2 or r <= 0.0:
+			continue
+		door_circles.append({
+			"center": Vector2(float(dc[0]), float(dc[1])),
+			"radius": r,
+		})
+
+	var result: Array = []
+	for raw in walls:
+		if not (raw is Dictionary):
+			continue
+		var w: Dictionary = raw
+		var a: Array = w.get("a_pt", [])
+		var b: Array = w.get("b_pt", [])
+		if a.size() != 2 or b.size() != 2:
+			result.append(w)
+			continue
+		var segments: Array = [{
+			"a": Vector2(float(a[0]), float(a[1])),
+			"b": Vector2(float(b[0]), float(b[1])),
+		}]
+		for door in door_circles:
+			var new_segments: Array = []
+			for seg in segments:
+				new_segments.append_array(
+					_cut_segment_at_circle(seg, door["center"], door["radius"])
+				)
+			segments = new_segments
+		# split된 각 piece를 wall 사본으로
+		for seg in segments:
+			var w2: Dictionary = w.duplicate()
+			w2["a_pt"] = [(seg["a"] as Vector2).x, (seg["a"] as Vector2).y]
+			w2["b_pt"] = [(seg["b"] as Vector2).x, (seg["b"] as Vector2).y]
+			result.append(w2)
+	return result
+
+
+func _cut_segment_at_circle(seg: Dictionary, center: Vector2, radius: float) -> Array:
+	var a: Vector2 = seg["a"]
+	var b: Vector2 = seg["b"]
+	var length: float = a.distance_to(b)
+	if length < 0.01:
+		return [seg]
+	var dir: Vector2 = (b - a) / length
+	var ac: Vector2 = center - a
+	var t_proj: float = ac.dot(dir)
+	var perp_dist: float = (ac - dir * t_proj).length()
+	if perp_dist >= radius:
+		return [seg]  # 직선과 원이 안 만남
+	var dt: float = sqrt(radius * radius - perp_dist * perp_dist)
+	var t_lo: float = clampf(t_proj - dt, 0.0, length)
+	var t_hi: float = clampf(t_proj + dt, 0.0, length)
+	var pieces: Array = []
+	if t_lo > 0.05:
+		pieces.append({"a": a, "b": a + dir * t_lo})
+	if t_hi < length - 0.05:
+		pieces.append({"a": a + dir * t_hi, "b": b})
+	return pieces
 
 
 # ---------------------------------------------------------------------------
@@ -302,22 +383,20 @@ func _create_walls(walls: Array, pt_to_m: float, ox_pt: float, oy_pt: float) -> 
 
 		var kind: String = w.get("kind", "inner")
 		if kind == "outer":
-			_spawn_outer_wall(Vector2(ax_m, az_m), Vector2(bx_m, bz_m), length)
+			# extract 단계에서 평행 line 병합 시 thickness_pt가 들어옴. 없으면 기본값.
+			var thickness_pt: float = float(w.get("thickness_pt", 0.0))
+			var thickness_m: float = thickness_pt * pt_to_m if thickness_pt > 0.0 else OUTER_WALL_THICKNESS
+			_spawn_outer_wall(Vector2(ax_m, az_m), Vector2(bx_m, bz_m), length, thickness_m)
 		else:
 			_spawn_inner_wall(Vector2(ax_m, az_m), Vector2(bx_m, bz_m), length)
 
 
-func _spawn_outer_wall(a: Vector2, b: Vector2, length: float) -> void:
-	# 외벽: 허리벽(아래) + 인방(위) 두 토막. 사이는 창문 띠.
+func _spawn_outer_wall(a: Vector2, b: Vector2, length: float, thickness: float) -> void:
+	# 외벽: STRUCTURE_HEIGHT 전체 단일 mesh (창문 띠 분할은 비계 인상 유발해 폐기).
 	_add_wall_segment(
-		a, b, length, OUTER_WALL_THICKNESS, _mat_outer_wall,
-		OUTER_WALL_BOTTOM_HEIGHT * 0.5,
-		OUTER_WALL_BOTTOM_HEIGHT
-	)
-	_add_wall_segment(
-		a, b, length, OUTER_WALL_THICKNESS, _mat_outer_wall,
-		WINDOW_BAND_TOP_Y + OUTER_WALL_TOP_HEIGHT * 0.5,
-		OUTER_WALL_TOP_HEIGHT
+		a, b, length, thickness, _mat_outer_wall,
+		STRUCTURE_HEIGHT * 0.5,
+		STRUCTURE_HEIGHT
 	)
 
 
