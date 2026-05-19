@@ -57,6 +57,24 @@ const CEILING_LIGHT_ENERGY: float = 4.0
 const CEILING_LIGHT_RANGE: float = 18.0
 const CEILING_LIGHT_COLOR: Color = Color(1.0, 0.95, 0.85, 1.0)
 
+## 엘리베이터 샤프트 외관
+const ELEVATOR_WIDTH: float = 2.4
+const ELEVATOR_DEPTH: float = 2.4
+const ELEVATOR_DOOR_WIDTH: float = 1.0
+const ELEVATOR_DOOR_HEIGHT: float = 2.2
+
+## 계단 (절차적 step)
+const STAIRS_FOOTPRINT_X: float = 3.5
+const STAIRS_FOOTPRINT_Z: float = 4.5
+const STAIRS_STEP_COUNT: int = 12
+const STAIRS_HANDRAIL_HEIGHT: float = 1.0
+const STAIRS_HANDRAIL_THICKNESS: float = 0.06
+
+const COLOR_ELEVATOR_SHAFT: Color = Color(0.55, 0.55, 0.58)
+const COLOR_ELEVATOR_DOOR: Color = Color(0.25, 0.25, 0.28)
+const COLOR_STAIRS_STEP: Color = Color(0.62, 0.6, 0.58)
+const COLOR_HANDRAIL: Color = Color(0.35, 0.32, 0.30)
+
 # ---------------------------------------------------------------------------
 # 내부 참조
 # ---------------------------------------------------------------------------
@@ -73,6 +91,10 @@ var _mat_outer_wall: StandardMaterial3D = null
 var _mat_inner_wall: StandardMaterial3D = null
 var _mat_slab: StandardMaterial3D = null
 var _mat_column: StandardMaterial3D = null
+var _mat_elevator_shaft: StandardMaterial3D = null
+var _mat_elevator_door: StandardMaterial3D = null
+var _mat_stairs_step: StandardMaterial3D = null
+var _mat_handrail: StandardMaterial3D = null
 
 var _surfaces: Array = []
 var _spawn_bounds: AABB = AABB()
@@ -113,6 +135,17 @@ func _init_materials() -> void:
 	_mat_inner_wall = _concrete_material.create_concrete_material()
 	_mat_slab = _concrete_material.create_floor_material()
 	_mat_column = _concrete_material.create_concrete_material()
+	_mat_elevator_shaft = _make_simple_material(COLOR_ELEVATOR_SHAFT)
+	_mat_elevator_door = _make_simple_material(COLOR_ELEVATOR_DOOR)
+	_mat_stairs_step = _make_simple_material(COLOR_STAIRS_STEP)
+	_mat_handrail = _make_simple_material(COLOR_HANDRAIL)
+
+
+func _make_simple_material(color: Color) -> StandardMaterial3D:
+	var mat: StandardMaterial3D = StandardMaterial3D.new()
+	mat.albedo_color = color
+	mat.roughness = 0.7
+	return mat
 
 
 # ---------------------------------------------------------------------------
@@ -377,20 +410,87 @@ func _create_core_markers(cores: Array, pt_to_m: float, ox_pt: float, oy_pt: flo
 		var cy_pt: float = (float(bbox[1]) + float(bbox[3])) * 0.5
 		var x_m: float = (cx_pt - ox_pt) * pt_to_m
 		var z_m: float = (cy_pt - oy_pt) * pt_to_m
+		var label: String = core.get("label", "UNKNOWN")
 
-		var marker: Node3D = Node3D.new()
-		marker.name = "Core_%s" % core.get("label", "UNKNOWN")
-		marker.position = Vector3(x_m, 0.0, z_m)
-		_cores_node.add_child(marker)
+		var visual: Node3D
+		var aabb_size: Vector3
+		if label == "ELEVATOR":
+			visual = _build_elevator(x_m, z_m)
+			aabb_size = Vector3(ELEVATOR_WIDTH, FLOOR_HEIGHT, ELEVATOR_DEPTH)
+		else:  # STAIRS
+			visual = _build_stairs(x_m, z_m)
+			aabb_size = Vector3(STAIRS_FOOTPRINT_X, FLOOR_HEIGHT, STAIRS_FOOTPRINT_Z)
+		_cores_node.add_child(visual)
 
 		_surfaces.append({
-			"node": marker,
+			"node": visual,
 			"surface_type": "core",
 			"aabb": AABB(
-				Vector3(x_m - 1.0, 0.0, z_m - 1.0),
-				Vector3(2.0, FLOOR_HEIGHT, 2.0)
+				Vector3(x_m - aabb_size.x * 0.5, 0.0, z_m - aabb_size.z * 0.5),
+				aabb_size
 			)
 		})
+
+
+func _build_elevator(x_m: float, z_m: float) -> Node3D:
+	# 엘리베이터 샤프트 박스 + 문 panel
+	var root: Node3D = Node3D.new()
+	root.name = "Core_ELEVATOR"
+	root.position = Vector3(x_m, 0.0, z_m)
+
+	var shaft: StaticBody3D = StaticBody3D.new()
+	shaft.name = "Shaft"
+	var shaft_size: Vector3 = Vector3(ELEVATOR_WIDTH, STRUCTURE_HEIGHT, ELEVATOR_DEPTH)
+	shaft.position = Vector3(0.0, STRUCTURE_HEIGHT * 0.5, 0.0)
+	shaft.add_child(_make_box_mesh(shaft_size, _mat_elevator_shaft))
+	shaft.add_child(_make_box_collision(shaft_size))
+	root.add_child(shaft)
+
+	# 정면(북측, -Z) 문 panel — 살짝 돌출
+	var door: MeshInstance3D = _make_box_mesh(
+		Vector3(ELEVATOR_DOOR_WIDTH, ELEVATOR_DOOR_HEIGHT, 0.05), _mat_elevator_door
+	)
+	door.name = "Door"
+	door.position = Vector3(0.0, ELEVATOR_DOOR_HEIGHT * 0.5, -ELEVATOR_DEPTH * 0.5 - 0.02)
+	root.add_child(door)
+	return root
+
+
+func _build_stairs(x_m: float, z_m: float) -> Node3D:
+	# 절차적 계단 step + 측면 핸드레일
+	var root: Node3D = Node3D.new()
+	root.name = "Core_STAIRS"
+	root.position = Vector3(x_m, 0.0, z_m)
+
+	var step_rise: float = STRUCTURE_HEIGHT / float(STAIRS_STEP_COUNT)
+	var step_run: float = STAIRS_FOOTPRINT_Z / float(STAIRS_STEP_COUNT)
+	var step_width: float = STAIRS_FOOTPRINT_X
+
+	for i in range(STAIRS_STEP_COUNT):
+		var step_height: float = step_rise * float(i + 1)
+		var step_mesh: MeshInstance3D = _make_box_mesh(
+			Vector3(step_width, step_height, step_run), _mat_stairs_step
+		)
+		step_mesh.name = "Step_%02d" % i
+		var z_offset: float = -STAIRS_FOOTPRINT_Z * 0.5 + step_run * (float(i) + 0.5)
+		step_mesh.position = Vector3(0.0, step_height * 0.5, z_offset)
+		root.add_child(step_mesh)
+
+	# 양측 핸드레일 — 시각적 force 강조
+	for side in [-1.0, 1.0]:
+		var rail: MeshInstance3D = _make_box_mesh(
+			Vector3(STAIRS_HANDRAIL_THICKNESS, STAIRS_HANDRAIL_THICKNESS, STAIRS_FOOTPRINT_Z),
+			_mat_handrail
+		)
+		rail.name = "Handrail_%s" % ("L" if side < 0 else "R")
+		rail.position = Vector3(
+			side * (step_width * 0.5 - STAIRS_HANDRAIL_THICKNESS * 0.5),
+			STRUCTURE_HEIGHT * 0.5 + STAIRS_HANDRAIL_HEIGHT * 0.5,
+			0.0
+		)
+		root.add_child(rail)
+
+	return root
 
 
 # ---------------------------------------------------------------------------
