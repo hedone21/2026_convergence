@@ -33,11 +33,29 @@ const COLUMN_DEPTH: float = 0.45
 const OUTER_WALL_THICKNESS: float = 0.30
 const INNER_WALL_THICKNESS: float = 0.18
 
-## wall 시각화 높이 (천장 슬래브 바닥과 만나도록)
-const WALL_RENDER_HEIGHT: float = FLOOR_HEIGHT - SLAB_THICKNESS
+## 구조물 시각화 높이 (바닥 슬래브 위, 천장 슬래브 아래)
+const STRUCTURE_HEIGHT: float = FLOOR_HEIGHT - SLAB_THICKNESS
+
+## 외벽 분할 — 가운데 띠가 창문 영역
+const OUTER_WALL_BOTTOM_HEIGHT: float = 0.95  # 허리벽
+const OUTER_WALL_TOP_HEIGHT: float = 0.55     # 인방
+const WINDOW_BAND_BOTTOM_Y: float = OUTER_WALL_BOTTOM_HEIGHT
+const WINDOW_BAND_TOP_Y: float = STRUCTURE_HEIGHT - OUTER_WALL_TOP_HEIGHT
+
+## 내벽 높이 — 천장과 갭을 둬 방 사이 빛/공기 흐름 확보 (답답함 완화)
+const INNER_WALL_HEIGHT: float = 2.55
+
+## 슬래브가 grid 라벨 좌표 밖으로 확장되는 패딩 (외주부 처마)
+const SLAB_EDGE_PADDING_M: float = 1.5
 
 ## 짧은 segment 노이즈 제외 임계값 (미터)
 const MIN_WALL_LENGTH: float = 0.08
+
+## 천장 광원
+const CEILING_LIGHT_OFFSET_Y: float = STRUCTURE_HEIGHT - 0.05
+const CEILING_LIGHT_ENERGY: float = 4.0
+const CEILING_LIGHT_RANGE: float = 18.0
+const CEILING_LIGHT_COLOR: Color = Color(1.0, 0.95, 0.85, 1.0)
 
 # ---------------------------------------------------------------------------
 # 내부 참조
@@ -45,9 +63,10 @@ const MIN_WALL_LENGTH: float = 0.08
 
 var _walls_node: Node3D
 var _columns_node: Node3D
-var _slab_node: Node3D
 var _cores_node: Node3D
+var _lights_node: Node3D
 var _floor_body: StaticBody3D
+var _ceiling_body: StaticBody3D
 
 var _concrete_material: ConcreteMaterial = ConcreteMaterial.new()
 var _mat_outer_wall: StandardMaterial3D = null
@@ -123,66 +142,108 @@ func _build_from_floor(data: Dictionary) -> void:
 	var scale_dict: Dictionary = data.get("scale", {})
 	var pt_to_m: float = float(scale_dict.get("pdf_pt_to_meter", 0.0338666))
 
-	var bbox: Array = data.get("walls_bbox_pt", [])
-	if bbox.size() != 4:
+	var walls_bbox: Array = data.get("walls_bbox_pt", [])
+	if walls_bbox.size() != 4:
 		push_error("[ParliamentVillageSite] walls_bbox_pt invalid")
 		return
-	var bx0: float = float(bbox[0])
-	var by0: float = float(bbox[1])
-	var bx1: float = float(bbox[2])
-	var by1: float = float(bbox[3])
-	var cx: float = (bx0 + bx1) * 0.5
-	var cy: float = (by0 + by1) * 0.5
-	var width_m: float = (bx1 - bx0) * pt_to_m
-	var depth_m: float = (by1 - by0) * pt_to_m
+
+	# site origin: walls_bbox 중심
+	var origin_x_pt: float = (float(walls_bbox[0]) + float(walls_bbox[2])) * 0.5
+	var origin_y_pt: float = (float(walls_bbox[1]) + float(walls_bbox[3])) * 0.5
+
+	# 슬래브 영역: grid bbox(외곽 기둥 포함) + 처마 패딩
+	var slab_rect_m: Rect2 = _compute_slab_rect(
+		data.get("grid", {}), walls_bbox, pt_to_m, origin_x_pt, origin_y_pt
+	)
+	var slab_size: Vector3 = Vector3(slab_rect_m.size.x, SLAB_THICKNESS, slab_rect_m.size.y)
+	var slab_center: Vector3 = Vector3(
+		slab_rect_m.position.x + slab_rect_m.size.x * 0.5,
+		0.0,
+		slab_rect_m.position.y + slab_rect_m.size.y * 0.5
+	)
 
 	_spawn_bounds = AABB(
-		Vector3(-width_m * 0.5, 0.0, -depth_m * 0.5),
-		Vector3(width_m, FLOOR_HEIGHT, depth_m)
+		Vector3(slab_rect_m.position.x, 0.0, slab_rect_m.position.y),
+		Vector3(slab_size.x, FLOOR_HEIGHT, slab_size.z)
 	)
 
-	_create_slab(width_m, depth_m)
-	_create_walls(data.get("walls", []), pt_to_m, cx, cy)
-	_create_columns(data.get("grid", {}), pt_to_m, cx, cy)
-	_create_core_markers(data.get("cores", []), pt_to_m, cx, cy)
+	_create_floor_slab(slab_size, slab_center)
+	_create_ceiling_slab(slab_size, slab_center)
+	_create_walls(data.get("walls", []), pt_to_m, origin_x_pt, origin_y_pt)
+	_create_columns(data.get("grid", {}), pt_to_m, origin_x_pt, origin_y_pt)
+	_create_core_markers(data.get("cores", []), pt_to_m, origin_x_pt, origin_y_pt)
+	_create_ceiling_lights(slab_size, slab_center)
+
+
+func _compute_slab_rect(
+	grid: Dictionary, walls_bbox: Array, pt_to_m: float,
+	origin_x_pt: float, origin_y_pt: float
+) -> Rect2:
+	# 우선순위: grid bbox(외곽 기둥 포함). 폴백: walls_bbox.
+	var gx: Dictionary = grid.get("x", {})
+	var gy: Dictionary = grid.get("y", {})
+	var min_x_pt: float
+	var max_x_pt: float
+	var min_y_pt: float
+	var max_y_pt: float
+	if not gx.is_empty() and not gy.is_empty():
+		var xs: Array = gx.values()
+		var ys: Array = gy.values()
+		min_x_pt = xs.min()
+		max_x_pt = xs.max()
+		min_y_pt = ys.min()
+		max_y_pt = ys.max()
+	else:
+		min_x_pt = float(walls_bbox[0])
+		min_y_pt = float(walls_bbox[1])
+		max_x_pt = float(walls_bbox[2])
+		max_y_pt = float(walls_bbox[3])
+
+	var x0_m: float = (min_x_pt - origin_x_pt) * pt_to_m - SLAB_EDGE_PADDING_M
+	var z0_m: float = (min_y_pt - origin_y_pt) * pt_to_m - SLAB_EDGE_PADDING_M
+	var x1_m: float = (max_x_pt - origin_x_pt) * pt_to_m + SLAB_EDGE_PADDING_M
+	var z1_m: float = (max_y_pt - origin_y_pt) * pt_to_m + SLAB_EDGE_PADDING_M
+	return Rect2(Vector2(x0_m, z0_m), Vector2(x1_m - x0_m, z1_m - z0_m))
 
 
 # ---------------------------------------------------------------------------
-# 슬래브 (1층 바닥)
+# 슬래브 (바닥 + 천장)
 # ---------------------------------------------------------------------------
 
-func _create_slab(width_m: float, depth_m: float) -> void:
+func _create_floor_slab(size: Vector3, center: Vector3) -> void:
 	_floor_body = StaticBody3D.new()
-	_floor_body.name = "Slab"
+	_floor_body.name = "FloorSlab"
 	add_child(_floor_body)
-
-	var mesh: MeshInstance3D = _make_box_mesh(
-		Vector3(width_m, SLAB_THICKNESS, depth_m), _mat_slab
-	)
-	_floor_body.add_child(mesh)
-
-	var coll: CollisionShape3D = _make_box_collision(
-		Vector3(width_m, SLAB_THICKNESS, depth_m)
-	)
-	_floor_body.add_child(coll)
-
-	_floor_body.position = Vector3(0.0, -SLAB_THICKNESS * 0.5, 0.0)
+	_floor_body.add_child(_make_box_mesh(size, _mat_slab))
+	_floor_body.add_child(_make_box_collision(size))
+	_floor_body.position = Vector3(center.x, -SLAB_THICKNESS * 0.5, center.z)
 
 	_surfaces.append({
 		"node": _floor_body,
 		"surface_type": "floor",
 		"aabb": AABB(
-			Vector3(-width_m * 0.5, -SLAB_THICKNESS, -depth_m * 0.5),
-			Vector3(width_m, SLAB_THICKNESS, depth_m)
+			Vector3(center.x - size.x * 0.5, -SLAB_THICKNESS, center.z - size.z * 0.5),
+			Vector3(size.x, SLAB_THICKNESS, size.z)
 		)
 	})
 
 
+func _create_ceiling_slab(size: Vector3, center: Vector3) -> void:
+	_ceiling_body = StaticBody3D.new()
+	_ceiling_body.name = "CeilingSlab"
+	add_child(_ceiling_body)
+	_ceiling_body.add_child(_make_box_mesh(size, _mat_slab))
+	_ceiling_body.add_child(_make_box_collision(size))
+	_ceiling_body.position = Vector3(
+		center.x, STRUCTURE_HEIGHT + SLAB_THICKNESS * 0.5, center.z
+	)
+
+
 # ---------------------------------------------------------------------------
-# 벽체 (line segment → BoxMesh)
+# 벽체 (line segment → BoxMesh, 외벽은 창문 띠 분할)
 # ---------------------------------------------------------------------------
 
-func _create_walls(walls: Array, pt_to_m: float, cx: float, cy: float) -> void:
+func _create_walls(walls: Array, pt_to_m: float, ox_pt: float, oy_pt: float) -> void:
 	_walls_node = Node3D.new()
 	_walls_node.name = "Walls"
 	add_child(_walls_node)
@@ -195,10 +256,10 @@ func _create_walls(walls: Array, pt_to_m: float, cx: float, cy: float) -> void:
 		var b: Array = w.get("b_pt", [])
 		if a.size() != 2 or b.size() != 2:
 			continue
-		var ax_m: float = (float(a[0]) - cx) * pt_to_m
-		var az_m: float = (float(a[1]) - cy) * pt_to_m
-		var bx_m: float = (float(b[0]) - cx) * pt_to_m
-		var bz_m: float = (float(b[1]) - cy) * pt_to_m
+		var ax_m: float = (float(a[0]) - ox_pt) * pt_to_m
+		var az_m: float = (float(a[1]) - oy_pt) * pt_to_m
+		var bx_m: float = (float(b[0]) - ox_pt) * pt_to_m
+		var bz_m: float = (float(b[1]) - oy_pt) * pt_to_m
 
 		var dx: float = bx_m - ax_m
 		var dz: float = bz_m - az_m
@@ -207,35 +268,50 @@ func _create_walls(walls: Array, pt_to_m: float, cx: float, cy: float) -> void:
 			continue
 
 		var kind: String = w.get("kind", "inner")
-		var thickness: float = OUTER_WALL_THICKNESS if kind == "outer" else INNER_WALL_THICKNESS
-		var material: StandardMaterial3D = _mat_outer_wall if kind == "outer" else _mat_inner_wall
-
-		_spawn_wall_segment(
-			Vector2(ax_m, az_m),
-			Vector2(bx_m, bz_m),
-			length,
-			thickness,
-			material,
-			true  # 모든 wall에 collision 부여 (내벽 통과 방지)
-		)
+		if kind == "outer":
+			_spawn_outer_wall(Vector2(ax_m, az_m), Vector2(bx_m, bz_m), length)
+		else:
+			_spawn_inner_wall(Vector2(ax_m, az_m), Vector2(bx_m, bz_m), length)
 
 
-func _spawn_wall_segment(
+func _spawn_outer_wall(a: Vector2, b: Vector2, length: float) -> void:
+	# 외벽: 허리벽(아래) + 인방(위) 두 토막. 사이는 창문 띠.
+	_add_wall_segment(
+		a, b, length, OUTER_WALL_THICKNESS, _mat_outer_wall,
+		OUTER_WALL_BOTTOM_HEIGHT * 0.5,
+		OUTER_WALL_BOTTOM_HEIGHT
+	)
+	_add_wall_segment(
+		a, b, length, OUTER_WALL_THICKNESS, _mat_outer_wall,
+		WINDOW_BAND_TOP_Y + OUTER_WALL_TOP_HEIGHT * 0.5,
+		OUTER_WALL_TOP_HEIGHT
+	)
+
+
+func _spawn_inner_wall(a: Vector2, b: Vector2, length: float) -> void:
+	# 내벽: 천장보다 낮게 (방 사이 빛/공기 흐름)
+	_add_wall_segment(
+		a, b, length, INNER_WALL_THICKNESS, _mat_inner_wall,
+		INNER_WALL_HEIGHT * 0.5,
+		INNER_WALL_HEIGHT
+	)
+
+
+func _add_wall_segment(
 	a: Vector2, b: Vector2, length: float, thickness: float,
-	material: StandardMaterial3D, with_collision: bool
+	material: StandardMaterial3D, center_y: float, height: float
 ) -> void:
 	var center: Vector2 = (a + b) * 0.5
 	var angle: float = atan2(b.y - a.y, b.x - a.x)
 
 	var body: StaticBody3D = StaticBody3D.new()
 	body.name = "Wall"
-	body.position = Vector3(center.x, WALL_RENDER_HEIGHT * 0.5, center.y)
+	body.position = Vector3(center.x, center_y, center.y)
 	body.rotation = Vector3(0.0, -angle, 0.0)
 
-	var size: Vector3 = Vector3(length, WALL_RENDER_HEIGHT, thickness)
+	var size: Vector3 = Vector3(length, height, thickness)
 	body.add_child(_make_box_mesh(size, material))
-	if with_collision:
-		body.add_child(_make_box_collision(size))
+	body.add_child(_make_box_collision(size))
 
 	_walls_node.add_child(body)
 
@@ -244,7 +320,7 @@ func _spawn_wall_segment(
 # 기둥 (grid 교점)
 # ---------------------------------------------------------------------------
 
-func _create_columns(grid: Dictionary, pt_to_m: float, cx: float, cy: float) -> void:
+func _create_columns(grid: Dictionary, pt_to_m: float, ox_pt: float, oy_pt: float) -> void:
 	_columns_node = Node3D.new()
 	_columns_node.name = "Columns"
 	add_child(_columns_node)
@@ -254,20 +330,18 @@ func _create_columns(grid: Dictionary, pt_to_m: float, cx: float, cy: float) -> 
 	if gx.is_empty() or gy.is_empty():
 		return
 
-	var col_index: int = 0
 	for label_x in gx.keys():
 		var x_pt: float = float(gx[label_x])
-		var x_m: float = (x_pt - cx) * pt_to_m
+		var x_m: float = (x_pt - ox_pt) * pt_to_m
 		for label_y in gy.keys():
 			var y_pt: float = float(gy[label_y])
-			var z_m: float = (y_pt - cy) * pt_to_m
-			col_index += 1
+			var z_m: float = (y_pt - oy_pt) * pt_to_m
 
 			var body: StaticBody3D = StaticBody3D.new()
 			body.name = "Column_%s%s" % [label_y, label_x]
-			body.position = Vector3(x_m, WALL_RENDER_HEIGHT * 0.5, z_m)
+			body.position = Vector3(x_m, STRUCTURE_HEIGHT * 0.5, z_m)
 
-			var size: Vector3 = Vector3(COLUMN_WIDTH, WALL_RENDER_HEIGHT, COLUMN_DEPTH)
+			var size: Vector3 = Vector3(COLUMN_WIDTH, STRUCTURE_HEIGHT, COLUMN_DEPTH)
 			body.add_child(_make_box_mesh(size, _mat_column))
 			body.add_child(_make_box_collision(size))
 
@@ -287,7 +361,7 @@ func _create_columns(grid: Dictionary, pt_to_m: float, cx: float, cy: float) -> 
 # 코어 마커 (STAIRS/ELEVATOR) — 위험 요소 배치 지점 후보
 # ---------------------------------------------------------------------------
 
-func _create_core_markers(cores: Array, pt_to_m: float, cx: float, cy: float) -> void:
+func _create_core_markers(cores: Array, pt_to_m: float, ox_pt: float, oy_pt: float) -> void:
 	_cores_node = Node3D.new()
 	_cores_node.name = "Cores"
 	add_child(_cores_node)
@@ -301,8 +375,8 @@ func _create_core_markers(cores: Array, pt_to_m: float, cx: float, cy: float) ->
 			continue
 		var cx_pt: float = (float(bbox[0]) + float(bbox[2])) * 0.5
 		var cy_pt: float = (float(bbox[1]) + float(bbox[3])) * 0.5
-		var x_m: float = (cx_pt - cx) * pt_to_m
-		var z_m: float = (cy_pt - cy) * pt_to_m
+		var x_m: float = (cx_pt - ox_pt) * pt_to_m
+		var z_m: float = (cy_pt - oy_pt) * pt_to_m
 
 		var marker: Node3D = Node3D.new()
 		marker.name = "Core_%s" % core.get("label", "UNKNOWN")
@@ -317,6 +391,34 @@ func _create_core_markers(cores: Array, pt_to_m: float, cx: float, cy: float) ->
 				Vector3(2.0, FLOOR_HEIGHT, 2.0)
 			)
 		})
+
+
+# ---------------------------------------------------------------------------
+# 천장 광원 — 천장 슬래브가 빛을 차단하므로 실내 보조 조명
+# ---------------------------------------------------------------------------
+
+func _create_ceiling_lights(slab_size: Vector3, slab_center: Vector3) -> void:
+	_lights_node = Node3D.new()
+	_lights_node.name = "CeilingLights"
+	add_child(_lights_node)
+
+	# 4×3 격자로 천장에 OmniLight3D 배치
+	var n_x: int = 4
+	var n_z: int = 3
+	for ix in range(n_x):
+		for iz in range(n_z):
+			var fx: float = (float(ix) + 0.5) / float(n_x)
+			var fz: float = (float(iz) + 0.5) / float(n_z)
+			var px: float = slab_center.x - slab_size.x * 0.5 + slab_size.x * fx
+			var pz: float = slab_center.z - slab_size.z * 0.5 + slab_size.z * fz
+			var light: OmniLight3D = OmniLight3D.new()
+			light.name = "Light_%d_%d" % [ix, iz]
+			light.position = Vector3(px, CEILING_LIGHT_OFFSET_Y, pz)
+			light.light_color = CEILING_LIGHT_COLOR
+			light.light_energy = CEILING_LIGHT_ENERGY
+			light.omni_range = CEILING_LIGHT_RANGE
+			light.shadow_enabled = false  # 그림자 비활성 (성능)
+			_lights_node.add_child(light)
 
 
 # ---------------------------------------------------------------------------
