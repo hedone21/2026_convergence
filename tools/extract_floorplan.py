@@ -33,8 +33,14 @@ PDF_PT_TO_METER = PDF_PT_TO_REAL_INCH * INCH_TO_METER
 
 OUTER_WALL_WIDTH_MIN_PT = 1.3
 INNER_WALL_WIDTH_MIN_PT = 0.9
+## stroke 2.5pt 이상은 page frame(도면 외곽 frame). 빌딩 외벽 최대 1.92pt.
+MAX_WALL_WIDTH_PT = 2.5
+## 빌딩 본체 단일 벽 segment 한계 길이 (pt). 35m 넘으면 frame/배경.
+MAX_SINGLE_WALL_LEN_PT = 1050.0
 # Legend(우상단 미니맵 + 타이틀블록) 영역 — 이 안에 들어가는 walls는 제외
 LEGEND_EXCLUDE_RECT_PT = (2650.0, 0.0, 3024.0, 2160.0)
+## grid 라벨 좌표 밖 패딩 (pt). 이 영역 밖 segment는 frame 노이즈로 간주.
+BUILDING_BBOX_PAD_PT = 60.0
 GRID_X_LABELS = ("1", "2", "3", "4", "5", "6", "7", "8")
 GRID_Y_LABELS = ("A", "B", "C", "D", "E", "F")
 CORE_LABELS = ("STAIRS", "ELEVATOR")
@@ -44,6 +50,8 @@ GRID_LABEL_FONT_SIZE_MAX = 11.5  # 도면 외곽 grid 라벨은 ~11pt. 우상단
 
 
 def classify_wall(width_pt: float) -> str | None:
+    if width_pt >= MAX_WALL_WIDTH_PT:
+        return None  # page frame
     if width_pt >= OUTER_WALL_WIDTH_MIN_PT:
         return "outer"
     if width_pt >= INNER_WALL_WIDTH_MIN_PT:
@@ -61,7 +69,25 @@ def _segment_in_legend(ax: float, ay: float, bx: float, by: float) -> bool:
     return _in_legend(ax, ay) and _in_legend(bx, by)
 
 
-def extract_walls(drawings: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _too_long(ax: float, ay: float, bx: float, by: float) -> bool:
+    dx = bx - ax; dy = by - ay
+    return (dx * dx + dy * dy) > (MAX_SINGLE_WALL_LEN_PT ** 2)
+
+
+def extract_walls(
+    drawings: list[dict[str, Any]],
+    building_bbox: tuple[float, float, float, float] | None = None,
+) -> list[dict[str, Any]]:
+    """building_bbox=(x0,y0,x1,y1)+pad 밖에 있는 segment는 frame 노이즈로 제외."""
+    bx0 = by0 = bx1 = by1 = None
+    if building_bbox is not None:
+        bx0, by0, bx1, by1 = building_bbox
+
+    def _in_building(x: float, y: float) -> bool:
+        if bx0 is None:
+            return True
+        return bx0 <= x <= bx1 and by0 <= y <= by1
+
     walls: list[dict[str, Any]] = []
     for d in drawings:
         width_pt = d.get("width") or 0.0
@@ -74,6 +100,10 @@ def extract_walls(drawings: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 p0, p1 = item[1], item[2]
                 if _segment_in_legend(p0.x, p0.y, p1.x, p1.y):
                     continue
+                if _too_long(p0.x, p0.y, p1.x, p1.y):
+                    continue
+                if not (_in_building(p0.x, p0.y) and _in_building(p1.x, p1.y)):
+                    continue
                 walls.append({
                     "a_pt": [round(p0.x, 3), round(p0.y, 3)],
                     "b_pt": [round(p1.x, 3), round(p1.y, 3)],
@@ -84,6 +114,10 @@ def extract_walls(drawings: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 rect = item[1]
                 x0, y0, x1, y1 = rect.x0, rect.y0, rect.x1, rect.y1
                 if _segment_in_legend(x0, y0, x1, y1):
+                    continue
+                if _too_long(x0, y0, x1, y1):
+                    continue
+                if not (_in_building(x0, y0) and _in_building(x1, y1)):
                     continue
                 corners = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
                 for i in range(4):
@@ -168,9 +202,20 @@ def extract_grid(spans: list[dict[str, Any]], page_rect: fitz.Rect) -> dict[str,
 def process_page(page: fitz.Page, page_index: int) -> dict[str, Any]:
     drawings = page.get_drawings()
     spans = extract_text_spans(page)
-    walls = extract_walls(drawings)
     cores = extract_cores(spans)
     grid = extract_grid(spans, page.rect)
+
+    gxs = list(grid["x"].values())
+    gys = list(grid["y"].values())
+    building_bbox: tuple[float, float, float, float] | None = None
+    if gxs and gys:
+        building_bbox = (
+            min(gxs) - BUILDING_BBOX_PAD_PT,
+            min(gys) - BUILDING_BBOX_PAD_PT,
+            max(gxs) + BUILDING_BBOX_PAD_PT,
+            max(gys) + BUILDING_BBOX_PAD_PT,
+        )
+    walls = extract_walls(drawings, building_bbox)
 
     title_match = next((s["text"] for s in spans if "FLOOR PLAN" in s["text"].upper()), None)
 
