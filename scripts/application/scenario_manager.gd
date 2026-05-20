@@ -34,6 +34,15 @@ var _validator: ScenarioValidator = ScenarioValidator.new()
 
 
 func _ready() -> void:
+	# --scenario=res://path/x.json 또는 절대 경로로 default 시나리오 override.
+	# 헤드리스 5층 검증 등 자동화 도구가 사용.
+	const SCN_PREFIX: String = "--scenario="
+	var args: PackedStringArray = OS.get_cmdline_args() + OS.get_cmdline_user_args()
+	for arg: String in args:
+		if arg.begins_with(SCN_PREFIX):
+			default_scenario_path = arg.substr(SCN_PREFIX.length())
+			print("[ScenarioManager] scenario override: %s" % default_scenario_path)
+			break
 	print("[ScenarioManager] Initialized.")
 
 
