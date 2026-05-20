@@ -6,11 +6,10 @@ extends Control
 ## 토글: M 키 (기본 표시)
 
 const FLOOR_JSON_TEMPLATE: String = "res://data/parliament_village/floor_%02d.json"
-const PT_TO_M: float = 0.0338666
 const TOGGLE_KEYCODE: int = KEY_M
 
-## 미니맵 외곽 padding (월드 pt 기준)
-const BBOX_PADDING_PT: float = 60.0
+## 미니맵 외곽 padding (m)
+const BBOX_PADDING_M: float = 2.0
 
 const COLOR_BG: Color = Color(0.08, 0.09, 0.12, 0.88)
 const COLOR_BORDER: Color = Color(0.4, 0.4, 0.5, 1.0)
@@ -25,14 +24,14 @@ const COLOR_PLAYER_HEADING: Color = Color(1.0, 0.95, 0.2, 0.7)
 
 @export var floor_to_show: int = 1
 
-var _floor_data: Dictionary = {}
-var _bbox_x0: float = 0.0
-var _bbox_y0: float = 0.0
-var _bbox_x1: float = 0.0
-var _bbox_y1: float = 0.0
-var _bbox_center_x_pt: float = 0.0
-var _bbox_center_y_pt: float = 0.0
-## 이 미니맵 윈도우가 표시하는 pt 영역 → 픽셀 영역. 한 번 계산해 둠.
+var _site_data: SiteData = null
+var _bbox_x0_m: float = 0.0
+var _bbox_y0_m: float = 0.0
+var _bbox_x1_m: float = 0.0
+var _bbox_y1_m: float = 0.0
+## 시뮬 site origin = bbox 중심 (padding 미적용). m.
+var _bbox_center_m: Vector2 = Vector2.ZERO
+## 이 미니맵 윈도우가 표시하는 m 영역 → 픽셀 영역. 한 번 계산해 둠.
 var _draw_rect: Rect2 = Rect2()
 var _font: Font = ThemeDB.fallback_font
 
@@ -58,43 +57,31 @@ func _input(event: InputEvent) -> void:
 
 func _load_floor_data() -> void:
 	var path: String = FLOOR_JSON_TEMPLATE % floor_to_show
-	if not FileAccess.file_exists(path):
-		push_error("[Minimap] floor JSON not found: %s" % path)
+	_site_data = SiteDataParser.parse_from_path(path)
+	if _site_data == null:
 		return
-	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
-	var text: String = file.get_as_text()
-	file.close()
-	var parsed: Variant = JSON.parse_string(text)
-	if not (parsed is Dictionary):
-		push_error("[Minimap] floor JSON parse failed: %s" % path)
-		return
-	_floor_data = parsed
-	var bb: Array = _floor_data.get("walls_bbox_pt", [])
-	if bb.size() != 4:
-		push_error("[Minimap] walls_bbox_pt invalid")
-		return
-	_bbox_x0 = float(bb[0]) - BBOX_PADDING_PT
-	_bbox_y0 = float(bb[1]) - BBOX_PADDING_PT
-	_bbox_x1 = float(bb[2]) + BBOX_PADDING_PT
-	_bbox_y1 = float(bb[3]) + BBOX_PADDING_PT
-	# 시뮬 site origin = walls_bbox 중심 (padding 미적용)
-	_bbox_center_x_pt = (float(bb[0]) + float(bb[2])) * 0.5
-	_bbox_center_y_pt = (float(bb[1]) + float(bb[3])) * 0.5
+	var bb_min: Vector2 = _site_data.metadata.bbox_min
+	var bb_max: Vector2 = _site_data.metadata.bbox_max
+	_bbox_x0_m = bb_min.x - BBOX_PADDING_M
+	_bbox_y0_m = bb_min.y - BBOX_PADDING_M
+	_bbox_x1_m = bb_max.x + BBOX_PADDING_M
+	_bbox_y1_m = bb_max.y + BBOX_PADDING_M
+	_bbox_center_m = (bb_min + bb_max) * 0.5
 
 
 func _compute_draw_rect() -> void:
 	# 컨트롤 사이즈 안에 비율 유지하며 fit
 	var avail: Vector2 = size
-	var pt_w: float = _bbox_x1 - _bbox_x0
-	var pt_h: float = _bbox_y1 - _bbox_y0
-	if pt_w <= 0.0 or pt_h <= 0.0 or avail.x <= 0.0 or avail.y <= 0.0:
+	var m_w: float = _bbox_x1_m - _bbox_x0_m
+	var m_h: float = _bbox_y1_m - _bbox_y0_m
+	if m_w <= 0.0 or m_h <= 0.0 or avail.x <= 0.0 or avail.y <= 0.0:
 		_draw_rect = Rect2(Vector2.ZERO, avail)
 		return
-	var scale_x: float = avail.x / pt_w
-	var scale_y: float = avail.y / pt_h
+	var scale_x: float = avail.x / m_w
+	var scale_y: float = avail.y / m_h
 	var s: float = min(scale_x, scale_y)
-	var draw_w: float = pt_w * s
-	var draw_h: float = pt_h * s
+	var draw_w: float = m_w * s
+	var draw_h: float = m_h * s
 	var offset: Vector2 = Vector2(
 		(avail.x - draw_w) * 0.5,
 		(avail.y - draw_h) * 0.5
@@ -107,22 +94,20 @@ func _resized() -> void:
 	queue_redraw()
 
 
-## PDF pt 좌표 → 미니맵 픽셀 좌표
-func _pt_to_pixel(px: float, py: float) -> Vector2:
-	var pt_w: float = _bbox_x1 - _bbox_x0
-	var pt_h: float = _bbox_y1 - _bbox_y0
-	if pt_w <= 0.0 or pt_h <= 0.0:
+## site 좌표 (m, 절대) → 미니맵 픽셀 좌표
+func _m_to_pixel(mx: float, my: float) -> Vector2:
+	var m_w: float = _bbox_x1_m - _bbox_x0_m
+	var m_h: float = _bbox_y1_m - _bbox_y0_m
+	if m_w <= 0.0 or m_h <= 0.0:
 		return Vector2.ZERO
-	var u: float = (px - _bbox_x0) / pt_w
-	var v: float = (py - _bbox_y0) / pt_h
+	var u: float = (mx - _bbox_x0_m) / m_w
+	var v: float = (my - _bbox_y0_m) / m_h
 	return _draw_rect.position + Vector2(u * _draw_rect.size.x, v * _draw_rect.size.y)
 
 
-## Godot world (x, z) → 미니맵 픽셀
+## Godot world (x, z) — site origin 기준 m → 미니맵 픽셀
 func _world_to_pixel(world_x: float, world_z: float) -> Vector2:
-	var px: float = world_x / PT_TO_M + _bbox_center_x_pt
-	var py: float = world_z / PT_TO_M + _bbox_center_y_pt
-	return _pt_to_pixel(px, py)
+	return _m_to_pixel(world_x + _bbox_center_m.x, world_z + _bbox_center_m.y)
 
 
 func _draw() -> void:
@@ -130,72 +115,53 @@ func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, size), COLOR_BG, true)
 	draw_rect(Rect2(Vector2.ZERO, size), COLOR_BORDER, false, 1.5)
 
-	if _floor_data.is_empty():
+	if _site_data == null:
 		return
 
-	# Grid lines
-	var grid: Dictionary = _floor_data.get("grid", {})
+	# Grid lines (raw_extra.grid, pt 단위 → m 변환)
+	var grid: Dictionary = _site_data.raw_extra.get("grid", {})
 	var gx: Dictionary = grid.get("x", {})
 	var gy: Dictionary = grid.get("y", {})
+	var pt_to_m: float = _site_data.metadata.unit_scale_to_meter
 	for key in gx.keys():
-		var xpt: float = float(gx[key])
-		var top: Vector2 = _pt_to_pixel(xpt, _bbox_y0)
-		var bot: Vector2 = _pt_to_pixel(xpt, _bbox_y1)
+		var x_m: float = float(gx[key]) * pt_to_m
+		var top: Vector2 = _m_to_pixel(x_m, _bbox_y0_m)
+		var bot: Vector2 = _m_to_pixel(x_m, _bbox_y1_m)
 		draw_line(top, bot, COLOR_GRID, 1.0)
 		draw_string(_font, top + Vector2(-4, 12), str(key), HORIZONTAL_ALIGNMENT_CENTER, -1, 10, COLOR_GRID_TEXT)
 	for key in gy.keys():
-		var ypt: float = float(gy[key])
-		var lf: Vector2 = _pt_to_pixel(_bbox_x0, ypt)
-		var rt: Vector2 = _pt_to_pixel(_bbox_x1, ypt)
+		var y_m: float = float(gy[key]) * pt_to_m
+		var lf: Vector2 = _m_to_pixel(_bbox_x0_m, y_m)
+		var rt: Vector2 = _m_to_pixel(_bbox_x1_m, y_m)
 		draw_line(lf, rt, COLOR_GRID, 1.0)
 		draw_string(_font, lf + Vector2(2, 4), str(key), HORIZONTAL_ALIGNMENT_LEFT, -1, 10, COLOR_GRID_TEXT)
 
 	# Inner walls (thin)
-	var walls: Array = _floor_data.get("walls", [])
-	for raw in walls:
-		if not (raw is Dictionary):
-			continue
-		var w: Dictionary = raw
-		if w.get("kind", "") != "inner":
-			continue
-		var a: Array = w.get("a_pt", [])
-		var b: Array = w.get("b_pt", [])
-		if a.size() != 2 or b.size() != 2:
-			continue
+	for w in _site_data.inner_walls:
 		draw_line(
-			_pt_to_pixel(float(a[0]), float(a[1])),
-			_pt_to_pixel(float(b[0]), float(b[1])),
+			_m_to_pixel(w.start.x, w.start.y),
+			_m_to_pixel(w.end.x, w.end.y),
 			COLOR_INNER_WALL, 1.0
 		)
 
 	# Outer walls (thick)
-	for raw in walls:
-		if not (raw is Dictionary):
-			continue
-		var w: Dictionary = raw
-		if w.get("kind", "") != "outer":
-			continue
-		var a: Array = w.get("a_pt", [])
-		var b: Array = w.get("b_pt", [])
-		if a.size() != 2 or b.size() != 2:
-			continue
+	for w in _site_data.outer_walls:
 		draw_line(
-			_pt_to_pixel(float(a[0]), float(a[1])),
-			_pt_to_pixel(float(b[0]), float(b[1])),
+			_m_to_pixel(w.start.x, w.start.y),
+			_m_to_pixel(w.end.x, w.end.y),
 			COLOR_OUTER_WALL, 2.0
 		)
 
-	# Cores
-	var cores: Array = _floor_data.get("cores", [])
-	for raw in cores:
+	# Cores (raw_extra, pt 단위 bbox)
+	for raw in _site_data.raw_extra.get("cores", []):
 		if not (raw is Dictionary):
 			continue
 		var core: Dictionary = raw
 		var bbox: Array = core.get("bbox_pt", [])
 		if bbox.size() != 4:
 			continue
-		var p0: Vector2 = _pt_to_pixel(float(bbox[0]), float(bbox[1]))
-		var p1: Vector2 = _pt_to_pixel(float(bbox[2]), float(bbox[3]))
+		var p0: Vector2 = _m_to_pixel(float(bbox[0]) * pt_to_m, float(bbox[1]) * pt_to_m)
+		var p1: Vector2 = _m_to_pixel(float(bbox[2]) * pt_to_m, float(bbox[3]) * pt_to_m)
 		var rect: Rect2 = Rect2(p0, p1 - p0).abs()
 		var label: String = core.get("label", "")
 		var color: Color = COLOR_CORE_STAIRS if label == "STAIRS" else COLOR_CORE_ELEVATOR
