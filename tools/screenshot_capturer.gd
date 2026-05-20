@@ -120,8 +120,9 @@ func _capture_hazard_closeups(camera: Camera3D, out_dir: String) -> void:
 		if not (h is Node3D):
 			continue
 		var hp: Vector3 = (h as Node3D).global_position
-		camera.global_position = hp + Vector3(0.0, 1.2, 1.5)
-		camera.look_at(hp + Vector3(0.0, 0.3, 0.0))
+		# closeup: hazard 근접 0.9m 후방 + 낮은 시선으로 각 hazard 단독 식별 강화
+		camera.global_position = hp + Vector3(0.0, 0.6, 0.9)
+		camera.look_at(hp + Vector3(0.0, 0.2, 0.0))
 		for _i: int in range(SHUTTER_FRAMES):
 			await get_tree().process_frame
 		var img: Image = get_viewport().get_texture().get_image()
