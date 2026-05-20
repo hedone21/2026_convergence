@@ -3,6 +3,7 @@
   "scenario_id": "calpoly_b001_medium",
   "site_type": "calpoly_b001",
   "site_floor": 1,
+  "time_of_day": "noon",
   "time_limit_seconds": 480,
   "random_placement": true,
   "random_seed": 22,
