@@ -19,5 +19,12 @@
     {"id": "hz_edge_01", "type": "unguarded_edge", "position": [16.0, 0.1, 10.0], "difficulty": 0.5},
     {"id": "hz_rebar_01", "type": "exposed_rebar", "position": [18.0, 0.5, 10.0], "difficulty": 0.5},
     {"id": "hz_wet_01", "type": "wet_floor", "position": [20.0, 0.0, 10.0], "difficulty": 0.3}
+  ],
+  "props": [
+    {"id": "p_worker_01", "model": "res://assets/models/props/worker.glb", "position": [5.0, 0.0, 5.0]},
+    {"id": "p_excavator_01", "model": "res://assets/models/props/excavator.glb", "position": [8.0, 0.0, 5.0]},
+    {"id": "p_scaffold_01", "model": "res://assets/models/props/scaffold.glb", "position": [11.0, 0.0, 5.0]},
+    {"id": "p_pile_01", "model": "res://assets/models/props/material_pile.glb", "position": [14.0, 0.0, 5.0]},
+    {"id": "p_sign_01", "model": "res://assets/models/props/sign.glb", "position": [17.0, 0.0, 5.0]}
   ]
 }
