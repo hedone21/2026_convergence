@@ -30,11 +30,11 @@ var _hazard_rules: HazardRules = HazardRules.new()
 const CRACK_MODULATE: Color = Color(0.08, 0.06, 0.05, 1.0)
 
 ## Decal 사이즈 계수 — crack_length(m) 기준 (X, Z) 평면 투영 영역.
-## 이전 0.6/0.4 → 2.5배 확대 (사용자: "crack 자체가 여전히 안 보임").
-const DECAL_X_FACTOR: float = 1.5
-const DECAL_Z_FACTOR: float = 1.0
-const DECAL_Y_DEPTH: float = 0.5  # 표면 투영 깊이 (Y축)
-const DECAL_FADE: float = 0.15    # upper/lower fade (이전 0.3)
+## 사실성 우선: 2.5x 확대(스티커 느낌) 원복 → 자연 크기.
+const DECAL_X_FACTOR: float = 1.0
+const DECAL_Z_FACTOR: float = 0.7
+const DECAL_Y_DEPTH: float = 0.5
+const DECAL_FADE: float = 0.3
 
 
 func _ready() -> void:
@@ -175,7 +175,7 @@ func _build_discovered_indicator() -> void:
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.emission_enabled = true
 	mat.emission = Color(0.0, 1.0, 0.3)
-	mat.emission_energy_multiplier = 0.5
+	mat.emission_energy_multiplier = 0.3
 	mesh_instance.material_override = mat
 
 	mesh_instance.position = Vector3(0.0, 0.3, 0.0)

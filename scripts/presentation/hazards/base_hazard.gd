@@ -77,6 +77,9 @@ func _build_warning_marker() -> void:
 	_warning_marker.material_override = mat
 
 	_warning_marker.position = Vector3(0.0, MARKER_HEIGHT_M, 0.0)
+	# 발견 전에는 시각 단서가 보이면 안 됨 (탐색 게임플레이 유지).
+	# discover() 시점에만 visible=true로 전환.
+	_warning_marker.visible = false
 	add_child(_warning_marker)
 
 
@@ -88,6 +91,8 @@ func discover() -> bool:
 		return false
 
 	state = HazardState.DISCOVERED
+	if _warning_marker != null:
+		_warning_marker.visible = true
 	_recolor_marker_discovered()
 	_show_discovered_feedback()
 	state_changed.emit(HazardState.DISCOVERED)
