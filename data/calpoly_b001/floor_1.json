@@ -1,13 +1,19 @@
 {
   "metadata": {
     "schema_version": "2.0",
-    "inner_walls_merge": {
-      "raw": 1180,
-      "merged": 1155,
+    "wall_classify": {
+      "raw_segments": 1201,
+      "near_polygon_outer": 235,
+      "inner": 966,
+      "outer_merged": 227,
+      "inner_merged": 937,
+      "classify_source": "AREA-GROSS",
       "params": {
         "angle_tol_deg": 1.5,
         "perp_tol_m": 0.05,
-        "gap_tol_m": 0.1
+        "gap_tol_m": 0.1,
+        "outer_perp_tol_m": 0.3,
+        "outer_angle_tol_deg": 3.0
       }
     },
     "source": {
@@ -38,8 +44,7 @@
     "footprint_polygon_count": 0
   },
   "categories": {
-    "outer_walls": [],
-    "inner_walls": [
+    "outer_walls": [
       {
         "id": "WB8D2D9",
         "start": [
@@ -50,10 +55,11 @@
           11.795899999793619,
           58.942000000039116
         ],
-        "side": "inner",
+        "side": "outer",
         "source": {
           "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
         }
       },
       {
@@ -66,26 +72,11 @@
           11.541999999899417,
           59.08120000001509
         ],
-        "side": "inner",
+        "side": "outer",
         "source": {
           "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W823492",
-        "start": [
-          11.547399999806657,
-          57.90460000000894
-        ],
-        "end": [
-          11.275699999881908,
-          57.96970000001602
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
         }
       },
       {
@@ -97,6 +88,3833 @@
         "end": [
           11.52419999986887,
           59.007100000046194
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W154D10",
+        "start": [
+          44.62599999993108,
+          41.11230000003707
+        ],
+        "end": [
+          44.70889999996871,
+          41.458100000047125
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W921424",
+        "start": [
+          41.044199999887496,
+          12.534500000067055
+        ],
+        "end": [
+          41.11519999988377,
+          12.830900000059046
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W5B7F23",
+        "start": [
+          44.38139999983832,
+          26.4660000000149
+        ],
+        "end": [
+          44.4523999998346,
+          26.762400000006892
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WA0D663",
+        "start": [
+          44.45289999991655,
+          26.76230000006035
+        ],
+        "end": [
+          44.15649999980815,
+          26.833300000056624
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W0F4939",
+        "start": [
+          16.211200000019744,
+          58.15670000005048
+        ],
+        "end": [
+          15.914799999911338,
+          58.22770000004675
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W58D9FD",
+        "start": [
+          12.154099999926984,
+          59.128600000054576
+        ],
+        "end": [
+          11.857699999818578,
+          59.19960000005085
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WD079B4",
+        "start": [
+          49.684799999929965,
+          62.336299999966286
+        ],
+        "end": [
+          49.38839999982156,
+          62.40729999996256
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WE012C7",
+        "start": [
+          42.99049999983981,
+          63.93989999999758
+        ],
+        "end": [
+          42.69409999996424,
+          64.01089999999385
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WCBE2B9",
+        "start": [
+          42.938399999868125,
+          34.177200000034645
+        ],
+        "end": [
+          43.0093999998644,
+          34.473600000026636
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WF37BC2",
+        "start": [
+          49.61269999993965,
+          62.04020000004675
+        ],
+        "end": [
+          49.683699999935925,
+          62.33660000003874
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WD3BFFF",
+        "start": [
+          36.26299999980256,
+          6.31449999997858
+        ],
+        "end": [
+          35.966599999926984,
+          6.385499999974854
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W105CF9",
+        "start": [
+          22.331799999810755,
+          9.651599999982864
+        ],
+        "end": [
+          22.03539999993518,
+          9.722599999979138
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W473190",
+        "start": [
+          1.4342999998480082,
+          14.657400000025518
+        ],
+        "end": [
+          1.1378999999724329,
+          14.728400000021793
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WDCC8E3",
+        "start": [
+          1.1381999999284744,
+          14.729700000025332
+        ],
+        "end": [
+          1.2091999999247491,
+          15.026100000017323
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W9DF014",
+        "start": [
+          2.8067999999038875,
+          21.695500000030734
+        ],
+        "end": [
+          2.877799999900162,
+          21.991900000022724
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W0E8541",
+        "start": [
+          6.143899999791756,
+          35.62690000003204
+        ],
+        "end": [
+          6.214900000020862,
+          35.92330000002403
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WC6661B",
+        "start": [
+          7.8125,
+          42.59270000003744
+        ],
+        "end": [
+          7.883499999996275,
+          42.88910000002943
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W314A82",
+        "start": [
+          9.481099999975413,
+          49.55839999997988
+        ],
+        "end": [
+          9.552099999971688,
+          49.854799999971874
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W30357B",
+        "start": [
+          11.149999999906868,
+          56.525299999979325
+        ],
+        "end": [
+          11.220999999903142,
+          56.821699999971315
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W1F1F64",
+        "start": [
+          46.29489999986254,
+          48.07790000003297
+        ],
+        "end": [
+          46.377699999837205,
+          48.42370000004303
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W8E463C",
+        "start": [
+          47.96279999986291,
+          55.04379999998491
+        ],
+        "end": [
+          48.04559999983758,
+          55.38959999999497
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WA682DF",
+        "start": [
+          20.183799999998882,
+          62.06480000005104
+        ],
+        "end": [
+          19.837999999988824,
+          62.147600000025705
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WE931A3",
+        "start": [
+          19.755200000014156,
+          61.801800000015646
+        ],
+        "end": [
+          19.837999999988824,
+          62.147600000025705
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W20C4BA",
+        "start": [
+          11.795899999793619,
+          58.942000000039116
+        ],
+        "end": [
+          11.858099999837577,
+          59.20140000001993
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WBC9656",
+        "start": [
+          4.475899999961257,
+          28.66099999996368
+        ],
+        "end": [
+          4.546899999957532,
+          28.957500000018626
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W16FA4F",
+        "start": [
+          8.40029999986291,
+          12.989799999981187
+        ],
+        "end": [
+          8.471299999859184,
+          13.286199999973178
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W8EDF83",
+        "start": [
+          8.40029999986291,
+          12.989799999981187
+        ],
+        "end": [
+          8.103899999987334,
+          13.06090000004042
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WAB20B4",
+        "start": [
+          42.712999999988824,
+          19.5002000000095
+        ],
+        "end": [
+          42.784099999815226,
+          19.79660000000149
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WAA98BF",
+        "start": [
+          41.044199999887496,
+          12.534500000067055
+        ],
+        "end": [
+          40.74780000001192,
+          12.60550000006333
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W845010",
+        "start": [
+          17.034800000023097,
+          18.285700000007637
+        ],
+        "end": [
+          16.73839999991469,
+          18.35670000000391
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W93B8FA",
+        "start": [
+          36.26299999980256,
+          6.31449999997858
+        ],
+        "end": [
+          36.33409999986179,
+          6.61089999997057
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W8E5FA5",
+        "start": [
+          29.297399999806657,
+          7.983299999963492
+        ],
+        "end": [
+          29.000899999868125,
+          8.054299999959767
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WA90E5F",
+        "start": [
+          22.035299999872223,
+          9.723200000007637
+        ],
+        "end": [
+          22.106299999868497,
+          10.019599999999627
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W2A85E9",
+        "start": [
+          36.0050999999512,
+          6.545999999972992
+        ],
+        "end": [
+          29.335800000000745,
+          8.143900000024587
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W7CFD39",
+        "start": [
+          29.03939999989234,
+          8.214900000020862
+        ],
+        "end": [
+          22.370099999941885,
+          9.8127000000095
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WA7ACA0",
+        "start": [
+          8.142400000011548,
+          13.2212999999756
+        ],
+        "end": [
+          1.4730999998282641,
+          14.819099999964237
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WD4DED5",
+        "start": [
+          4.608699999982491,
+          28.942700000014156
+        ],
+        "end": [
+          6.206499999854714,
+          35.61190000001807
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W581974",
+        "start": [
+          6.277499999850988,
+          35.90830000001006
+        ],
+        "end": [
+          7.875299999956042,
+          42.57759999996051
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W6CC84E",
+        "start": [
+          7.946299999952316,
+          42.87400000006892
+        ],
+        "end": [
+          9.544099999824539,
+          49.54330000001937
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W9D50AD",
+        "start": [
+          9.615099999820814,
+          49.83970000001136
+        ],
+        "end": [
+          11.212899999925867,
+          56.508999999961816
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W54ED71",
+        "start": [
+          11.283999999985099,
+          56.80540000007022
+        ],
+        "end": [
+          11.547399999806657,
+          57.90460000000894
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W1DE63E",
+        "start": [
+          15.870799999916926,
+          58.04410000005737
+        ],
+        "end": [
+          12.110099999932572,
+          58.945100000011735
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WC3495D",
+        "start": [
+          4.301499999826774,
+          28.85959999996703
+        ],
+        "end": [
+          11.275699999881908,
+          57.96970000001602
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WC752DA",
+        "start": [
+          41.30349999992177,
+          27.51679999998305
+        ],
+        "end": [
+          42.90129999979399,
+          34.18610000004992
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W2EF8B1",
+        "start": [
+          42.655899999896064,
+          63.85050000005867
+        ],
+        "end": [
+          40.37109999987297,
+          64.39789999998175
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W7FBDCE",
+        "start": [
+          1.2448999998159707,
+          16.101499999989755
+        ],
+        "end": [
+          1.256699999794364,
+          16.150900000007823
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W463557",
+        "start": [
+          1.51949999993667,
+          17.25109999999404
+        ],
+        "end": [
+          1.5312999999150634,
+          17.300500000012107
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W88200D",
+        "start": [
+          2.342499999795109,
+          20.696600000024773
+        ],
+        "end": [
+          2.354300000006333,
+          20.74600000004284
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W44B6D1",
+        "start": [
+          2.6169000000227243,
+          21.84539999999106
+        ],
+        "end": [
+          2.6287000000011176,
+          21.894800000009127
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W318849",
+        "start": [
+          3.17160000000149,
+          24.167699999990873
+        ],
+        "end": [
+          3.1833999999798834,
+          24.21710000000894
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WB254DC",
+        "start": [
+          3.4490000000223517,
+          25.32880000001751
+        ],
+        "end": [
+          3.460800000000745,
+          25.378200000035577
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WB007E1",
+        "start": [
+          4.003700000001118,
+          27.651100000017323
+        ],
+        "end": [
+          4.015499999979511,
+          27.70050000003539
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WDBF4E5",
+        "start": [
+          1.7951999998185784,
+          18.398700000019744
+        ],
+        "end": [
+          1.807099999859929,
+          18.44810000003781
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W11C037",
+        "start": [
+          2.071799999801442,
+          19.54700000002049
+        ],
+        "end": [
+          2.0836999998427927,
+          19.596400000038557
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W84DD28",
+        "start": [
+          2.9046000000089407,
+          23.00399999995716
+        ],
+        "end": [
+          2.9164999998174608,
+          23.053399999975227
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W37A648",
+        "start": [
+          3.7432999999728054,
+          26.48589999997057
+        ],
+        "end": [
+          3.755200000014156,
+          26.535299999988638
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WA660C6",
+        "start": [
+          4.301099999807775,
+          28.801199999987148
+        ],
+        "end": [
+          4.312999999849126,
+          28.850600000005215
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W90F77B",
+        "start": [
+          1.1395999998785555,
+          14.899100000038743
+        ],
+        "end": [
+          1.1543999998830259,
+          14.960900000063702
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W556AE0",
+        "start": [
+          1.4177999999374151,
+          16.06010000000242
+        ],
+        "end": [
+          1.4295999999158084,
+          16.10950000002049
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W8F467A",
+        "start": [
+          1.6921999999321997,
+          17.208899999968708
+        ],
+        "end": [
+          1.703999999910593,
+          17.258299999986775
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W7B8337",
+        "start": [
+          2.5155999998096377,
+          20.655999999959022
+        ],
+        "end": [
+          2.5274000000208616,
+          20.70539999997709
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WB4FF7C",
+        "start": [
+          2.791399999987334,
+          21.81070000003092
+        ],
+        "end": [
+          2.8031999999657273,
+          21.860100000048988
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WB0835A",
+        "start": [
+          3.3447000000160187,
+          24.12699999997858
+        ],
+        "end": [
+          3.356499999994412,
+          24.176399999996647
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W68188F",
+        "start": [
+          3.6218999999109656,
+          25.287400000030175
+        ],
+        "end": [
+          3.633699999889359,
+          25.336800000048243
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W55C307",
+        "start": [
+          3.89919999986887,
+          26.44850000005681
+        ],
+        "end": [
+          3.910999999847263,
+          26.497899999958463
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W7D5D90",
+        "start": [
+          4.176599999889731,
+          27.60970000002999
+        ],
+        "end": [
+          4.188399999868125,
+          27.659100000048056
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WB8EB9A",
+        "start": [
+          1.9680999999400228,
+          18.35730000003241
+        ],
+        "end": [
+          1.9799999999813735,
+          18.406700000050478
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WBBF163",
+        "start": [
+          2.2446999999228865,
+          19.505600000033155
+        ],
+        "end": [
+          2.256599999964237,
+          19.555000000051223
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WF66ED7",
+        "start": [
+          3.0774999998975545,
+          22.962599999969825
+        ],
+        "end": [
+          3.0893999999389052,
+          23.011999999987893
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WBC9656",
+        "start": [
+          4.475399999879301,
+          28.76560000004247
+        ],
+        "end": [
+          4.487299999920651,
+          28.815000000060536
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W6243B0",
+        "start": [
+          1.1543999998830259,
+          14.960900000063702
+        ],
+        "end": [
+          0.9814999999944121,
+          15.002300000051036
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WAA219E",
+        "start": [
+          0.9666999999899417,
+          14.94059999997262
+        ],
+        "end": [
+          0.9814999999944121,
+          15.002300000051036
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W8BFA8B",
+        "start": [
+          1.1766999999526888,
+          14.89020000002347
+        ],
+        "end": [
+          0.9666999999899417,
+          14.94059999997262
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WC7D4A6",
+        "start": [
+          23.616799999959767,
+          16.487800000002608
+        ],
+        "end": [
+          23.443800000008196,
+          16.52919999998994
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W1FEE27",
+        "start": [
+          21.86379999993369,
+          9.934000000008382
+        ],
+        "end": [
+          21.875599999912083,
+          9.98340000002645
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W392DB1",
+        "start": [
+          22.12349999998696,
+          11.021100000012666
+        ],
+        "end": [
+          22.135299999965355,
+          11.070500000030734
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W5CD4AF",
+        "start": [
+          23.42919999989681,
+          16.487599999993108
+        ],
+        "end": [
+          23.440999999875203,
+          16.537000000011176
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W932C7A",
+        "start": [
+          22.817799999844283,
+          13.153099999995902
+        ],
+        "end": [
+          22.829699999885634,
+          13.20250000001397
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WCC51DC",
+        "start": [
+          23.07949999999255,
+          14.239700000034645
+        ],
+        "end": [
+          23.09139999980107,
+          14.289100000052713
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W9AE372",
+        "start": [
+          23.341299999970943,
+          15.32620000001043
+        ],
+        "end": [
+          23.353200000012293,
+          15.375600000028498
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W647E41",
+        "start": [
+          23.608999999938533,
+          16.437400000053458
+        ],
+        "end": [
+          23.620899999979883,
+          16.48679999995511
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W13FCB8",
+        "start": [
+          40.820999999996275,
+          12.366000000038184
+        ],
+        "end": [
+          40.77159999986179,
+          12.377800000016578
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W918A49",
+        "start": [
+          39.436299999943,
+          12.696699999971315
+        ],
+        "end": [
+          39.38689999980852,
+          12.708500000066124
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WA6E26F",
+        "start": [
+          38.14049999997951,
+          13.006300000008196
+        ],
+        "end": [
+          38.09109999984503,
+          13.018099999986589
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W5CD4AF",
+        "start": [
+          23.440999999875203,
+          16.51749999995809
+        ],
+        "end": [
+          23.39159999997355,
+          16.5293000000529
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W27A3E1",
+        "start": [
+          22.262799999909475,
+          16.798900000052527
+        ],
+        "end": [
+          22.213400000007823,
+          16.81070000003092
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WB2EA2A",
+        "start": [
+          21.152899999869987,
+          17.06400000001304
+        ],
+        "end": [
+          21.103499999968335,
+          17.075799999991432
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WFD6257",
+        "start": [
+          20.05559999984689,
+          17.32620000001043
+        ],
+        "end": [
+          20.00619999994524,
+          17.337999999988824
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W0882E4",
+        "start": [
+          18.943800000008196,
+          17.59169999998994
+        ],
+        "end": [
+          18.894399999873713,
+          17.603499999968335
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WC550E5",
+        "start": [
+          16.732499999925494,
+          18.1199000000488
+        ],
+        "end": [
+          16.68309999979101,
+          18.131700000027195
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W48336C",
+        "start": [
+          13.499199999962002,
+          18.892300000065006
+        ],
+        "end": [
+          13.449799999827519,
+          18.9041000000434
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W1CE6E2",
+        "start": [
+          12.395499999867752,
+          19.15590000001248
+        ],
+        "end": [
+          12.3460999999661,
+          19.167699999990873
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W32FF1D",
+        "start": [
+          11.29189999983646,
+          19.419499999959953
+        ],
+        "end": [
+          11.242499999934807,
+          19.43130000005476
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WC4C4BD",
+        "start": [
+          23.443800000008196,
+          16.52919999998994
+        ],
+        "end": [
+          23.485299999825656,
+          16.70209999999497
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WAA98BF",
+        "start": [
+          40.86239999998361,
+          12.538900000043213
+        ],
+        "end": [
+          40.812999999849126,
+          12.550700000021607
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WDE0D38",
+        "start": [
+          39.47899999981746,
+          12.869399999966845
+        ],
+        "end": [
+          39.42959999991581,
+          12.881200000061654
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WE6D29D",
+        "start": [
+          38.180799999972805,
+          13.179400000022724
+        ],
+        "end": [
+          38.13139999983832,
+          13.191200000001118
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WD9611A",
+        "start": [
+          23.481399999931455,
+          16.69059999997262
+        ],
+        "end": [
+          23.43199999979697,
+          16.702400000067428
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W75A388",
+        "start": [
+          21.19429999985732,
+          17.236900000018068
+        ],
+        "end": [
+          21.14489999995567,
+          17.24869999999646
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WE2E34C",
+        "start": [
+          20.096999999834225,
+          17.49910000001546
+        ],
+        "end": [
+          20.047599999932572,
+          17.510899999993853
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WC2738F",
+        "start": [
+          23.394399999873713,
+          16.540999999968335
+        ],
+        "end": [
+          23.435899999924004,
+          16.713899999973364
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W33E485",
+        "start": [
+          38.079699999885634,
+          12.970500000054017
+        ],
+        "end": [
+          37.90679999999702,
+          13.01190000004135
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WC7D4A6",
+        "start": [
+          23.60479999985546,
+          16.43640000000596
+        ],
+        "end": [
+          23.431899999966845,
+          16.477799999993294
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W9EE453",
+        "start": [
+          10.216499999864027,
+          19.64220000000205
+        ],
+        "end": [
+          10.043599999975413,
+          19.683599999989383
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W8437AF",
+        "start": [
+          23.653799999970943,
+          16.478899999987334
+        ],
+        "end": [
+          23.70409999997355,
+          16.688900000066496
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W651ACD",
+        "start": [
+          38.141799999866635,
+          13.229900000034831
+        ],
+        "end": [
+          37.931899999966845,
+          13.28020000003744
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W50ECFC",
+        "start": [
+          23.704599999822676,
+          16.689600000041537
+        ],
+        "end": [
+          23.494699999922886,
+          16.739900000044145
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W191014",
+        "start": [
+          10.279699999839067,
+          19.906700000050478
+        ],
+        "end": [
+          10.069799999939278,
+          19.957000000053085
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W97C181",
+        "start": [
+          10.018899999791756,
+          19.745600000023842
+        ],
+        "end": [
+          10.069199999794364,
+          19.955500000040047
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WA90E5F",
+        "start": [
+          22.036699999822304,
+          9.892600000021048
+        ],
+        "end": [
+          22.048499999800697,
+          9.942000000039116
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WD26ECF",
+        "start": [
+          22.556199999991804,
+          12.067500000004657
+        ],
+        "end": [
+          22.567999999970198,
+          12.116900000022724
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WD2F014",
+        "start": [
+          18.991099999984726,
+          17.778799999970943
+        ],
+        "end": [
+          18.941699999850243,
+          17.790700000012293
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W981679",
+        "start": [
+          15.671299999812618,
+          18.578500000061467
+        ],
+        "end": [
+          15.621899999910966,
+          18.590399999986403
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WAE0FBC",
+        "start": [
+          10.323499999940395,
+          19.866700000013225
+        ],
+        "end": [
+          10.274099999805912,
+          19.878600000054576
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W4A51C4",
+        "start": [
+          22.31069999979809,
+          16.98349999997299
+        ],
+        "end": [
+          22.261299999896437,
+          16.9953000000678
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WBD8359",
+        "start": [
+          17.885199999902397,
+          18.04060000006575
+        ],
+        "end": [
+          17.835800000000745,
+          18.052400000044145
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W5572E0",
+        "start": [
+          16.780499999877065,
+          18.304499999969266
+        ],
+        "end": [
+          16.731099999975413,
+          18.316300000064075
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W0D27EC",
+        "start": [
+          13.547099999850616,
+          19.07680000003893
+        ],
+        "end": [
+          13.497699999948964,
+          19.088600000017323
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W618910",
+        "start": [
+          12.442299999995157,
+          19.34070000005886
+        ],
+        "end": [
+          12.392899999860674,
+          19.352500000037253
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WFFC0C5",
+        "start": [
+          11.339799999957904,
+          19.604099999996834
+        ],
+        "end": [
+          11.290399999823421,
+          19.615899999975227
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WEFAC76",
+        "start": [
+          9.002299999818206,
+          15.339099999982864
+        ],
+        "end": [
+          9.014199999859557,
+          15.388500000000931
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W25569B",
+        "start": [
+          9.788100000005215,
+          18.601299999980256
+        ],
+        "end": [
+          9.799999999813735,
+          18.650699999998324
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W2A585E",
+        "start": [
+          9.262799999909475,
+          16.426100000040606
+        ],
+        "end": [
+          9.274599999887869,
+          16.475500000058673
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WF9AC97",
+        "start": [
+          9.522499999962747,
+          17.51340000005439
+        ],
+        "end": [
+          9.53429999994114,
+          17.56279999995604
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WA398F3",
+        "start": [
+          10.04189999983646,
+          19.68779999995604
+        ],
+        "end": [
+          10.053699999814853,
+          19.73719999997411
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W749EA1",
+        "start": [
+          8.74239999987185,
+          14.254100000020117
+        ],
+        "end": [
+          8.754199999850243,
+          14.303500000038184
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W16FA4F",
+        "start": [
+          8.4757999998983,
+          13.141500000027008
+        ],
+        "end": [
+          8.488299999851733,
+          13.193700000061654
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W48336C",
+        "start": [
+          13.507800000021234,
+          18.90969999996014
+        ],
+        "end": [
+          13.45769999991171,
+          18.921700000064448
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W16FA4F",
+        "start": [
+          8.4757999998983,
+          13.141500000027008
+        ],
+        "end": [
+          8.47649999987334,
+          13.144300000043586
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W5D5030",
+        "start": [
+          17.842199999839067,
+          17.87120000005234
+        ],
+        "end": [
+          17.792799999937415,
+          17.883099999977276
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W2CDA1D",
+        "start": [
+          15.628299999982119,
+          18.4045000000624
+        ],
+        "end": [
+          15.578899999847636,
+          18.416399999987334
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W8639D9",
+        "start": [
+          10.280499999877065,
+          19.692700000014156
+        ],
+        "end": [
+          10.231099999975413,
+          19.704600000055507
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WB66668",
+        "start": [
+          10.2300999998115,
+          19.695000000065193
+        ],
+        "end": [
+          10.280399999814108,
+          19.904899999964982
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WB66668",
+        "start": [
+          10.279499999945983,
+          19.683100000023842
+        ],
+        "end": [
+          10.320899999933317,
+          19.85600000002887
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W7F7151",
+        "start": [
+          8.649399999994785,
+          13.102799999993294
+        ],
+        "end": [
+          8.47649999987334,
+          13.144300000043586
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WE62B9D",
+        "start": [
+          8.649399999994785,
+          13.102799999993294
+        ],
+        "end": [
+          8.661199999973178,
+          13.152200000011362
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W89AD13",
+        "start": [
+          8.914600000018254,
+          14.212900000042282
+        ],
+        "end": [
+          8.926399999996647,
+          14.26230000006035
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W2A02CC",
+        "start": [
+          9.435300000011921,
+          16.39269999996759
+        ],
+        "end": [
+          9.447099999990314,
+          16.442099999985658
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WA7BA32",
+        "start": [
+          9.693199999863282,
+          17.47239999996964
+        ],
+        "end": [
+          9.704999999841675,
+          17.521799999987707
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WF65641",
+        "start": [
+          10.212599999969825,
+          19.646999999997206
+        ],
+        "end": [
+          10.224399999948218,
+          19.696400000015274
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WBE2E3C",
+        "start": [
+          36.523300000000745,
+          6.474099999992177
+        ],
+        "end": [
+          36.3503999998793,
+          6.515600000042468
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W7F7151",
+        "start": [
+          8.6632999998983,
+          13.161100000026636
+        ],
+        "end": [
+          8.490400000009686,
+          13.202599999960512
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W2EBD5D",
+        "start": [
+          9.17519999993965,
+          15.297600000048988
+        ],
+        "end": [
+          9.187099999981001,
+          15.347000000067055
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W75ABF8",
+        "start": [
+          9.961099999956787,
+          18.559899999992922
+        ],
+        "end": [
+          9.972999999998137,
+          18.60930000001099
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WA398F3",
+        "start": [
+          10.228799999924377,
+          19.695300000021234
+        ],
+        "end": [
+          10.018899999791756,
+          19.745600000023842
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WC7D4A6",
+        "start": [
+          23.653799999970943,
+          16.478899999987334
+        ],
+        "end": [
+          23.443800000008196,
+          16.52919999998994
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WC4C4BD",
+        "start": [
+          23.443800000008196,
+          16.52919999998994
+        ],
+        "end": [
+          23.49419999984093,
+          16.739200000069104
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WFFFD57",
+        "start": [
+          23.165700000012293,
+          15.368200000026263
+        ],
+        "end": [
+          23.177499999990687,
+          15.417699999990873
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W366F67",
+        "start": [
+          22.384499999927357,
+          12.107700000051409
+        ],
+        "end": [
+          22.396399999968708,
+          12.157100000069477
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WFB3628",
+        "start": [
+          22.646199999842793,
+          13.194299999973737
+        ],
+        "end": [
+          22.658099999884143,
+          13.243699999991804
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W97DBAF",
+        "start": [
+          22.90639999997802,
+          14.274100000038743
+        ],
+        "end": [
+          22.91830000001937,
+          14.32350000005681
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W7552F7",
+        "start": [
+          22.048499999800697,
+          9.942000000039116
+        ],
+        "end": [
+          21.875599999912083,
+          9.98340000002645
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WC31543",
+        "start": [
+          22.036699999822304,
+          9.892600000021048
+        ],
+        "end": [
+          21.86379999993369,
+          9.934000000008382
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W76C11C",
+        "start": [
+          22.297099999850616,
+          10.97940000006929
+        ],
+        "end": [
+          22.30889999982901,
+          11.0289000000339
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WC35CEA",
+        "start": [
+          37.3800999999512,
+          10.813500000047497
+        ],
+        "end": [
+          37.39189999992959,
+          10.862900000065565
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W40A688",
+        "start": [
+          37.63980000000447,
+          11.900600000051782
+        ],
+        "end": [
+          37.651599999982864,
+          11.95000000006985
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WBF8D27",
+        "start": [
+          37.90529999998398,
+          13.01230000006035
+        ],
+        "end": [
+          37.917099999962375,
+          13.061699999962002
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WECF2F7",
+        "start": [
+          38.09149999986403,
+          13.019899999955669
+        ],
+        "end": [
+          37.91859999997541,
+          13.061300000059418
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W649228",
+        "start": [
+          36.51150000002235,
+          6.424699999974109
+        ],
+        "end": [
+          36.523300000000745,
+          6.474099999992177
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WCC7D83",
+        "start": [
+          37.55030000000261,
+          10.773599999956787
+        ],
+        "end": [
+          37.562099999981,
+          10.822999999974854
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W6C3B93",
+        "start": [
+          37.80999999982305,
+          11.86069999996107
+        ],
+        "end": [
+          37.82179999980144,
+          11.910099999979138
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WB2D654",
+        "start": [
+          38.07549999980256,
+          12.972300000023097
+        ],
+        "end": [
+          38.087300000013784,
+          13.021700000041164
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WE6D29D",
+        "start": [
+          38.09149999986403,
+          13.019899999955669
+        ],
+        "end": [
+          38.13299999991432,
+          13.192799999960698
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WA6E26F",
+        "start": [
+          38.14089999999851,
+          13.008099999977276
+        ],
+        "end": [
+          38.18239999981597,
+          13.180999999982305
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WBF8D27",
+        "start": [
+          37.91859999997541,
+          13.061300000059418
+        ],
+        "end": [
+          37.88159999996424,
+          13.070199999958277
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WD28504",
+        "start": [
+          37.88159999996424,
+          13.070199999958277
+        ],
+        "end": [
+          37.931899999966845,
+          13.28020000003744
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W554BD9",
+        "start": [
+          38.13299999991432,
+          13.192799999960698
+        ],
+        "end": [
+          38.141799999866635,
+          13.229900000034831
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W38A29E",
+        "start": [
+          36.59889999986626,
+          7.552999999956228
+        ],
+        "end": [
+          36.61079999990761,
+          7.6023999999742955
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W9E00CF",
+        "start": [
+          36.86060000001453,
+          8.639500000048429
+        ],
+        "end": [
+          36.87249999982305,
+          8.688900000066496
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W6B82F9",
+        "start": [
+          37.12239999999292,
+          9.726099999970756
+        ],
+        "end": [
+          37.13429999980144,
+          9.775499999988824
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W93B8FA",
+        "start": [
+          36.33859999990091,
+          6.466200000024401
+        ],
+        "end": [
+          36.3503999998793,
+          6.515600000042468
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W5F7830",
+        "start": [
+          40.77159999986179,
+          12.377800000016578
+        ],
+        "end": [
+          40.812999999849126,
+          12.550700000021607
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W8ED40B",
+        "start": [
+          40.820999999996275,
+          12.366000000038184
+        ],
+        "end": [
+          40.86239999998361,
+          12.538900000043213
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WA89558",
+        "start": [
+          37.2925999998115,
+          9.685300000011921
+        ],
+        "end": [
+          37.30449999985285,
+          9.734700000029989
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W04F6C4",
+        "start": [
+          36.77179999998771,
+          7.511599999968894
+        ],
+        "end": [
+          36.78369999979623,
+          7.5609999999869615
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WC5C138",
+        "start": [
+          37.03349999990314,
+          8.598100000061095
+        ],
+        "end": [
+          37.04539999994449,
+          8.647499999962747
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WBE2E3C",
+        "start": [
+          36.51150000002235,
+          6.424699999974109
+        ],
+        "end": [
+          36.301499999826774,
+          6.474999999976717
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W9E905F",
+        "start": [
+          18.581799999810755,
+          57.39459999999963
+        ],
+        "end": [
+          18.94869999983348,
+          58.926100000040606
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W5236C9",
+        "start": [
+          18.853499999968335,
+          57.32949999999255
+        ],
+        "end": [
+          19.22039999999106,
+          58.86100000003353
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WD75C02",
+        "start": [
+          16.70449999999255,
+          57.84440000005998
+        ],
+        "end": [
+          16.1671999997925,
+          57.973100000061095
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W15DD4D",
+        "start": [
+          34.11519999988377,
+          58.727100000018254
+        ],
+        "end": [
+          33.76939999987371,
+          58.81000000005588
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W700176",
+        "start": [
+          27.149800000013784,
+          60.396999999997206
+        ],
+        "end": [
+          26.804000000003725,
+          60.47990000003483
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W9E9527",
+        "start": [
+          38.79689999995753,
+          57.82750000001397
+        ],
+        "end": [
+          40.37109999987297,
+          64.39789999998175
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W0CEA86",
+        "start": [
+          49.9460999998264,
+          62.39130000001751
+        ],
+        "end": [
+          40.18919999990612,
+          64.72880000004079
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W82DDE1",
+        "start": [
+          44.14169999980368,
+          26.771500000031665
+        ],
+        "end": [
+          41.32579999999143,
+          27.446200000005774
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W1D41F2",
+        "start": [
+          44.64709999994375,
+          41.472900000051595
+        ],
+        "end": [
+          46.23309999983758,
+          48.09270000003744
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W1E131F",
+        "start": [
+          46.3159999998752,
+          48.4385000000475
+        ],
+        "end": [
+          47.901899999938905,
+          55.05839999997988
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WACCA70",
+        "start": [
+          18.596599999815226,
+          57.45640000002459
+        ],
+        "end": [
+          18.547199999913573,
+          57.46820000000298
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W22EF53",
+        "start": [
+          16.76839999994263,
+          57.89309999998659
+        ],
+        "end": [
+          16.718999999808148,
+          57.90489999996498
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W9010F1",
+        "start": [
+          18.632099999813363,
+          57.604599999962375
+        ],
+        "end": [
+          18.58269999991171,
+          57.61640000005718
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WEB4FB9",
+        "start": [
+          16.80629999982193,
+          58.04070000001229
+        ],
+        "end": [
+          16.75689999992028,
+          58.05249999999069
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WD5B4F8",
+        "start": [
+          18.547199999913573,
+          57.46820000000298
+        ],
+        "end": [
+          18.58269999991171,
+          57.61640000005718
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WD076F4",
+        "start": [
+          16.768699999898672,
+          57.894300000043586
+        ],
+        "end": [
+          16.80419999989681,
+          58.04249999998137
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WB6DF17",
+        "start": [
+          16.70449999999255,
+          57.84440000005998
+        ],
+        "end": [
+          16.769599999999627,
+          58.116099999984726
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WEDEE04",
+        "start": [
+          18.853499999968335,
+          57.32949999999255
+        ],
+        "end": [
+          18.581799999810755,
+          57.39459999999963
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WBBF163",
+        "start": [
+          2.231499999994412,
+          19.45649999997113
+        ],
+        "end": [
+          2.2669999999925494,
+          19.604700000025332
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W03D74C",
+        "start": [
+          42.972399999853224,
+          34.48250000004191
+        ],
+        "end": [
+          44.56429999996908,
+          41.12699999997858
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WB588BA",
+        "start": [
+          19.01039999979548,
+          58.911300000036135
+        ],
+        "end": [
+          19.022299999836832,
+          58.9607000000542
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W242D40",
+        "start": [
+          19.450799999991432,
+          60.739500000025146
+        ],
+        "end": [
+          19.462699999799952,
+          60.78890000004321
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W522D4A",
+        "start": [
+          19.1585999999661,
+          58.875800000038
+        ],
+        "end": [
+          19.17050000000745,
+          58.925200000056066
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WE5FEA6",
+        "start": [
+          19.597399999853224,
+          60.697299999999814
+        ],
+        "end": [
+          19.609299999894574,
+          60.74670000001788
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WF72D96",
+        "start": [
+          19.67009999998845,
+          60.73829999996815
+        ],
+        "end": [
+          19.915700000012293,
+          61.76340000005439
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WC1FD32",
+        "start": [
+          47.98479999997653,
+          55.40419999998994
+        ],
+        "end": [
+          49.57669999985956,
+          62.04879999998957
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W4F2352",
+        "start": [
+          37.34799999999814,
+          5.937000000034459
+        ],
+        "end": [
+          20.897099999943748,
+          9.878299999982119
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W13305D",
+        "start": [
+          37.41299999994226,
+          6.208699999959208
+        ],
+        "end": [
+          36.301499999826774,
+          6.474999999976717
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W906890",
+        "start": [
+          22.07369999983348,
+          9.883800000068732
+        ],
+        "end": [
+          20.962199999950826,
+          10.150099999969825
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W01E991",
+        "start": [
+          9.550300000002608,
+          12.884199999971315
+        ],
+        "end": [
+          8.438799999887124,
+          13.150499999988824
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WCC0EAE",
+        "start": [
+          20.897099999943748,
+          9.878299999982119
+        ],
+        "end": [
+          20.962199999950826,
+          10.150000000023283
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W4A9B37",
+        "start": [
+          9.48519999999553,
+          12.612399999983609
+        ],
+        "end": [
+          9.550300000002608,
+          12.884100000024773
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W01D6A5",
+        "start": [
+          9.48519999999553,
+          12.612399999983609
+        ],
+        "end": [
+          9.999983012676239e-05,
+          14.884799999999814
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WFD0672",
+        "start": [
+          9.999983012676239e-05,
+          14.884799999999814
+        ],
+        "end": [
+          0.06519999983720481,
+          15.15659999998752
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W00AFD5",
+        "start": [
+          1.1766999999526888,
+          14.89020000002347
+        ],
+        "end": [
+          0.06519999983720481,
+          15.15659999998752
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W54696A",
+        "start": [
+          37.34799999999814,
+          5.937000000034459
+        ],
+        "end": [
+          37.41299999994226,
+          6.208699999959208
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WF70094",
+        "start": [
+          40.60499999998137,
+          11.46440000005532
+        ],
+        "end": [
+          40.87129999999888,
+          12.57590000005439
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W577C78",
+        "start": [
+          40.8890999997966,
+          11.396300000022165
+        ],
+        "end": [
+          40.60499999998137,
+          11.46440000005532
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W1D54AD",
+        "start": [
+          40.8890999997966,
+          11.396300000022165
+        ],
+        "end": [
+          44.61439999984577,
+          26.945599999977276
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WEAB23E",
+        "start": [
+          44.61439999984577,
+          26.945599999977276
+        ],
+        "end": [
+          41.625499999849126,
+          27.661700000055134
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WF78D3C",
+        "start": [
+          41.625499999849126,
+          27.661700000055134
+        ],
+        "end": [
+          49.9460999998264,
+          62.39130000001751
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W89544E",
+        "start": [
+          38.54989999998361,
+          57.886599999968894
+        ],
+        "end": [
+          40.18919999990612,
+          64.72880000004079
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W910A8A",
+        "start": [
+          38.54989999998361,
+          57.886599999968894
+        ],
+        "end": [
+          19.777199999894947,
+          62.384199999971315
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W7CCC0D",
+        "start": [
+          19.398399999830872,
+          60.80339999997523
+        ],
+        "end": [
+          19.777199999894947,
+          62.384199999971315
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W35878F",
+        "start": [
+          16.769599999999627,
+          58.116099999984726
+        ],
+        "end": [
+          10.499499999918044,
+          59.618299999972805
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "W04BF4E",
+        "start": [
+          10.640399999916553,
+          59.29720000002999
+        ],
+        "end": [
+          10.705499999923632,
+          59.56889999995474
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      },
+      {
+        "id": "WDD3F11",
+        "start": [
+          1.2844999998342246,
+          14.57709999999497
+        ],
+        "end": [
+          1.2597999998833984,
+          14.582999999984168
+        ],
+        "side": "outer",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED",
+          "classify": "near_area_gross"
+        }
+      }
+    ],
+    "inner_walls": [
+      {
+        "id": "W823492",
+        "start": [
+          11.547399999806657,
+          57.90460000000894
+        ],
+        "end": [
+          11.275699999881908,
+          57.96970000001602
         ],
         "side": "inner",
         "source": {
@@ -249,30 +4067,14 @@
         }
       },
       {
-        "id": "WA0D663",
-        "start": [
-          44.45289999991655,
-          26.76230000006035
-        ],
-        "end": [
-          44.15649999980815,
-          26.833300000056624
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "W3DD080",
         "start": [
           41.3405999999959,
-          27.507800000021234
+          27.507899999967776
         ],
         "end": [
           41.044199999887496,
-          27.57880000001751
+          27.57889999996405
         ],
         "side": "inner",
         "source": {
@@ -284,11 +4086,11 @@
         "id": "W7C0165",
         "start": [
           34.374799999874085,
-          29.176399999996647
+          29.176500000059605
         ],
         "end": [
           34.07839999999851,
-          29.247399999992922
+          29.24750000005588
         ],
         "side": "inner",
         "source": {
@@ -300,11 +4102,11 @@
         "id": "W4662E9",
         "start": [
           21.159499999834225,
-          32.3420000000624
+          32.34210000000894
         ],
         "end": [
           20.86309999995865,
-          32.41300000005867
+          32.413100000005215
         ],
         "side": "inner",
         "source": {
@@ -316,11 +4118,11 @@
         "id": "W122614",
         "start": [
           10.778799999970943,
-          34.82860000000801
+          34.82870000007097
         ],
         "end": [
           10.630599999800324,
-          34.86410000000615
+          34.864200000069104
         ],
         "side": "inner",
         "source": {
@@ -332,11 +4134,11 @@
         "id": "WF10B3A",
         "start": [
           6.51189999980852,
-          35.85070000006817
+          35.850800000014715
         ],
         "end": [
           6.215499999932945,
-          35.92170000006445
+          35.92180000001099
         ],
         "side": "inner",
         "source": {
@@ -385,22 +4187,6 @@
         "end": [
           23.38259999989532,
           46.198899999959394
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W154D10",
-        "start": [
-          44.62599999993108,
-          41.11230000003707
-        ],
-        "end": [
-          44.70889999996871,
-          41.458100000047125
         ],
         "side": "inner",
         "source": {
@@ -465,38 +4251,6 @@
         "end": [
           46.0327999999281,
           48.5054999999702
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W921424",
-        "start": [
-          41.044199999887496,
-          12.534500000067055
-        ],
-        "end": [
-          41.11519999988377,
-          12.830900000059046
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W5B7F23",
-        "start": [
-          44.38139999983832,
-          26.4660000000149
-        ],
-        "end": [
-          44.4523999998346,
-          26.762400000006892
         ],
         "side": "inner",
         "source": {
@@ -809,38 +4563,6 @@
         }
       },
       {
-        "id": "W0F4939",
-        "start": [
-          16.211200000019744,
-          58.15670000005048
-        ],
-        "end": [
-          15.914799999911338,
-          58.22770000004675
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W58D9FD",
-        "start": [
-          12.154099999926984,
-          59.128600000054576
-        ],
-        "end": [
-          11.857699999818578,
-          59.19960000005085
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "W091B1C",
         "start": [
           15.843799999915063,
@@ -969,118 +4691,6 @@
         }
       },
       {
-        "id": "WD079B4",
-        "start": [
-          49.684799999929965,
-          62.336299999966286
-        ],
-        "end": [
-          49.38839999982156,
-          62.40729999996256
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WE012C7",
-        "start": [
-          42.99049999983981,
-          63.93989999999758
-        ],
-        "end": [
-          42.69409999996424,
-          64.01089999999385
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WA28D7D",
-        "start": [
-          37.931899999966845,
-          13.28020000003744
-        ],
-        "end": [
-          38.00289999996312,
-          13.57660000002943
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W3D8E1A",
-        "start": [
-          39.60049999994226,
-          20.245899999979883
-        ],
-        "end": [
-          39.67149999993853,
-          20.542299999971874
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W429995",
-        "start": [
-          41.26909999991767,
-          27.211600000038743
-        ],
-        "end": [
-          41.340099999913946,
-          27.508000000030734
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WCBE2B9",
-        "start": [
-          42.93759999983013,
-          34.177400000044145
-        ],
-        "end": [
-          43.0085999998264,
-          34.473800000036135
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WF37BC2",
-        "start": [
-          49.61199999996461,
-          62.040299999993294
-        ],
-        "end": [
-          49.682999999960884,
-          62.336699999985285
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "WA63A3F",
         "start": [
           49.61379999993369,
@@ -1161,150 +4771,6 @@
         }
       },
       {
-        "id": "WD3BFFF",
-        "start": [
-          36.26299999980256,
-          6.31449999997858
-        ],
-        "end": [
-          35.966599999926984,
-          6.385499999974854
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W105CF9",
-        "start": [
-          22.331799999810755,
-          9.651599999982864
-        ],
-        "end": [
-          22.03539999993518,
-          9.722599999979138
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W473190",
-        "start": [
-          1.4342999998480082,
-          14.657400000025518
-        ],
-        "end": [
-          1.1378999999724329,
-          14.728400000021793
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WDCC8E3",
-        "start": [
-          1.1381999999284744,
-          14.729700000025332
-        ],
-        "end": [
-          1.2091999999247491,
-          15.026100000017323
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W9DF014",
-        "start": [
-          2.8067999999038875,
-          21.695500000030734
-        ],
-        "end": [
-          2.877799999900162,
-          21.991900000022724
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W0E8541",
-        "start": [
-          6.143899999791756,
-          35.62690000003204
-        ],
-        "end": [
-          6.214900000020862,
-          35.92330000002403
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WC6661B",
-        "start": [
-          7.8125,
-          42.59270000003744
-        ],
-        "end": [
-          7.883499999996275,
-          42.88910000002943
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W314A82",
-        "start": [
-          9.481099999975413,
-          49.55839999997988
-        ],
-        "end": [
-          9.552099999971688,
-          49.854799999971874
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W30357B",
-        "start": [
-          11.149999999906868,
-          56.525299999979325
-        ],
-        "end": [
-          11.220999999903142,
-          56.821699999971315
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "W6AE55F",
         "start": [
           36.33409999986179,
@@ -1345,38 +4811,6 @@
         "end": [
           45.94900000002235,
           48.160800000070594
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W1F1F64",
-        "start": [
-          46.29489999986254,
-          48.07790000003297
-        ],
-        "end": [
-          46.377699999837205,
-          48.42370000004303
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W8E463C",
-        "start": [
-          47.96279999986291,
-          55.04379999998491
-        ],
-        "end": [
-          48.04559999983758,
-          55.38959999999497
         ],
         "side": "inner",
         "source": {
@@ -1513,38 +4947,6 @@
         }
       },
       {
-        "id": "W15DD4D",
-        "start": [
-          34.11569999996573,
-          58.72909999999683
-        ],
-        "end": [
-          33.76989999995567,
-          58.81200000003446
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W700176",
-        "start": [
-          27.150199999799952,
-          60.39890000002924
-        ],
-        "end": [
-          26.804400000022724,
-          60.48180000006687
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "WB5C562",
         "start": [
           47.617899999953806,
@@ -1577,30 +4979,14 @@
         }
       },
       {
-        "id": "WA90E5F",
-        "start": [
-          22.035299999872223,
-          9.723200000007637
-        ],
-        "end": [
-          22.106299999868497,
-          10.019599999999627
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "W9CEECB",
         "start": [
-          28.709599999943748,
-          37.58609999995679
+          28.71059999987483,
+          37.5859000000637
         ],
         "end": [
-          28.780599999940023,
-          37.88250000006519
+          28.781599999871105,
+          37.88230000005569
         ],
         "side": "inner",
         "source": {
@@ -2057,54 +5443,6 @@
         }
       },
       {
-        "id": "WA682DF",
-        "start": [
-          20.183799999998882,
-          62.06480000005104
-        ],
-        "end": [
-          19.837999999988824,
-          62.147600000025705
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W05BA79",
-        "start": [
-          16.417499999981374,
-          47.870499999960884
-        ],
-        "end": [
-          16.50029999995604,
-          48.21629999997094
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WE931A3",
-        "start": [
-          19.753399999812245,
-          61.802200000034645
-        ],
-        "end": [
-          19.836200000019744,
-          62.1480000000447
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "W4E8F34",
         "start": [
           16.763299999991432,
@@ -2189,6 +5527,22 @@
         "start": [
           16.846199999796227,
           48.13340000004973
+        ],
+        "end": [
+          16.50029999995604,
+          48.21629999997094
+        ],
+        "side": "inner",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED"
+        }
+      },
+      {
+        "id": "W05BA79",
+        "start": [
+          16.417499999981374,
+          47.870499999960884
         ],
         "end": [
           16.50029999995604,
@@ -2473,22 +5827,6 @@
         }
       },
       {
-        "id": "W20C4BA",
-        "start": [
-          11.795899999793619,
-          58.942000000039116
-        ],
-        "end": [
-          11.858099999837577,
-          59.20140000001993
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "W6370EC",
         "start": [
           12.083499999949709,
@@ -2745,62 +6083,14 @@
         }
       },
       {
-        "id": "WBC9656",
-        "start": [
-          4.475899999961257,
-          28.66099999996368
-        ],
-        "end": [
-          4.546899999957532,
-          28.957500000018626
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WAA98BF",
-        "start": [
-          41.044199999887496,
-          12.534500000067055
-        ],
-        "end": [
-          40.74780000001192,
-          12.60550000006333
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "WCE3714",
         "start": [
-          37.93199999979697,
-          13.28000000002794
+          37.931899999966845,
+          13.28020000003744
         ],
         "end": [
-          37.635599999921396,
-          13.351000000024214
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W845010",
-        "start": [
-          17.034800000023097,
-          18.285700000007637
-        ],
-        "end": [
-          16.73839999991469,
-          18.35670000000391
+          37.63549999985844,
+          13.351200000033714
         ],
         "side": "inner",
         "source": {
@@ -2811,12 +6101,12 @@
       {
         "id": "W428B57",
         "start": [
-          10.068899999838322,
-          19.954400000046007
+          10.068800000008196,
+          19.954600000055507
         ],
         "end": [
-          9.772499999962747,
-          20.025400000042282
+          9.77239999989979,
+          20.02560000005178
         ],
         "side": "inner",
         "source": {
@@ -2827,12 +6117,12 @@
       {
         "id": "W763E4E",
         "start": [
-          3.10329999984242,
-          21.622899999958463
+          3.1032000000122935,
+          21.623099999967963
         ],
         "end": [
-          2.806899999966845,
-          21.693899999954738
+          2.8067999999038875,
+          21.694099999964237
         ],
         "side": "inner",
         "source": {
@@ -2905,46 +6195,14 @@
         }
       },
       {
-        "id": "W16FA4F",
-        "start": [
-          8.40029999986291,
-          12.989799999981187
-        ],
-        "end": [
-          8.471299999859184,
-          13.286199999973178
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "W5D18A3",
         "start": [
           10.069199999794364,
-          19.95669999998063
+          19.955500000040047
         ],
         "end": [
           10.14020000002347,
-          20.25309999997262
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W8EDF83",
-        "start": [
-          8.40029999986291,
-          12.989799999981187
-        ],
-        "end": [
-          8.103899999987334,
-          13.06090000004042
+          20.251900000032037
         ],
         "side": "inner",
         "source": {
@@ -2961,22 +6219,6 @@
         "end": [
           8.174899999983609,
           13.35730000003241
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WAB20B4",
-        "start": [
-          42.712999999988824,
-          19.5002000000095
-        ],
-        "end": [
-          42.784099999815226,
-          19.79660000000149
         ],
         "side": "inner",
         "source": {
@@ -3009,6 +6251,54 @@
         "end": [
           32.40889999992214,
           22.280999999959022
+        ],
+        "side": "inner",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED"
+        }
+      },
+      {
+        "id": "WA28D7D",
+        "start": [
+          37.931899999966845,
+          13.28020000003744
+        ],
+        "end": [
+          38.00289999996312,
+          13.57660000002943
+        ],
+        "side": "inner",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED"
+        }
+      },
+      {
+        "id": "W3D8E1A",
+        "start": [
+          39.60049999994226,
+          20.245899999979883
+        ],
+        "end": [
+          39.67149999993853,
+          20.542299999971874
+        ],
+        "side": "inner",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED"
+        }
+      },
+      {
+        "id": "W429995",
+        "start": [
+          41.26909999991767,
+          27.211600000038743
+        ],
+        "end": [
+          41.340099999913946,
+          27.508000000030734
         ],
         "side": "inner",
         "source": {
@@ -3233,38 +6523,6 @@
         "end": [
           32.706099999835715,
           22.211099999956787
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W93B8FA",
-        "start": [
-          36.26299999980256,
-          6.31449999997858
-        ],
-        "end": [
-          36.33409999986179,
-          6.61089999997057
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W8E5FA5",
-        "start": [
-          29.297399999806657,
-          7.983299999963492
-        ],
-        "end": [
-          29.000899999868125,
-          8.054299999959767
         ],
         "side": "inner",
         "source": {
@@ -4057,54 +7315,6 @@
         }
       },
       {
-        "id": "W2A85E9",
-        "start": [
-          36.0050999999512,
-          6.545999999972992
-        ],
-        "end": [
-          29.335800000000745,
-          8.143900000024587
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W7CFD39",
-        "start": [
-          29.03939999989234,
-          8.214900000020862
-        ],
-        "end": [
-          22.370099999941885,
-          9.8127000000095
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WA7ACA0",
-        "start": [
-          8.142400000011548,
-          13.2212999999756
-        ],
-        "end": [
-          1.4730999998282641,
-          14.819099999964237
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "W4FDDDA",
         "start": [
           4.511399999959394,
@@ -4121,150 +7331,6 @@
         }
       },
       {
-        "id": "WD4DED5",
-        "start": [
-          4.608699999982491,
-          28.942700000014156
-        ],
-        "end": [
-          6.206499999854714,
-          35.61190000001807
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W581974",
-        "start": [
-          6.277499999850988,
-          35.90830000001006
-        ],
-        "end": [
-          7.875299999956042,
-          42.57759999996051
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W6CC84E",
-        "start": [
-          7.946299999952316,
-          42.87400000006892
-        ],
-        "end": [
-          9.544099999824539,
-          49.54330000001937
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W9D50AD",
-        "start": [
-          9.615099999820814,
-          49.83970000001136
-        ],
-        "end": [
-          11.212899999925867,
-          56.508999999961816
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W54ED71",
-        "start": [
-          11.283999999985099,
-          56.80540000007022
-        ],
-        "end": [
-          11.547399999806657,
-          57.90460000000894
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W1DE63E",
-        "start": [
-          15.870799999916926,
-          58.04410000005737
-        ],
-        "end": [
-          12.110099999932572,
-          58.945100000011735
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WC3495D",
-        "start": [
-          4.301499999826774,
-          28.85959999996703
-        ],
-        "end": [
-          11.275699999881908,
-          57.96970000001602
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WC752DA",
-        "start": [
-          41.30349999992177,
-          27.51679999998305
-        ],
-        "end": [
-          42.90129999979399,
-          34.18610000004992
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W2EF8B1",
-        "start": [
-          42.655899999896064,
-          63.85050000005867
-        ],
-        "end": [
-          40.37109999987297,
-          64.39789999998175
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "W44B6D1",
         "start": [
           2.805500000016764,
@@ -4273,118 +7339,6 @@
         "end": [
           2.6325999998953193,
           21.893900000024587
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W7FBDCE",
-        "start": [
-          1.2448999998159707,
-          16.101499999989755
-        ],
-        "end": [
-          1.256699999794364,
-          16.150900000007823
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W463557",
-        "start": [
-          1.51949999993667,
-          17.25109999999404
-        ],
-        "end": [
-          1.5312999999150634,
-          17.300500000012107
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W88200D",
-        "start": [
-          2.342499999795109,
-          20.696600000024773
-        ],
-        "end": [
-          2.354300000006333,
-          20.74600000004284
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W44B6D1",
-        "start": [
-          2.6169000000227243,
-          21.84539999999106
-        ],
-        "end": [
-          2.6287000000011176,
-          21.894800000009127
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W318849",
-        "start": [
-          3.17160000000149,
-          24.167699999990873
-        ],
-        "end": [
-          3.1833999999798834,
-          24.21710000000894
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WB254DC",
-        "start": [
-          3.4490000000223517,
-          25.32880000001751
-        ],
-        "end": [
-          3.460800000000745,
-          25.378200000035577
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WB007E1",
-        "start": [
-          4.003700000001118,
-          27.651100000017323
-        ],
-        "end": [
-          4.015499999979511,
-          27.70050000003539
         ],
         "side": "inner",
         "source": {
@@ -4449,86 +7403,6 @@
         "end": [
           2.0822999998927116,
           19.5966999999946
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WDBF4E5",
-        "start": [
-          1.7951999998185784,
-          18.398700000019744
-        ],
-        "end": [
-          1.807099999859929,
-          18.44810000003781
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W11C037",
-        "start": [
-          2.071799999801442,
-          19.54700000002049
-        ],
-        "end": [
-          2.0836999998427927,
-          19.596400000038557
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W84DD28",
-        "start": [
-          2.9046000000089407,
-          23.00399999995716
-        ],
-        "end": [
-          2.9164999998174608,
-          23.053399999975227
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W37A648",
-        "start": [
-          3.7432999999728054,
-          26.48589999997057
-        ],
-        "end": [
-          3.755200000014156,
-          26.535299999988638
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WA660C6",
-        "start": [
-          4.301099999807775,
-          28.801199999987148
-        ],
-        "end": [
-          4.312999999849126,
-          28.850600000005215
         ],
         "side": "inner",
         "source": {
@@ -4689,214 +7563,6 @@
         "end": [
           1.2382000000216067,
           16.07220000005327
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W90F77B",
-        "start": [
-          1.1395999998785555,
-          14.899100000038743
-        ],
-        "end": [
-          1.1543999998830259,
-          14.960900000063702
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W556AE0",
-        "start": [
-          1.4177999999374151,
-          16.06010000000242
-        ],
-        "end": [
-          1.4295999999158084,
-          16.10950000002049
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W8F467A",
-        "start": [
-          1.6921999999321997,
-          17.208899999968708
-        ],
-        "end": [
-          1.703999999910593,
-          17.258299999986775
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W7B8337",
-        "start": [
-          2.5155999998096377,
-          20.655999999959022
-        ],
-        "end": [
-          2.5274000000208616,
-          20.70539999997709
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WB4FF7C",
-        "start": [
-          2.791399999987334,
-          21.81070000003092
-        ],
-        "end": [
-          2.8031999999657273,
-          21.860100000048988
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WB0835A",
-        "start": [
-          3.3447000000160187,
-          24.12699999997858
-        ],
-        "end": [
-          3.356499999994412,
-          24.176399999996647
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W68188F",
-        "start": [
-          3.6218999999109656,
-          25.287400000030175
-        ],
-        "end": [
-          3.633699999889359,
-          25.336800000048243
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W55C307",
-        "start": [
-          3.89919999986887,
-          26.44850000005681
-        ],
-        "end": [
-          3.910999999847263,
-          26.497899999958463
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W7D5D90",
-        "start": [
-          4.176599999889731,
-          27.60970000002999
-        ],
-        "end": [
-          4.188399999868125,
-          27.659100000048056
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WB8EB9A",
-        "start": [
-          1.9680999999400228,
-          18.35730000003241
-        ],
-        "end": [
-          1.9799999999813735,
-          18.406700000050478
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WBBF163",
-        "start": [
-          2.2446999999228865,
-          19.505600000033155
-        ],
-        "end": [
-          2.256599999964237,
-          19.555000000051223
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WF66ED7",
-        "start": [
-          3.0774999998975545,
-          22.962599999969825
-        ],
-        "end": [
-          3.0893999999389052,
-          23.011999999987893
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WBC9656",
-        "start": [
-          4.475399999879301,
-          28.76560000004247
-        ],
-        "end": [
-          4.487299999920651,
-          28.815000000060536
         ],
         "side": "inner",
         "source": {
@@ -5097,1174 +7763,6 @@
         }
       },
       {
-        "id": "W6243B0",
-        "start": [
-          1.1543999998830259,
-          14.960900000063702
-        ],
-        "end": [
-          0.9814999999944121,
-          15.002300000051036
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WAA219E",
-        "start": [
-          0.9666999999899417,
-          14.94059999997262
-        ],
-        "end": [
-          0.9814999999944121,
-          15.002300000051036
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W8BFA8B",
-        "start": [
-          1.1766999999526888,
-          14.89020000002347
-        ],
-        "end": [
-          0.9666999999899417,
-          14.94059999997262
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WC7D4A6",
-        "start": [
-          23.616799999959767,
-          16.487800000002608
-        ],
-        "end": [
-          23.443800000008196,
-          16.52919999998994
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W1FEE27",
-        "start": [
-          21.86379999993369,
-          9.934000000008382
-        ],
-        "end": [
-          21.875599999912083,
-          9.98340000002645
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W392DB1",
-        "start": [
-          22.12349999998696,
-          11.021100000012666
-        ],
-        "end": [
-          22.135299999965355,
-          11.070500000030734
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W5CD4AF",
-        "start": [
-          23.42919999989681,
-          16.487599999993108
-        ],
-        "end": [
-          23.440999999875203,
-          16.537000000011176
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W932C7A",
-        "start": [
-          22.817799999844283,
-          13.153099999995902
-        ],
-        "end": [
-          22.829699999885634,
-          13.20250000001397
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WCC51DC",
-        "start": [
-          23.07949999999255,
-          14.239700000034645
-        ],
-        "end": [
-          23.09139999980107,
-          14.289100000052713
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W9AE372",
-        "start": [
-          23.341299999970943,
-          15.32620000001043
-        ],
-        "end": [
-          23.353200000012293,
-          15.375600000028498
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W647E41",
-        "start": [
-          23.608999999938533,
-          16.437400000053458
-        ],
-        "end": [
-          23.620899999979883,
-          16.48679999995511
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W13FCB8",
-        "start": [
-          40.820999999996275,
-          12.366000000038184
-        ],
-        "end": [
-          40.77159999986179,
-          12.377800000016578
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W918A49",
-        "start": [
-          39.436299999943,
-          12.696699999971315
-        ],
-        "end": [
-          39.38689999980852,
-          12.708500000066124
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WA6E26F",
-        "start": [
-          38.14049999997951,
-          13.006300000008196
-        ],
-        "end": [
-          38.09109999984503,
-          13.018099999986589
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W5CD4AF",
-        "start": [
-          23.440999999875203,
-          16.51749999995809
-        ],
-        "end": [
-          23.39159999997355,
-          16.5293000000529
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W27A3E1",
-        "start": [
-          22.262799999909475,
-          16.798900000052527
-        ],
-        "end": [
-          22.213400000007823,
-          16.81070000003092
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WB2EA2A",
-        "start": [
-          21.152899999869987,
-          17.06400000001304
-        ],
-        "end": [
-          21.103499999968335,
-          17.075799999991432
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WFD6257",
-        "start": [
-          20.05559999984689,
-          17.32620000001043
-        ],
-        "end": [
-          20.00619999994524,
-          17.337999999988824
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W0882E4",
-        "start": [
-          18.943800000008196,
-          17.59169999998994
-        ],
-        "end": [
-          18.894399999873713,
-          17.603499999968335
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WC550E5",
-        "start": [
-          16.732499999925494,
-          18.1199000000488
-        ],
-        "end": [
-          16.68309999979101,
-          18.131700000027195
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W48336C",
-        "start": [
-          13.499199999962002,
-          18.892300000065006
-        ],
-        "end": [
-          13.449799999827519,
-          18.9041000000434
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W1CE6E2",
-        "start": [
-          12.395499999867752,
-          19.15590000001248
-        ],
-        "end": [
-          12.3460999999661,
-          19.167699999990873
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W32FF1D",
-        "start": [
-          11.29189999983646,
-          19.419499999959953
-        ],
-        "end": [
-          11.242499999934807,
-          19.43130000005476
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WC4C4BD",
-        "start": [
-          23.443800000008196,
-          16.52919999998994
-        ],
-        "end": [
-          23.485299999825656,
-          16.70209999999497
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WAA98BF",
-        "start": [
-          40.86239999998361,
-          12.538900000043213
-        ],
-        "end": [
-          40.812999999849126,
-          12.550700000021607
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WDE0D38",
-        "start": [
-          39.47899999981746,
-          12.869399999966845
-        ],
-        "end": [
-          39.42959999991581,
-          12.881200000061654
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WE6D29D",
-        "start": [
-          38.180799999972805,
-          13.179400000022724
-        ],
-        "end": [
-          38.13139999983832,
-          13.191200000001118
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WD9611A",
-        "start": [
-          23.481399999931455,
-          16.69059999997262
-        ],
-        "end": [
-          23.43199999979697,
-          16.702400000067428
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W75A388",
-        "start": [
-          21.19429999985732,
-          17.236900000018068
-        ],
-        "end": [
-          21.14489999995567,
-          17.24869999999646
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WE2E34C",
-        "start": [
-          20.096999999834225,
-          17.49910000001546
-        ],
-        "end": [
-          20.047599999932572,
-          17.510899999993853
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WC2738F",
-        "start": [
-          23.394399999873713,
-          16.540999999968335
-        ],
-        "end": [
-          23.435899999924004,
-          16.713899999973364
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W33E485",
-        "start": [
-          38.079699999885634,
-          12.970500000054017
-        ],
-        "end": [
-          37.90679999999702,
-          13.01190000004135
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WC7D4A6",
-        "start": [
-          23.60479999985546,
-          16.43640000000596
-        ],
-        "end": [
-          23.431899999966845,
-          16.477799999993294
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W9EE453",
-        "start": [
-          10.216499999864027,
-          19.64220000000205
-        ],
-        "end": [
-          10.043599999975413,
-          19.683599999989383
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W8437AF",
-        "start": [
-          23.653799999970943,
-          16.478899999987334
-        ],
-        "end": [
-          23.70409999997355,
-          16.688900000066496
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W651ACD",
-        "start": [
-          38.141799999866635,
-          13.229900000034831
-        ],
-        "end": [
-          37.931899999966845,
-          13.28020000003744
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W50ECFC",
-        "start": [
-          23.704599999822676,
-          16.689600000041537
-        ],
-        "end": [
-          23.494699999922886,
-          16.739900000044145
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W191014",
-        "start": [
-          10.279699999839067,
-          19.906700000050478
-        ],
-        "end": [
-          10.069799999939278,
-          19.957000000053085
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W97C181",
-        "start": [
-          10.018899999791756,
-          19.745600000023842
-        ],
-        "end": [
-          10.069199999794364,
-          19.955500000040047
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W70A019",
-        "start": [
-          18.24279999989085,
-          54.06359999999404
-        ],
-        "end": [
-          18.36709999991581,
-          54.58230000000913
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WA90E5F",
-        "start": [
-          22.036699999822304,
-          9.892600000021048
-        ],
-        "end": [
-          22.048499999800697,
-          9.942000000039116
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WD26ECF",
-        "start": [
-          22.556199999991804,
-          12.067500000004657
-        ],
-        "end": [
-          22.567999999970198,
-          12.116900000022724
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WD2F014",
-        "start": [
-          18.991099999984726,
-          17.778799999970943
-        ],
-        "end": [
-          18.941699999850243,
-          17.790700000012293
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W981679",
-        "start": [
-          15.671299999812618,
-          18.578500000061467
-        ],
-        "end": [
-          15.621899999910966,
-          18.590399999986403
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WAE0FBC",
-        "start": [
-          10.323499999940395,
-          19.866700000013225
-        ],
-        "end": [
-          10.274099999805912,
-          19.878600000054576
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W4A51C4",
-        "start": [
-          22.31069999979809,
-          16.98349999997299
-        ],
-        "end": [
-          22.261299999896437,
-          16.9953000000678
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WBD8359",
-        "start": [
-          17.885199999902397,
-          18.04060000006575
-        ],
-        "end": [
-          17.835800000000745,
-          18.052400000044145
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W5572E0",
-        "start": [
-          16.780499999877065,
-          18.304499999969266
-        ],
-        "end": [
-          16.731099999975413,
-          18.316300000064075
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W0D27EC",
-        "start": [
-          13.547099999850616,
-          19.07680000003893
-        ],
-        "end": [
-          13.497699999948964,
-          19.088600000017323
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W618910",
-        "start": [
-          12.442299999995157,
-          19.34070000005886
-        ],
-        "end": [
-          12.392899999860674,
-          19.352500000037253
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WFFC0C5",
-        "start": [
-          11.339799999957904,
-          19.604099999996834
-        ],
-        "end": [
-          11.290399999823421,
-          19.615899999975227
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WEFAC76",
-        "start": [
-          9.002299999818206,
-          15.339099999982864
-        ],
-        "end": [
-          9.014199999859557,
-          15.388500000000931
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W25569B",
-        "start": [
-          9.788100000005215,
-          18.601299999980256
-        ],
-        "end": [
-          9.799999999813735,
-          18.650699999998324
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W2A585E",
-        "start": [
-          9.262799999909475,
-          16.426100000040606
-        ],
-        "end": [
-          9.274599999887869,
-          16.475500000058673
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WF9AC97",
-        "start": [
-          9.522499999962747,
-          17.51340000005439
-        ],
-        "end": [
-          9.53429999994114,
-          17.56279999995604
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WA398F3",
-        "start": [
-          10.04189999983646,
-          19.68779999995604
-        ],
-        "end": [
-          10.053699999814853,
-          19.73719999997411
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W749EA1",
-        "start": [
-          8.74239999987185,
-          14.254100000020117
-        ],
-        "end": [
-          8.754199999850243,
-          14.303500000038184
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W16FA4F",
-        "start": [
-          8.4757999998983,
-          13.141500000027008
-        ],
-        "end": [
-          8.488299999851733,
-          13.193700000061654
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W48336C",
-        "start": [
-          13.507800000021234,
-          18.90969999996014
-        ],
-        "end": [
-          13.45769999991171,
-          18.921700000064448
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W16FA4F",
-        "start": [
-          8.4757999998983,
-          13.141500000027008
-        ],
-        "end": [
-          8.47649999987334,
-          13.144300000043586
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W5D5030",
-        "start": [
-          17.842199999839067,
-          17.87120000005234
-        ],
-        "end": [
-          17.792799999937415,
-          17.883099999977276
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W2CDA1D",
-        "start": [
-          15.628299999982119,
-          18.4045000000624
-        ],
-        "end": [
-          15.578899999847636,
-          18.416399999987334
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W8639D9",
-        "start": [
-          10.280499999877065,
-          19.692700000014156
-        ],
-        "end": [
-          10.231099999975413,
-          19.704600000055507
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WB66668",
-        "start": [
-          10.2300999998115,
-          19.695000000065193
-        ],
-        "end": [
-          10.280399999814108,
-          19.904899999964982
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WB66668",
-        "start": [
-          10.279499999945983,
-          19.683100000023842
-        ],
-        "end": [
-          10.320899999933317,
-          19.85600000002887
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W7F7151",
-        "start": [
-          8.649399999994785,
-          13.102799999993294
-        ],
-        "end": [
-          8.47649999987334,
-          13.144300000043586
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WE62B9D",
-        "start": [
-          8.649399999994785,
-          13.102799999993294
-        ],
-        "end": [
-          8.661199999973178,
-          13.152200000011362
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W89AD13",
-        "start": [
-          8.914600000018254,
-          14.212900000042282
-        ],
-        "end": [
-          8.926399999996647,
-          14.26230000006035
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W2A02CC",
-        "start": [
-          9.435300000011921,
-          16.39269999996759
-        ],
-        "end": [
-          9.447099999990314,
-          16.442099999985658
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WA7BA32",
-        "start": [
-          9.693199999863282,
-          17.47239999996964
-        ],
-        "end": [
-          9.704999999841675,
-          17.521799999987707
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WF65641",
-        "start": [
-          10.212599999969825,
-          19.646999999997206
-        ],
-        "end": [
-          10.224399999948218,
-          19.696400000015274
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WBE2E3C",
-        "start": [
-          36.523300000000745,
-          6.474099999992177
-        ],
-        "end": [
-          36.3503999998793,
-          6.515600000042468
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W7F7151",
-        "start": [
-          8.6632999998983,
-          13.161100000026636
-        ],
-        "end": [
-          8.490400000009686,
-          13.202599999960512
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "W902BCD",
         "start": [
           36.77179999998771,
@@ -6305,38 +7803,6 @@
         "end": [
           9.002299999818206,
           15.339099999982864
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W2EBD5D",
-        "start": [
-          9.17519999993965,
-          15.297600000048988
-        ],
-        "end": [
-          9.187099999981001,
-          15.347000000067055
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W75ABF8",
-        "start": [
-          9.961099999956787,
-          18.559899999992922
-        ],
-        "end": [
-          9.972999999998137,
-          18.60930000001099
         ],
         "side": "inner",
         "source": {
@@ -6489,22 +7955,6 @@
         }
       },
       {
-        "id": "WA398F3",
-        "start": [
-          10.228799999924377,
-          19.695300000021234
-        ],
-        "end": [
-          10.018899999791756,
-          19.745600000023842
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "W2B54A0",
         "start": [
           11.248399999924004,
@@ -6625,38 +8075,6 @@
         "end": [
           15.671399999875575,
           18.574099999968894
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WC7D4A6",
-        "start": [
-          23.653799999970943,
-          16.478899999987334
-        ],
-        "end": [
-          23.443800000008196,
-          16.52919999998994
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WC4C4BD",
-        "start": [
-          23.443800000008196,
-          16.52919999998994
-        ],
-        "end": [
-          23.49419999984093,
-          16.739200000069104
         ],
         "side": "inner",
         "source": {
@@ -6889,22 +8307,6 @@
         }
       },
       {
-        "id": "WFFFD57",
-        "start": [
-          23.165700000012293,
-          15.368200000026263
-        ],
-        "end": [
-          23.177499999990687,
-          15.417699999990873
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "W9AE372",
         "start": [
           23.350499999942258,
@@ -6945,54 +8347,6 @@
         "end": [
           22.904899999964982,
           14.279500000062399
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W366F67",
-        "start": [
-          22.384499999927357,
-          12.107700000051409
-        ],
-        "end": [
-          22.396399999968708,
-          12.157100000069477
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WFB3628",
-        "start": [
-          22.646199999842793,
-          13.194299999973737
-        ],
-        "end": [
-          22.658099999884143,
-          13.243699999991804
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W97DBAF",
-        "start": [
-          22.90639999997802,
-          14.274100000038743
-        ],
-        "end": [
-          22.91830000001937,
-          14.32350000005681
         ],
         "side": "inner",
         "source": {
@@ -7129,326 +8483,6 @@
         }
       },
       {
-        "id": "W7552F7",
-        "start": [
-          22.048499999800697,
-          9.942000000039116
-        ],
-        "end": [
-          21.875599999912083,
-          9.98340000002645
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WC31543",
-        "start": [
-          22.036699999822304,
-          9.892600000021048
-        ],
-        "end": [
-          21.86379999993369,
-          9.934000000008382
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W76C11C",
-        "start": [
-          22.297099999850616,
-          10.97940000006929
-        ],
-        "end": [
-          22.30889999982901,
-          11.0289000000339
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WC35CEA",
-        "start": [
-          37.3800999999512,
-          10.813500000047497
-        ],
-        "end": [
-          37.39189999992959,
-          10.862900000065565
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W40A688",
-        "start": [
-          37.63980000000447,
-          11.900600000051782
-        ],
-        "end": [
-          37.651599999982864,
-          11.95000000006985
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WBF8D27",
-        "start": [
-          37.90529999998398,
-          13.01230000006035
-        ],
-        "end": [
-          37.917099999962375,
-          13.061699999962002
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WECF2F7",
-        "start": [
-          38.09149999986403,
-          13.019899999955669
-        ],
-        "end": [
-          37.91859999997541,
-          13.061300000059418
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W649228",
-        "start": [
-          36.51150000002235,
-          6.424699999974109
-        ],
-        "end": [
-          36.523300000000745,
-          6.474099999992177
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WCC7D83",
-        "start": [
-          37.55030000000261,
-          10.773599999956787
-        ],
-        "end": [
-          37.562099999981,
-          10.822999999974854
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W6C3B93",
-        "start": [
-          37.80999999982305,
-          11.86069999996107
-        ],
-        "end": [
-          37.82179999980144,
-          11.910099999979138
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WB2D654",
-        "start": [
-          38.07549999980256,
-          12.972300000023097
-        ],
-        "end": [
-          38.087300000013784,
-          13.021700000041164
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WE6D29D",
-        "start": [
-          38.09149999986403,
-          13.019899999955669
-        ],
-        "end": [
-          38.13299999991432,
-          13.192799999960698
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WA6E26F",
-        "start": [
-          38.14089999999851,
-          13.008099999977276
-        ],
-        "end": [
-          38.18239999981597,
-          13.180999999982305
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WBF8D27",
-        "start": [
-          37.91859999997541,
-          13.061300000059418
-        ],
-        "end": [
-          37.88159999996424,
-          13.070199999958277
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WD28504",
-        "start": [
-          37.88159999996424,
-          13.070199999958277
-        ],
-        "end": [
-          37.931899999966845,
-          13.28020000003744
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W554BD9",
-        "start": [
-          38.13299999991432,
-          13.192799999960698
-        ],
-        "end": [
-          38.141799999866635,
-          13.229900000034831
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W38A29E",
-        "start": [
-          36.59889999986626,
-          7.552999999956228
-        ],
-        "end": [
-          36.61079999990761,
-          7.6023999999742955
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W9E00CF",
-        "start": [
-          36.86060000001453,
-          8.639500000048429
-        ],
-        "end": [
-          36.87249999982305,
-          8.688900000066496
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W6B82F9",
-        "start": [
-          37.12239999999292,
-          9.726099999970756
-        ],
-        "end": [
-          37.13429999980144,
-          9.775499999988824
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W93B8FA",
-        "start": [
-          36.33859999990091,
-          6.466200000024401
-        ],
-        "end": [
-          36.3503999998793,
-          6.515600000042468
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "W918A49",
         "start": [
           39.437699999893084,
@@ -7481,38 +8515,6 @@
         }
       },
       {
-        "id": "W5F7830",
-        "start": [
-          40.77159999986179,
-          12.377800000016578
-        ],
-        "end": [
-          40.812999999849126,
-          12.550700000021607
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W8ED40B",
-        "start": [
-          40.820999999996275,
-          12.366000000038184
-        ],
-        "end": [
-          40.86239999998361,
-          12.538900000043213
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "W42338B",
         "start": [
           37.2925999998115,
@@ -7529,22 +8531,6 @@
         }
       },
       {
-        "id": "WA89558",
-        "start": [
-          37.2925999998115,
-          9.685300000011921
-        ],
-        "end": [
-          37.30449999985285,
-          9.734700000029989
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "WF09FBD",
         "start": [
           37.03220000001602,
@@ -7553,54 +8539,6 @@
         "end": [
           36.859299999894574,
           8.63980000000447
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W04F6C4",
-        "start": [
-          36.77179999998771,
-          7.511599999968894
-        ],
-        "end": [
-          36.78369999979623,
-          7.5609999999869615
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WC5C138",
-        "start": [
-          37.03349999990314,
-          8.598100000061095
-        ],
-        "end": [
-          37.04539999994449,
-          8.647499999962747
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WBE2E3C",
-        "start": [
-          36.51150000002235,
-          6.424699999974109
-        ],
-        "end": [
-          36.301499999826774,
-          6.474999999976717
         ],
         "side": "inner",
         "source": {
@@ -8137,70 +9075,6 @@
         }
       },
       {
-        "id": "W9E905F",
-        "start": [
-          18.581799999810755,
-          57.39459999999963
-        ],
-        "end": [
-          18.94869999983348,
-          58.926100000040606
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W242407",
-        "start": [
-          23.34639999992214,
-          24.244500000029802
-        ],
-        "end": [
-          24.67200000002049,
-          29.777499999967404
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W4B9A57",
-        "start": [
-          26.630899999989197,
-          37.95380000001751
-        ],
-        "end": [
-          26.99780000001192,
-          39.48530000005849
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WD75C02",
-        "start": [
-          16.70449999999255,
-          57.84440000005998
-        ],
-        "end": [
-          16.1671999997925,
-          57.973100000061095
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "W4BC376",
         "start": [
           26.77999999979511,
@@ -8249,22 +9123,6 @@
         }
       },
       {
-        "id": "W9E9527",
-        "start": [
-          38.79689999995753,
-          57.82750000001397
-        ],
-        "end": [
-          40.37109999987297,
-          64.39789999998175
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "W4E3042",
         "start": [
           41.20529999979772,
@@ -8289,38 +9147,6 @@
         "end": [
           41.20529999979772,
           57.25049999996554
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W0CEA86",
-        "start": [
-          49.9460999998264,
-          62.39130000001751
-        ],
-        "end": [
-          40.18919999990612,
-          64.72880000004079
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W82DDE1",
-        "start": [
-          44.14169999980368,
-          26.771500000031665
-        ],
-        "end": [
-          41.32579999999143,
-          27.446200000005774
         ],
         "side": "inner",
         "source": {
@@ -8369,38 +9195,6 @@
         "end": [
           47.546099999919534,
           40.54469999996945
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W1D41F2",
-        "start": [
-          44.64709999994375,
-          41.472900000051595
-        ],
-        "end": [
-          46.23309999983758,
-          48.09270000003744
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W1E131F",
-        "start": [
-          46.3159999998752,
-          48.4385000000475
-        ],
-        "end": [
-          47.901899999938905,
-          55.05839999997988
         ],
         "side": "inner",
         "source": {
@@ -8673,70 +9467,6 @@
         "end": [
           18.14449999993667,
           55.187900000019
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WACCA70",
-        "start": [
-          18.596599999815226,
-          57.45640000002459
-        ],
-        "end": [
-          18.547199999913573,
-          57.46820000000298
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W22EF53",
-        "start": [
-          16.76839999994263,
-          57.89309999998659
-        ],
-        "end": [
-          16.718999999808148,
-          57.90489999996498
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W9010F1",
-        "start": [
-          18.632099999813363,
-          57.604599999962375
-        ],
-        "end": [
-          18.58269999991171,
-          57.61640000005718
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WEB4FB9",
-        "start": [
-          16.80629999982193,
-          58.04070000001229
-        ],
-        "end": [
-          16.75689999992028,
-          58.05249999999069
         ],
         "side": "inner",
         "source": {
@@ -9233,6 +9963,22 @@
         "end": [
           33.3265999997966,
           36.793399999965914
+        ],
+        "side": "inner",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED"
+        }
+      },
+      {
+        "id": "W242407",
+        "start": [
+          23.34639999992214,
+          24.244500000029802
+        ],
+        "end": [
+          24.67200000002049,
+          29.777499999967404
         ],
         "side": "inner",
         "source": {
@@ -9921,6 +10667,22 @@
         "end": [
           18.209799999836832,
           54.8066000000108
+        ],
+        "side": "inner",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED"
+        }
+      },
+      {
+        "id": "W4CF142",
+        "start": [
+          18.02019999991171,
+          54.66920000000391
+        ],
+        "end": [
+          18.14449999993667,
+          55.187900000019
         ],
         "side": "inner",
         "source": {
@@ -11097,54 +11859,6 @@
         }
       },
       {
-        "id": "WD5B4F8",
-        "start": [
-          18.547199999913573,
-          57.46820000000298
-        ],
-        "end": [
-          18.58269999991171,
-          57.61640000005718
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WD076F4",
-        "start": [
-          16.768699999898672,
-          57.894300000043586
-        ],
-        "end": [
-          16.80419999989681,
-          58.04249999998137
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WB6DF17",
-        "start": [
-          16.70449999999255,
-          57.84440000005998
-        ],
-        "end": [
-          16.769599999999627,
-          58.116099999984726
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "WBF1C38",
         "start": [
           21.571999999927357,
@@ -11169,22 +11883,6 @@
         "end": [
           18.856399999931455,
           57.34189999999944
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WEDEE04",
-        "start": [
-          18.853499999968335,
-          57.32949999999255
-        ],
-        "end": [
-          18.581799999810755,
-          57.39459999999963
         ],
         "side": "inner",
         "source": {
@@ -11433,38 +12131,6 @@
         }
       },
       {
-        "id": "WBBF163",
-        "start": [
-          2.231499999994412,
-          19.45649999997113
-        ],
-        "end": [
-          2.2669999999925494,
-          19.604700000025332
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WA133D3",
-        "start": [
-          10.200799999991432,
-          52.72550000005867
-        ],
-        "end": [
-          10.96999999997206,
-          55.936699999962
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "W2E2B75",
         "start": [
           5.258499999996275,
@@ -11489,22 +12155,6 @@
         "end": [
           5.349999999860302,
           18.709299999987707
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W03D74C",
-        "start": [
-          42.972399999853224,
-          34.48250000004191
-        ],
-        "end": [
-          44.56429999996908,
-          41.12699999997858
         ],
         "side": "inner",
         "source": {
@@ -12129,6 +12779,22 @@
         "end": [
           25.807199999922886,
           12.384700000053272
+        ],
+        "side": "inner",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED"
+        }
+      },
+      {
+        "id": "WB0AC8E",
+        "start": [
+          27.853799999924377,
+          8.49890000000596
+        ],
+        "end": [
+          28.623099999967963,
+          11.710100000025705
         ],
         "side": "inner",
         "source": {
@@ -13865,30 +14531,14 @@
         }
       },
       {
-        "id": "W4A9B37",
+        "id": "WD19E5B",
         "start": [
-          9.48519999999553,
-          12.612399999983609
+          16.368599999928847,
+          34.039199999999255
         ],
         "end": [
-          9.550300000002608,
-          12.884100000024773
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W17F1DF",
-        "start": [
-          15.278099999995902,
-          36.789699999964796
-        ],
-        "end": [
-          15.757499999832362,
-          38.790500000002794
+          16.847999999998137,
+          36.04000000003725
         ],
         "side": "inner",
         "source": {
@@ -14305,86 +14955,6 @@
         "end": [
           18.94869999983348,
           58.926100000040606
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WB588BA",
-        "start": [
-          19.01039999979548,
-          58.911300000036135
-        ],
-        "end": [
-          19.022299999836832,
-          58.9607000000542
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W242D40",
-        "start": [
-          19.450799999991432,
-          60.739500000025146
-        ],
-        "end": [
-          19.462699999799952,
-          60.78890000004321
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W522D4A",
-        "start": [
-          19.1585999999661,
-          58.875800000038
-        ],
-        "end": [
-          19.17050000000745,
-          58.925200000056066
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WE5FEA6",
-        "start": [
-          19.597399999853224,
-          60.697299999999814
-        ],
-        "end": [
-          19.609299999894574,
-          60.74670000001788
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WF72D96",
-        "start": [
-          19.67009999998845,
-          60.73829999996815
-        ],
-        "end": [
-          19.915700000012293,
-          61.76340000005439
         ],
         "side": "inner",
         "source": {
@@ -15305,22 +15875,6 @@
         }
       },
       {
-        "id": "WC1FD32",
-        "start": [
-          47.98479999997653,
-          55.40419999998994
-        ],
-        "end": [
-          49.57669999985956,
-          62.04879999998957
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
         "id": "W1BDC78",
         "start": [
           23.72899999981746,
@@ -15729,310 +16283,6 @@
         "end": [
           39.79979999992065,
           37.59330000006594
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W4F2352",
-        "start": [
-          37.34799999999814,
-          5.937000000034459
-        ],
-        "end": [
-          20.897099999943748,
-          9.878299999982119
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W13305D",
-        "start": [
-          37.41299999994226,
-          6.208699999959208
-        ],
-        "end": [
-          36.301499999826774,
-          6.474999999976717
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W906890",
-        "start": [
-          22.07369999983348,
-          9.883800000068732
-        ],
-        "end": [
-          20.962199999950826,
-          10.150099999969825
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W01E991",
-        "start": [
-          9.550300000002608,
-          12.884199999971315
-        ],
-        "end": [
-          8.438799999887124,
-          13.150499999988824
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WCC0EAE",
-        "start": [
-          20.897099999943748,
-          9.878299999982119
-        ],
-        "end": [
-          20.962199999950826,
-          10.150000000023283
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W01D6A5",
-        "start": [
-          9.48519999999553,
-          12.612399999983609
-        ],
-        "end": [
-          9.999983012676239e-05,
-          14.884799999999814
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WFD0672",
-        "start": [
-          9.999983012676239e-05,
-          14.884799999999814
-        ],
-        "end": [
-          0.06519999983720481,
-          15.15659999998752
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W00AFD5",
-        "start": [
-          1.1766999999526888,
-          14.89020000002347
-        ],
-        "end": [
-          0.06519999983720481,
-          15.15659999998752
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W54696A",
-        "start": [
-          37.34799999999814,
-          5.937000000034459
-        ],
-        "end": [
-          37.41299999994226,
-          6.208699999959208
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WF70094",
-        "start": [
-          40.60499999998137,
-          11.46440000005532
-        ],
-        "end": [
-          40.87129999999888,
-          12.57590000005439
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W577C78",
-        "start": [
-          40.8890999997966,
-          11.396300000022165
-        ],
-        "end": [
-          40.60499999998137,
-          11.46440000005532
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W1D54AD",
-        "start": [
-          40.8890999997966,
-          11.396300000022165
-        ],
-        "end": [
-          44.61439999984577,
-          26.945599999977276
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WEAB23E",
-        "start": [
-          44.61439999984577,
-          26.945599999977276
-        ],
-        "end": [
-          41.625499999849126,
-          27.661700000055134
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WF78D3C",
-        "start": [
-          41.625499999849126,
-          27.661700000055134
-        ],
-        "end": [
-          49.9460999998264,
-          62.39130000001751
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W89544E",
-        "start": [
-          38.54989999998361,
-          57.886599999968894
-        ],
-        "end": [
-          40.18919999990612,
-          64.72880000004079
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W910A8A",
-        "start": [
-          38.54989999998361,
-          57.886599999968894
-        ],
-        "end": [
-          19.777199999894947,
-          62.384199999971315
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W7CCC0D",
-        "start": [
-          19.398399999830872,
-          60.80339999997523
-        ],
-        "end": [
-          19.777199999894947,
-          62.384199999971315
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W35878F",
-        "start": [
-          16.769599999999627,
-          58.116099999984726
-        ],
-        "end": [
-          10.499499999918044,
-          59.618299999972805
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "W04BF4E",
-        "start": [
-          10.640399999916553,
-          59.29720000002999
-        ],
-        "end": [
-          10.705499999923632,
-          59.56889999995474
         ],
         "side": "inner",
         "source": {
@@ -16465,22 +16715,6 @@
         "end": [
           9.638399999821559,
           34.946400000015274
-        ],
-        "side": "inner",
-        "source": {
-          "dxf_layer": "A-WALL",
-          "dxf_type": "LINE_MERGED"
-        }
-      },
-      {
-        "id": "WDD3F11",
-        "start": [
-          1.2844999998342246,
-          14.57709999999497
-        ],
-        "end": [
-          1.2597999998833984,
-          14.582999999984168
         ],
         "side": "inner",
         "source": {
@@ -18513,6 +18747,150 @@
         "end": [
           30.438099999912083,
           41.089799999957904
+        ],
+        "side": "inner",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED"
+        }
+      },
+      {
+        "id": "W924359",
+        "start": [
+          25.6288999998942,
+          53.39480000000913
+        ],
+        "end": [
+          24.986700000008568,
+          53.54859999998007
+        ],
+        "side": "inner",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED"
+        }
+      },
+      {
+        "id": "W1ABC6A",
+        "start": [
+          36.084700000006706,
+          32.60660000005737
+        ],
+        "end": [
+          36.12020000000484,
+          32.75479999999516
+        ],
+        "side": "inner",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED"
+        }
+      },
+      {
+        "id": "W7D2626",
+        "start": [
+          35.19539999985136,
+          32.819600000046194
+        ],
+        "end": [
+          35.2308999998495,
+          32.96790000004694
+        ],
+        "side": "inner",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED"
+        }
+      },
+      {
+        "id": "WB8ED3D",
+        "start": [
+          10.2878999998793,
+          20.895600000047125
+        ],
+        "end": [
+          7.595399999991059,
+          21.540700000012293
+        ],
+        "side": "inner",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED"
+        }
+      },
+      {
+        "id": "W215D54",
+        "start": [
+          10.1339999998454,
+          20.253400000045076
+        ],
+        "end": [
+          10.2878999998793,
+          20.895600000047125
+        ],
+        "side": "inner",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED"
+        }
+      },
+      {
+        "id": "WA84CAC",
+        "start": [
+          10.471599999815226,
+          21.008299999986775
+        ],
+        "end": [
+          7.630999999819323,
+          21.688900000066496
+        ],
+        "side": "inner",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED"
+        }
+      },
+      {
+        "id": "WD40F7B",
+        "start": [
+          10.211200000019744,
+          19.921500000054948
+        ],
+        "end": [
+          10.471599999815226,
+          21.008299999986775
+        ],
+        "side": "inner",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED"
+        }
+      },
+      {
+        "id": "W62841D",
+        "start": [
+          8.357799999881536,
+          27.966099999961443
+        ],
+        "end": [
+          7.468600000021979,
+          28.179100000066683
+        ],
+        "side": "inner",
+        "source": {
+          "dxf_layer": "A-WALL",
+          "dxf_type": "LINE_MERGED"
+        }
+      },
+      {
+        "id": "WB1564E",
+        "start": [
+          8.322299999883398,
+          27.817900000023656
+        ],
+        "end": [
+          7.433099999791011,
+          28.03090000001248
         ],
         "side": "inner",
         "source": {

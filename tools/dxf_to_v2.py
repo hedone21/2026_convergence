@@ -112,6 +112,53 @@ def _polygon_edges(pts: list[tuple[float, float]]):
         yield a, b
 
 
+def _seg_near_polygon(
+    seg: tuple[tuple[float, float], tuple[float, float]],
+    poly_edges: list[tuple[tuple[float, float], tuple[float, float]]],
+    perp_tol_m: float = 0.30,
+    angle_tol_deg: float = 3.0,
+    along_pad_m: float = 0.30,
+) -> bool:
+    """segment의 mid가 polygon edge 중 하나와 평행 + 수직거리 perp_tol 안 +
+    along projection이 edge의 t-range ± along_pad 안에 있으면 True. (m 단위)
+    외/내 벽 분류용.
+    """
+    import math as _m
+    sx0, sy0 = seg[0]
+    sx1, sy1 = seg[1]
+    sdx, sdy = sx1 - sx0, sy1 - sy0
+    sL = _m.hypot(sdx, sdy)
+    if sL < 1e-6:
+        return False
+    ang_s = _m.atan2(sdy, sdx) % _m.pi
+    smx, smy = (sx0 + sx1) * 0.5, (sy0 + sy1) * 0.5
+    ang_tol_rad = _m.radians(angle_tol_deg)
+    for pa, pb in poly_edges:
+        edx, edy = pb[0] - pa[0], pb[1] - pa[1]
+        eL = _m.hypot(edx, edy)
+        if eL < 1e-6:
+            continue
+        ang_e = _m.atan2(edy, edx) % _m.pi
+        ang_diff = abs(ang_s - ang_e)
+        if ang_diff > _m.pi - ang_tol_rad:
+            ang_diff = abs(_m.pi - ang_diff)
+        if ang_diff > ang_tol_rad:
+            continue
+        cos_e, sin_e = _m.cos(ang_e), _m.sin(ang_e)
+        d_e = -sin_e * pa[0] + cos_e * pa[1]
+        d_s = -sin_e * smx + cos_e * smy
+        if abs(d_s - d_e) > perp_tol_m:
+            continue
+        t_a = cos_e * pa[0] + sin_e * pa[1]
+        t_b = cos_e * pb[0] + sin_e * pb[1]
+        t_lo, t_hi = (t_a, t_b) if t_a <= t_b else (t_b, t_a)
+        t_s = cos_e * smx + sin_e * smy
+        if t_s < t_lo - along_pad_m or t_s > t_hi + along_pad_m:
+            continue
+        return True
+    return False
+
+
 def _merge_collinear_segments(
     segs: list[tuple[tuple[float, float], tuple[float, float]]],
     angle_tol_deg: float = 1.5,
@@ -196,13 +243,18 @@ def convert(dxf_path: Path, out_path: Path) -> dict:
         "slabs": [],
     }
 
-    # 2차: A-FOOTPRINT LWPOLYLINE → outer_walls
+    # 2차: A-FOOTPRINT LWPOLYLINE → outer_walls (직접 외곽선)
     footprints_raw = []
+    footprint_edges_m: list = []
     for e in msp.query("LWPOLYLINE"):
         if _layer_kind(e.dxf.layer) == "footprint":
             pts = [(p[0], p[1]) for p in e.get_points("xy")]
             footprints_raw.append(pts)
             for a, b in _polygon_edges(pts):
+                footprint_edges_m.append((
+                    (m(a[0]), m(a[1])),
+                    (m(b[0]), m(b[1])),
+                ))
                 cx, cy = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2
                 categories["outer_walls"].append({
                     "id": _make_id("W", cx, cy),
@@ -212,22 +264,76 @@ def convert(dxf_path: Path, out_path: Path) -> dict:
                     "source": {"dxf_layer": e.dxf.layer, "dxf_type": "LWPOLYLINE_EDGE"},
                 })
 
-    # 3차: A-WALL LINE → inner_walls (DXF는 짧은 segment 다발로 들어오므로 collinear merge)
-    inner_raw_m: list = []
+    # 2.5차: AREA-GROSS LWPOLYLINE → 외/내 분류 기준 (실제 벽 아님, 면적 경계)
+    gross_edges_m: list = []
+    for e in msp.query("LWPOLYLINE"):
+        base = e.dxf.layer.split("$")[-1] if "$" in e.dxf.layer else e.dxf.layer
+        if base == "AREA-GROSS":
+            pts = [(p[0], p[1]) for p in e.get_points("xy")]
+            for a, b in _polygon_edges(pts):
+                gross_edges_m.append((
+                    (m(a[0]), m(a[1])),
+                    (m(b[0]), m(b[1])),
+                ))
+
+    # 3차: A-WALL LINE + LWPOLYLINE → segment 수집 → 외/내 분류 → 각각 collinear merge
+    wall_segs_m: list = []
     for e in msp.query("LINE"):
         if _layer_kind(e.dxf.layer) == "wall":
             s, t = e.dxf.start, e.dxf.end
-            inner_raw_m.append((
+            wall_segs_m.append((
                 (m(s[0]), m(s[1])),
                 (m(t[0]), m(t[1])),
             ))
-    inner_raw_count = len(inner_raw_m)
-    inner_merged = _merge_collinear_segments(
-        inner_raw_m,
-        angle_tol_deg=1.5,
-        perp_tol_m=0.05,
-        gap_tol_m=0.10,
+    for e in msp.query("LWPOLYLINE"):
+        if _layer_kind(e.dxf.layer) == "wall":
+            pts_xy = [(p[0], p[1]) for p in e.get_points("xy")]
+            closed = bool(getattr(e, "closed", False))
+            n = len(pts_xy)
+            edge_count = n if closed else n - 1
+            for i in range(edge_count):
+                a = pts_xy[i]
+                b = pts_xy[(i + 1) % n]
+                if a == b:
+                    continue
+                wall_segs_m.append((
+                    (m(a[0]), m(a[1])),
+                    (m(b[0]), m(b[1])),
+                ))
+
+    inner_raw_count = len(wall_segs_m)
+    classify_edges = gross_edges_m if gross_edges_m else footprint_edges_m
+    outer_segs_m: list = []
+    inner_segs_m: list = []
+    if classify_edges:
+        for seg in wall_segs_m:
+            if _seg_near_polygon(seg, classify_edges):
+                outer_segs_m.append(seg)
+            else:
+                inner_segs_m.append(seg)
+    else:
+        inner_segs_m = wall_segs_m
+
+    outer_wall_merged = _merge_collinear_segments(
+        outer_segs_m, angle_tol_deg=1.5, perp_tol_m=0.05, gap_tol_m=0.10,
     )
+    inner_merged = _merge_collinear_segments(
+        inner_segs_m, angle_tol_deg=1.5, perp_tol_m=0.05, gap_tol_m=0.10,
+    )
+
+    for (s_m, e_m) in outer_wall_merged:
+        cx_m = (s_m[0] + e_m[0]) * 0.5
+        cy_m = (s_m[1] + e_m[1]) * 0.5
+        categories["outer_walls"].append({
+            "id": _make_id("W", cx_m / scale, cy_m / scale),
+            "start": [round(s_m[0], 4), round(s_m[1], 4)],
+            "end": [round(e_m[0], 4), round(e_m[1], 4)],
+            "side": "outer",
+            "source": {
+                "dxf_layer": "A-WALL", "dxf_type": "LINE_MERGED",
+                "classify": "near_area_gross" if gross_edges_m else "near_footprint",
+            },
+        })
     for (s_m, e_m) in inner_merged:
         cx_m = (s_m[0] + e_m[0]) * 0.5
         cy_m = (s_m[1] + e_m[1]) * 0.5
@@ -405,13 +511,22 @@ def convert(dxf_path: Path, out_path: Path) -> dict:
     result = {
         "metadata": {
             "schema_version": "2.0",
-            "inner_walls_merge": {
-                "raw": inner_raw_count,
-                "merged": len(inner_merged),
+            "wall_classify": {
+                "raw_segments": inner_raw_count,
+                "near_polygon_outer": len(outer_segs_m),
+                "inner": len(inner_segs_m),
+                "outer_merged": len(outer_wall_merged),
+                "inner_merged": len(inner_merged),
+                "classify_source": (
+                    "AREA-GROSS" if gross_edges_m
+                    else ("A-FOOTPRINT" if footprint_edges_m else "none")
+                ),
                 "params": {
                     "angle_tol_deg": 1.5,
                     "perp_tol_m": 0.05,
                     "gap_tol_m": 0.10,
+                    "outer_perp_tol_m": 0.30,
+                    "outer_angle_tol_deg": 3.0,
                 },
             },
             "source": {
