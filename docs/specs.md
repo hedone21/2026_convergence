@@ -367,7 +367,9 @@
 - **예외 처리**:
   - 위험 요소가 0개인 세션 -> 발견율을 0%로 기록하고 경고 로그 출력
 - **대안 동작**: 없음
-- **비고**: 실시간 산출 결과는 세션 중에는 내부적으로만 유지하고, 세션 종료 후 SPEC-DAT-001을 통해 저장. 실시간 UI 표시는 연구 목적에 따라 선택적.
+- **비고**:
+  - 실시간 산출 결과는 세션 중에는 내부적으로만 유지하고, 세션 종료 후 SPEC-DAT-001을 통해 저장. 실시간 UI 표시는 연구 목적에 따라 선택적.
+  - 사후 채점(SessionScorer): 실제 hazard 위치와 사용자 마킹(HazardMarkPlaced)을 거리 임계(2m)로 매칭하여 precision/recall/F1, true_positives/false_positives/false_negatives, 평균 식별 시간을 산출한다. GDScript `SessionScorer.score()` 및 Python `tools/score_session.py`에서 동일 알고리즘 제공 (오프라인 분석 가능).
 
 ---
 
