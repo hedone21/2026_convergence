@@ -10,7 +10,8 @@ extends RefCounted
 ## 허용되는 현장 유형 목록
 ## SPEC-ENV-003: parliament_village (Texas Woman's University South Hall 평면도 기반)
 ## SPEC-ENV-004 (TBD): calpoly_b001 (Cal Poly Building 001 DXF 도면 기반)
-var VALID_SITE_TYPES: Array[String] = ["building_frame", "parliament_village", "calpoly_b001"]
+## SPEC-ENV-005 (TBD): calpoly_b002 (Cal Poly Building 002 DXF 도면 기반, 파이프라인 일반화 검증)
+var VALID_SITE_TYPES: Array[String] = ["building_frame", "parliament_village", "calpoly_b001", "calpoly_b002"]
 
 ## 허용되는 위험 요소 유형 목록
 ## SPEC-HAZ-003: 위험 요소 종류 확장 — 5종 추가 (spill/debris/unguarded_edge/exposed_rebar/wet_floor)
