@@ -28,7 +28,8 @@ const WINDOW_SILL_HEIGHT: float = 0.9
 const WINDOW_HEAD_HEIGHT: float = 2.4
 
 ## door span 양옆 padding (m). 벽 잘릴 영역 = span + 2 × padding.
-const DOOR_CUT_PADDING_M: float = 0.05
+## 표준 문 span 0.9m + 양옆 0.25m = cut 폭 1.4m (VR 통과 편안).
+const DOOR_CUT_PADDING_M: float = 0.25
 
 ## door axis와 wall 방향 평행 판정 임계값 (|cos θ| 최소).
 const DOOR_AXIS_PARALLEL_COS: float = 0.85
@@ -36,6 +37,10 @@ const DOOR_AXIS_PARALLEL_COS: float = 0.85
 ## door hinge에서 wall line까지 수직 거리 임계값 (m). 벽 두께 + 문 두께 마진.
 ## hinge는 door slab 닫힘 위치 chord의 중점 — 벽 중심선과 0.5m 이내가 일반적.
 const DOOR_HINGE_PERP_MAX_M: float = 1.00
+
+## door cut 영역 *안*에 갇힌 axis-비평행 짧은 wall (door frame 등) 제거 임계 길이 (m).
+## 이보다 짧고 cut 영역 안에 mid가 있으면 axis 평행 검사 없이 제거.
+const DOOR_INSIDE_WALL_MAX_M: float = 0.5
 
 var _walls_node: Node3D
 var _columns_node: Node3D
@@ -298,10 +303,19 @@ func _clip_segment_by_slot(
 		return
 	var wall_dir: Vector2 = ab / L
 	var axis: Vector2 = slot["axis"] as Vector2
+	var hinge: Vector2 = slot["hinge"] as Vector2
+	var span: float = float(slot["span"])
 	if absf(wall_dir.dot(axis)) < DOOR_AXIS_PARALLEL_COS:
+		# axis 비평행이라도 짧은 wall이 cut 영역 안에 갇히면 (door frame) 제거
+		if L < DOOR_INSIDE_WALL_MAX_M:
+			var axis_perp: Vector2 = Vector2(-axis.y, axis.x)
+			var mid: Vector2 = (a + b) * 0.5
+			var along: float = (mid - hinge).dot(axis)
+			var perp_d: float = absf((mid - hinge).dot(axis_perp))
+			if absf(along) < span * 0.5 and perp_d < DOOR_HINGE_PERP_MAX_M:
+				return
 		out_segs.append([a, b])
 		return
-	var hinge: Vector2 = slot["hinge"] as Vector2
 	# wall line으로의 hinge 수직 거리
 	var perp: Vector2 = Vector2(-wall_dir.y, wall_dir.x)
 	var perp_dist: float = absf((hinge - a).dot(perp))
@@ -310,7 +324,6 @@ func _clip_segment_by_slot(
 		return
 	# hinge의 wall 상 t (0~L)
 	var t_hinge: float = (hinge - a).dot(wall_dir)
-	var span: float = float(slot["span"])
 	var t0: float = t_hinge - span * 0.5
 	var t1: float = t_hinge + span * 0.5
 	# cut 영역이 wall 밖이면 원본 유지
