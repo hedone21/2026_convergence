@@ -1,0 +1,16 @@
+{
+  "_comment": "SPEC-ENV-004 (TBD): Cal Poly Building 001 Floor 3 — 다층 검증 시나리오",
+  "scenario_id": "mvp_calpoly_b001_f3",
+  "site_type": "calpoly_b001",
+  "site_floor": 3,
+  "time_limit_seconds": 600,
+  "random_placement": true,
+  "random_seed": 0,
+  "random_config": {
+    "hazard_count": 5,
+    "types": ["crack"],
+    "min_spacing": 6.0,
+    "difficulty_range": [0.2, 0.5]
+  },
+  "hazards": []
+}

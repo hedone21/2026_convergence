@@ -252,7 +252,9 @@
 - **예외 처리**:
   - 광선이 아무것도 적중하지 않음 (허공) -> 오탐으로 기록하되 마킹 위치는 광선 끝점으로 기록
 - **대안 동작**: 없음
-- **비고**: 광선 시각화(레이저 포인터 또는 크로스헤어)는 연구 목적에 따라 on/off 가능하게 설계.
+- **비고**:
+  - 광선 시각화(레이저 포인터 또는 크로스헤어)는 연구 목적에 따라 on/off 가능하게 설계.
+  - 시각 마커(HazardMarkPlaced): 마킹 적중 위치에 영구 시각 마커를 spawn한다. 메타데이터(Vector3 위치 + Unix epoch ms timestamp + 카테고리)는 세션 채점(SPEC-DAT-002)에서 실제 hazard와 매칭하는 입력으로 사용된다. 시그널 명: `hazard_mark_placed` (대응 fl: HazardMarkPlaced).
 
 ---
 
@@ -365,7 +367,9 @@
 - **예외 처리**:
   - 위험 요소가 0개인 세션 -> 발견율을 0%로 기록하고 경고 로그 출력
 - **대안 동작**: 없음
-- **비고**: 실시간 산출 결과는 세션 중에는 내부적으로만 유지하고, 세션 종료 후 SPEC-DAT-001을 통해 저장. 실시간 UI 표시는 연구 목적에 따라 선택적.
+- **비고**:
+  - 실시간 산출 결과는 세션 중에는 내부적으로만 유지하고, 세션 종료 후 SPEC-DAT-001을 통해 저장. 실시간 UI 표시는 연구 목적에 따라 선택적.
+  - 사후 채점(SessionScorer): 실제 hazard 위치와 사용자 마킹(HazardMarkPlaced)을 거리 임계(2m)로 매칭하여 precision/recall/F1, true_positives/false_positives/false_negatives, 평균 식별 시간을 산출한다. GDScript `SessionScorer.score()` 및 Python `tools/score_session.py`에서 동일 알고리즘 제공 (오프라인 분석 가능).
 
 ---
 
@@ -488,7 +492,9 @@
 - **예외 처리**:
   - 시뮬레이션 중 사용자가 강제 종료 요청 -> 현재까지의 데이터를 저장 후 결과 상태로 전환
 - **대안 동작**: 없음
-- **비고**: 상태 패턴(State Pattern) 기반 구현 권장.
+- **비고**:
+  - 상태 패턴(State Pattern) 기반 구현 권장.
+  - 결과 화면 UI: `scenes/ui/result_screen.tscn` + `scripts/presentation/ui/result_screen.gd`. SessionManager.session_ended 시그널 구독, RESULT 진입 시 발견율/경과시간/평균 반응시간을 표시. main.tscn UILayer에 인스턴스화.
 
 ---
 

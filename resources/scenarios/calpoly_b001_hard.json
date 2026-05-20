@@ -1,0 +1,17 @@
+{
+  "_comment": "SPEC-HAZ-002 / SPEC-SCN-001: Cal Poly B001 HARD 난이도 — 8 hazard, difficulty 0.7~0.9 (미세, 높은 은닉), 6종 다양",
+  "scenario_id": "calpoly_b001_hard",
+  "site_type": "calpoly_b001",
+  "site_floor": 1,
+  "time_of_day": "dusk",
+  "time_limit_seconds": 360,
+  "random_placement": true,
+  "random_seed": 33,
+  "random_config": {
+    "hazard_count": 8,
+    "types": ["crack", "spill", "debris", "unguarded_edge", "exposed_rebar", "wet_floor"],
+    "min_spacing": 4.0,
+    "difficulty_range": [0.7, 0.9]
+  },
+  "hazards": []
+}

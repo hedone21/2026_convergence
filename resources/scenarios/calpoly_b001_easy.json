@@ -1,0 +1,17 @@
+{
+  "_comment": "SPEC-HAZ-002 / SPEC-SCN-001: Cal Poly B001 EASY 난이도 — 3 hazard, difficulty 0.2~0.4 (큰 크랙/스필, 높은 가시성)",
+  "scenario_id": "calpoly_b001_easy",
+  "site_type": "calpoly_b001",
+  "site_floor": 1,
+  "time_of_day": "morning",
+  "time_limit_seconds": 600,
+  "random_placement": true,
+  "random_seed": 11,
+  "random_config": {
+    "hazard_count": 3,
+    "types": ["crack", "spill", "debris"],
+    "min_spacing": 8.0,
+    "difficulty_range": [0.2, 0.4]
+  },
+  "hazards": []
+}

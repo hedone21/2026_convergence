@@ -16,6 +16,9 @@ signal hazard_discovered(hazard: BaseHazard)
 ## SPEC-INP-002: 오탐 (위험 요소가 아닌 곳 마킹)
 signal false_positive(position: Vector3, direction: Vector3)
 
+## SPEC-INP-002: 마킹 마커가 배치됨 (HazardMarkPlaced) — Vec3 + Unix epoch ms + 카테고리
+signal hazard_mark_placed(marker_position: Vector3, timestamp_ms: int, category: String)
+
 ## SPEC-HAZ-001: 모든 위험 요소가 발견됨
 signal all_hazards_discovered
 
@@ -30,6 +33,15 @@ var hazard_container: Node3D = null
 
 ## 크랙 위험 요소 씬
 var _crack_hazard_scene: PackedScene = preload("res://scenes/hazards/crack_hazard.tscn")
+
+## SPEC-HAZ-003: 단순 위험 요소 씬 (BaseHazard 기반 5종)
+var _simple_hazard_scenes: Dictionary = {
+	"spill": preload("res://scenes/hazards/spill_hazard.tscn"),
+	"debris": preload("res://scenes/hazards/debris_hazard.tscn"),
+	"unguarded_edge": preload("res://scenes/hazards/unguarded_edge_hazard.tscn"),
+	"exposed_rebar": preload("res://scenes/hazards/exposed_rebar_hazard.tscn"),
+	"wet_floor": preload("res://scenes/hazards/wet_floor_hazard.tscn"),
+}
 
 ## Domain 서비스
 var _hazard_rules: HazardRules = HazardRules.new()
@@ -56,6 +68,8 @@ func spawn_hazard(data: HazardData) -> BaseHazard:
 	match data.hazard_type:
 		"crack":
 			hazard = _spawn_crack_hazard(data)
+		"spill", "debris", "unguarded_edge", "exposed_rebar", "wet_floor":
+			hazard = _spawn_simple_hazard(data)
 		_:
 			push_warning("SPEC-HAZ-001: 알 수 없는 위험 요소 유형: %s. crack으로 대체합니다." % data.hazard_type)
 			data.hazard_type = "crack"
@@ -100,6 +114,22 @@ func attempt_mark_hazard(hazard: BaseHazard, hit_position: Vector3) -> MarkingRe
 	result.is_correct = changed
 
 	return result
+
+
+## SPEC-INP-002: 마커 노드를 spawn하고 hazard_mark_placed 시그널을 발행한다.
+## category — 적중한 hazard.hazard_type 또는 "false_positive".
+## 반환: 생성된 HazardMarker (실패 시 null).
+func place_marker(pos: Vector3, category: String) -> HazardMarker:
+	var ts: int = Time.get_ticks_msec()
+	var marker: HazardMarker = HazardMarker.new()
+	marker.place(pos, ts, category)
+	var parent: Node = hazard_container
+	if parent == null:
+		var scene: Node = get_tree().current_scene if get_tree() != null else null
+		parent = scene if scene != null else self
+	parent.add_child(marker)
+	hazard_mark_placed.emit(pos, ts, category)
+	return marker
 
 
 ## SPEC-INP-002: 오탐을 기록한다.
@@ -169,6 +199,24 @@ func _spawn_crack_hazard(data: HazardData) -> BaseHazard:
 		hazard_node.queue_free()
 		return null
 
+	hazard.apply_hazard_data(data)
+	hazard.name = data.hazard_id
+	hazard_container.add_child(hazard)
+	return hazard
+
+
+## SPEC-HAZ-003: 단순 위험 요소(SimpleHazard 기반)를 생성한다.
+func _spawn_simple_hazard(data: HazardData) -> BaseHazard:
+	var scene: PackedScene = _simple_hazard_scenes.get(data.hazard_type, null)
+	if scene == null:
+		push_error("SPEC-HAZ-003: 알 수 없는 단순 hazard 유형: %s" % data.hazard_type)
+		return null
+	var hazard_node: Node = scene.instantiate()
+	var hazard: SimpleHazard = hazard_node as SimpleHazard
+	if hazard == null:
+		push_error("SPEC-HAZ-003: %s tscn 인스턴스가 SimpleHazard가 아닙니다." % data.hazard_type)
+		hazard_node.queue_free()
+		return null
 	hazard.apply_hazard_data(data)
 	hazard.name = data.hazard_id
 	hazard_container.add_child(hazard)

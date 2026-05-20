@@ -1,0 +1,36 @@
+[gd_scene load_steps=2 format=3 uid="uid://ccalpoly_b002_001"]
+
+[ext_resource type="Script" path="res://scripts/presentation/environment/calpoly_b002_site.gd" id="1_site"]
+
+[node name="CalPolyB002Site" type="Node3D"]
+script = ExtResource("1_site")
+
+[node name="LightmapGI" type="LightmapGI" parent="."]
+quality = 2
+bounces = 2
+use_denoiser = true
+
+[node name="ReflectionProbe" type="ReflectionProbe" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 1.5, 44)
+size = Vector3(72, 6, 88)
+update_mode = 1
+ambient_mode = 1
+intensity = 0.8
+
+[node name="WorkLight_01" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 2.5, 22)
+light_color = Color(1.0, 0.92, 0.78, 1)
+light_energy = 4.0
+light_temperature = 4000
+omni_range = 14.0
+omni_attenuation = 1.5
+shadow_enabled = true
+
+[node name="WorkLight_02" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54, 2.5, 66)
+light_color = Color(1.0, 0.92, 0.78, 1)
+light_energy = 4.0
+light_temperature = 4000
+omni_range = 14.0
+omni_attenuation = 1.5
+shadow_enabled = true

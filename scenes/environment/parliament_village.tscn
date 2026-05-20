@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://cparliament_village_001"]
+
+[ext_resource type="Script" path="res://scripts/presentation/environment/parliament_village_site.gd" id="1_site"]
+
+[node name="ParliamentVillageSite" type="Node3D"]
+script = ExtResource("1_site")

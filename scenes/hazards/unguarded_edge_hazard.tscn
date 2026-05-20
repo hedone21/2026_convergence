@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://cunguarded_edge_hazard_001"]
+
+[ext_resource type="Script" path="res://scripts/presentation/hazards/simple_hazard.gd" id="1"]
+
+[node name="UnguardedEdgeHazard" type="Area3D"]
+script = ExtResource("1")
+collision_layer = 32
+collision_mask = 0
+monitorable = true
+monitoring = false
+hazard_kind = "unguarded_edge"

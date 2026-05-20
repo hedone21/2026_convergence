@@ -1,10 +1,17 @@
-[gd_scene load_steps=3 format=3 uid="uid://cdesktop_rig_001"]
+[gd_scene load_steps=4 format=3 uid="uid://cdesktop_rig_001"]
 
 [ext_resource type="Script" path="res://scripts/presentation/vr/desktop_rig_controller.gd" id="1"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_001"]
 radius = 0.35
 height = 1.8
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttr_001"]
+dof_blur_far_enabled = false
+dof_blur_near_enabled = false
+auto_exposure_enabled = true
+auto_exposure_min_sensitivity = 0.0
+auto_exposure_max_sensitivity = 800.0
 
 [node name="DesktopRig" type="Node3D"]
 script = ExtResource("1")
@@ -17,3 +24,4 @@ shape = SubResource("CapsuleShape3D_001")
 
 [node name="Camera3D" type="Camera3D" parent="CharacterBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
+attributes = SubResource("CameraAttr_001")

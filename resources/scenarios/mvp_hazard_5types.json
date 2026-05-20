@@ -1,0 +1,30 @@
+{
+  "_comment": "SPEC-HAZ-003: 5종 위험 요소 (crack/spill/debris/unguarded_edge/exposed_rebar/wet_floor) 모두 spawn 검증용",
+  "scenario_id": "mvp_hazard_5types",
+  "site_type": "calpoly_b001",
+  "site_floor": 1,
+  "time_limit_seconds": 600,
+  "random_placement": false,
+  "random_seed": 0,
+  "random_config": {
+    "hazard_count": 6,
+    "types": ["crack", "spill", "debris", "unguarded_edge", "exposed_rebar", "wet_floor"],
+    "min_spacing": 6.0,
+    "difficulty_range": [0.2, 0.5]
+  },
+  "hazards": [
+    {"id": "hz_crack_01", "type": "crack", "position": [10.0, 0.5, 10.0], "difficulty": 0.3},
+    {"id": "hz_spill_01", "type": "spill", "position": [12.0, 0.0, 10.0], "difficulty": 0.3},
+    {"id": "hz_debris_01", "type": "debris", "position": [14.0, 0.5, 10.0], "difficulty": 0.4},
+    {"id": "hz_edge_01", "type": "unguarded_edge", "position": [16.0, 0.1, 10.0], "difficulty": 0.5},
+    {"id": "hz_rebar_01", "type": "exposed_rebar", "position": [18.0, 0.5, 10.0], "difficulty": 0.5},
+    {"id": "hz_wet_01", "type": "wet_floor", "position": [20.0, 0.0, 10.0], "difficulty": 0.3}
+  ],
+  "props": [
+    {"id": "p_worker_01", "model": "res://assets/models/props/worker.glb", "position": [5.0, 0.0, 5.0]},
+    {"id": "p_excavator_01", "model": "res://assets/models/props/excavator.glb", "position": [8.0, 0.0, 5.0]},
+    {"id": "p_scaffold_01", "model": "res://assets/models/props/scaffold.glb", "position": [11.0, 0.0, 5.0]},
+    {"id": "p_pile_01", "model": "res://assets/models/props/material_pile.glb", "position": [14.0, 0.0, 5.0]},
+    {"id": "p_sign_01", "model": "res://assets/models/props/sign.glb", "position": [17.0, 0.0, 5.0]}
+  ]
+}

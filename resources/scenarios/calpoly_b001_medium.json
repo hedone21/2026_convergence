@@ -1,0 +1,17 @@
+{
+  "_comment": "SPEC-HAZ-002 / SPEC-SCN-001: Cal Poly B001 MEDIUM 난이도 — 5 hazard, difficulty 0.4~0.6 (중간 크기, 일부 은닉)",
+  "scenario_id": "calpoly_b001_medium",
+  "site_type": "calpoly_b001",
+  "site_floor": 1,
+  "time_of_day": "noon",
+  "time_limit_seconds": 480,
+  "random_placement": true,
+  "random_seed": 22,
+  "random_config": {
+    "hazard_count": 5,
+    "types": ["crack", "spill", "debris", "wet_floor"],
+    "min_spacing": 6.0,
+    "difficulty_range": [0.4, 0.6]
+  },
+  "hazards": []
+}
