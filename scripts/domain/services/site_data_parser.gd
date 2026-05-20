@@ -83,5 +83,10 @@ static func _parse_v1(data: Dictionary) -> SiteData:
 	for d in data.get("rooms", []):
 		if d is Dictionary:
 			sd.rooms.append(RoomData.from_v1(d, scale))
-	# v1은 columns/windows 카테고리가 데이터에 없음. site.gd가 grid/cores로 별도 처리.
+	# v1 grid/cores는 공통 schema가 아님 → site.gd가 raw_extra로 직접 access.
+	sd.raw_extra = {
+		"grid": data.get("grid", {}),
+		"cores": data.get("cores", []),
+		"walls_bbox_pt": data.get("walls_bbox_pt", []),
+	}
 	return sd

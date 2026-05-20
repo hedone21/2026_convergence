@@ -102,8 +102,8 @@ var _spawn_bounds: AABB = AABB()
 
 func _ready() -> void:
 	_init_materials()
-	var data: Dictionary = _load_floor_json(floor_to_show)
-	if data.is_empty():
+	var data: SiteData = _load_floor_data(floor_to_show)
+	if data == null:
 		push_error("[ParliamentVillageSite] Failed to load floor %d" % floor_to_show)
 		return
 	_build_from_floor(data)
@@ -154,42 +154,25 @@ func _make_simple_material(color: Color) -> StandardMaterial3D:
 # JSON 로드
 # ---------------------------------------------------------------------------
 
-func _load_floor_json(floor_num: int) -> Dictionary:
+func _load_floor_data(floor_num: int) -> SiteData:
 	var path: String = FLOOR_JSON_TEMPLATE % floor_num
-	if not FileAccess.file_exists(path):
-		push_error("[ParliamentVillageSite] floor JSON not found: %s" % path)
-		return {}
-	var file: FileAccess = FileAccess.open(path, FileAccess.READ)
-	var text: String = file.get_as_text()
-	file.close()
-	var parsed: Variant = JSON.parse_string(text)
-	if not (parsed is Dictionary):
-		push_error("[ParliamentVillageSite] floor JSON parse failed: %s" % path)
-		return {}
-	return parsed
+	return SiteDataParser.parse_from_path(path)
 
 
 # ---------------------------------------------------------------------------
 # 변환
 # ---------------------------------------------------------------------------
 
-func _build_from_floor(data: Dictionary) -> void:
-	var scale_dict: Dictionary = data.get("scale", {})
-	var pt_to_m: float = float(scale_dict.get("pdf_pt_to_meter", 0.0338666))
-
-	var walls_bbox: Array = data.get("walls_bbox_pt", [])
-	if walls_bbox.size() != 4:
-		push_error("[ParliamentVillageSite] walls_bbox_pt invalid")
+func _build_from_floor(data: SiteData) -> void:
+	if data.metadata.bbox_min == data.metadata.bbox_max:
+		push_error("[ParliamentVillageSite] bbox missing in metadata")
 		return
 
-	# site origin: walls_bbox 중심
-	var origin_x_pt: float = (float(walls_bbox[0]) + float(walls_bbox[2])) * 0.5
-	var origin_y_pt: float = (float(walls_bbox[1]) + float(walls_bbox[3])) * 0.5
+	# site origin: bbox 중심 (m 단위)
+	var origin_m: Vector2 = (data.metadata.bbox_min + data.metadata.bbox_max) * 0.5
 
 	# 슬래브 영역: grid bbox(외곽 기둥 포함) + 처마 패딩
-	var slab_rect_m: Rect2 = _compute_slab_rect(
-		data.get("grid", {}), walls_bbox, pt_to_m, origin_x_pt, origin_y_pt
-	)
+	var slab_rect_m: Rect2 = _compute_slab_rect(data, origin_m)
 	var slab_size: Vector3 = Vector3(slab_rect_m.size.x, SLAB_THICKNESS, slab_rect_m.size.y)
 	var slab_center: Vector3 = Vector3(
 		slab_rect_m.position.x + slab_rect_m.size.x * 0.5,
@@ -205,45 +188,43 @@ func _build_from_floor(data: Dictionary) -> void:
 	_create_floor_slab(slab_size, slab_center)
 	if show_ceiling:
 		_create_ceiling_slab(slab_size, slab_center)
-	# door 위치에서 wall을 cut해 출입구 생성. 가설 A 검증.
-	var walls_raw: Array = data.get("walls", [])
-	var doors_raw: Array = data.get("doors", [])
-	var walls_cut: Array = _cut_walls_at_doors(walls_raw, doors_raw)
-	_create_walls(walls_cut, pt_to_m, origin_x_pt, origin_y_pt)
-	_create_columns(data.get("grid", {}), pt_to_m, origin_x_pt, origin_y_pt)
-	_create_core_markers(data.get("cores", []), pt_to_m, origin_x_pt, origin_y_pt)
+	# door swing 위치에서 wall을 cut해 출입구 생성. v1은 swing_radius 기반 circle cut.
+	var outer_cut: Array[WallData] = _cut_walls_at_doors(data.outer_walls, data.doors)
+	var inner_cut: Array[WallData] = _cut_walls_at_doors(data.inner_walls, data.doors)
+	_create_walls(outer_cut, inner_cut, origin_m)
+	_create_columns(data, origin_m)
+	_create_core_markers(data, origin_m)
 	_create_ceiling_lights(slab_size, slab_center)
 
 
-func _compute_slab_rect(
-	grid: Dictionary, walls_bbox: Array, pt_to_m: float,
-	origin_x_pt: float, origin_y_pt: float
-) -> Rect2:
-	# 우선순위: grid bbox(외곽 기둥 포함). 폴백: walls_bbox.
+func _compute_slab_rect(data: SiteData, origin_m: Vector2) -> Rect2:
+	# 우선순위: grid bbox(외곽 기둥 포함). 폴백: metadata.bbox.
+	var grid: Dictionary = data.raw_extra.get("grid", {})
 	var gx: Dictionary = grid.get("x", {})
 	var gy: Dictionary = grid.get("y", {})
-	var min_x_pt: float
-	var max_x_pt: float
-	var min_y_pt: float
-	var max_y_pt: float
+	var pt_to_m: float = data.metadata.unit_scale_to_meter
+	var min_x_m: float
+	var max_x_m: float
+	var min_y_m: float
+	var max_y_m: float
 	if not gx.is_empty() and not gy.is_empty():
 		var xs: Array = gx.values()
 		var ys: Array = gy.values()
-		min_x_pt = xs.min()
-		max_x_pt = xs.max()
-		min_y_pt = ys.min()
-		max_y_pt = ys.max()
+		min_x_m = float(xs.min()) * pt_to_m
+		max_x_m = float(xs.max()) * pt_to_m
+		min_y_m = float(ys.min()) * pt_to_m
+		max_y_m = float(ys.max()) * pt_to_m
 	else:
-		min_x_pt = float(walls_bbox[0])
-		min_y_pt = float(walls_bbox[1])
-		max_x_pt = float(walls_bbox[2])
-		max_y_pt = float(walls_bbox[3])
+		min_x_m = data.metadata.bbox_min.x
+		min_y_m = data.metadata.bbox_min.y
+		max_x_m = data.metadata.bbox_max.x
+		max_y_m = data.metadata.bbox_max.y
 
-	var x0_m: float = (min_x_pt - origin_x_pt) * pt_to_m - SLAB_EDGE_PADDING_M
-	var z0_m: float = (min_y_pt - origin_y_pt) * pt_to_m - SLAB_EDGE_PADDING_M
-	var x1_m: float = (max_x_pt - origin_x_pt) * pt_to_m + SLAB_EDGE_PADDING_M
-	var z1_m: float = (max_y_pt - origin_y_pt) * pt_to_m + SLAB_EDGE_PADDING_M
-	return Rect2(Vector2(x0_m, z0_m), Vector2(x1_m - x0_m, z1_m - z0_m))
+	var x0: float = min_x_m - origin_m.x - SLAB_EDGE_PADDING_M
+	var z0: float = min_y_m - origin_m.y - SLAB_EDGE_PADDING_M
+	var x1: float = max_x_m - origin_m.x + SLAB_EDGE_PADDING_M
+	var z1: float = max_y_m - origin_m.y + SLAB_EDGE_PADDING_M
+	return Rect2(Vector2(x0, z0), Vector2(x1 - x0, z1 - z0))
 
 
 # ---------------------------------------------------------------------------
@@ -283,37 +264,20 @@ func _create_ceiling_slab(size: Vector3, center: Vector3) -> void:
 # 출입구 처리 — door 위치에서 wall segment를 cut
 # ---------------------------------------------------------------------------
 
-func _cut_walls_at_doors(walls: Array, doors: Array) -> Array:
+func _cut_walls_at_doors(walls: Array[WallData], doors: Array[DoorData]) -> Array[WallData]:
 	if doors.is_empty():
 		return walls
-	# door 중심+반경을 미리 Vector2/float로 변환
+	# v1 door는 hinge + swing_radius_m로 circle cut.
 	var door_circles: Array = []
-	for raw in doors:
-		if not (raw is Dictionary):
+	for d in doors:
+		if d.swing_radius_m <= 0.0:
 			continue
-		var dc: Array = raw.get("center_pt", [])
-		var r: float = float(raw.get("cut_radius_pt", 0.0))
-		if dc.size() != 2 or r <= 0.0:
-			continue
-		door_circles.append({
-			"center": Vector2(float(dc[0]), float(dc[1])),
-			"radius": r,
-		})
-
-	var result: Array = []
-	for raw in walls:
-		if not (raw is Dictionary):
-			continue
-		var w: Dictionary = raw
-		var a: Array = w.get("a_pt", [])
-		var b: Array = w.get("b_pt", [])
-		if a.size() != 2 or b.size() != 2:
-			result.append(w)
-			continue
-		var segments: Array = [{
-			"a": Vector2(float(a[0]), float(a[1])),
-			"b": Vector2(float(b[0]), float(b[1])),
-		}]
+		door_circles.append({"center": d.hinge, "radius": d.swing_radius_m})
+	if door_circles.is_empty():
+		return walls
+	var result: Array[WallData] = []
+	for w in walls:
+		var segments: Array = [{"a": w.start, "b": w.end}]
 		for door in door_circles:
 			var new_segments: Array = []
 			for seg in segments:
@@ -321,12 +285,11 @@ func _cut_walls_at_doors(walls: Array, doors: Array) -> Array:
 					_cut_segment_at_circle(seg, door["center"], door["radius"])
 				)
 			segments = new_segments
-		# split된 각 piece를 wall 사본으로
 		for seg in segments:
-			var w2: Dictionary = w.duplicate()
-			w2["a_pt"] = [(seg["a"] as Vector2).x, (seg["a"] as Vector2).y]
-			w2["b_pt"] = [(seg["b"] as Vector2).x, (seg["b"] as Vector2).y]
-			result.append(w2)
+			var nw: WallData = w.duplicate(true)
+			nw.start = seg["a"]
+			nw.end = seg["b"]
+			result.append(nw)
 	return result
 
 
@@ -357,38 +320,30 @@ func _cut_segment_at_circle(seg: Dictionary, center: Vector2, radius: float) -> 
 # 벽체 (line segment → BoxMesh, 외벽은 창문 띠 분할)
 # ---------------------------------------------------------------------------
 
-func _create_walls(walls: Array, pt_to_m: float, ox_pt: float, oy_pt: float) -> void:
+func _create_walls(
+	outer_cut: Array[WallData], inner_cut: Array[WallData], origin: Vector2
+) -> void:
 	_walls_node = Node3D.new()
 	_walls_node.name = "Walls"
 	add_child(_walls_node)
 
-	for raw in walls:
-		if not (raw is Dictionary):
-			continue
-		var w: Dictionary = raw
-		var a: Array = w.get("a_pt", [])
-		var b: Array = w.get("b_pt", [])
-		if a.size() != 2 or b.size() != 2:
-			continue
-		var ax_m: float = (float(a[0]) - ox_pt) * pt_to_m
-		var az_m: float = (float(a[1]) - oy_pt) * pt_to_m
-		var bx_m: float = (float(b[0]) - ox_pt) * pt_to_m
-		var bz_m: float = (float(b[1]) - oy_pt) * pt_to_m
-
-		var dx: float = bx_m - ax_m
-		var dz: float = bz_m - az_m
-		var length: float = sqrt(dx * dx + dz * dz)
+	for w in outer_cut:
+		var a: Vector2 = w.start - origin
+		var b: Vector2 = w.end - origin
+		var length: float = a.distance_to(b)
 		if length < MIN_WALL_LENGTH:
 			continue
+		# WallData.thickness_m default 0.18은 outer 기본값으로 부적합 → OUTER_WALL_THICKNESS로 fallback.
+		var thickness: float = w.thickness_m if w.thickness_m > 0.19 else OUTER_WALL_THICKNESS
+		_spawn_outer_wall(a, b, length, thickness)
 
-		var kind: String = w.get("kind", "inner")
-		if kind == "outer":
-			# extract 단계에서 평행 line 병합 시 thickness_pt가 들어옴. 없으면 기본값.
-			var thickness_pt: float = float(w.get("thickness_pt", 0.0))
-			var thickness_m: float = thickness_pt * pt_to_m if thickness_pt > 0.0 else OUTER_WALL_THICKNESS
-			_spawn_outer_wall(Vector2(ax_m, az_m), Vector2(bx_m, bz_m), length, thickness_m)
-		else:
-			_spawn_inner_wall(Vector2(ax_m, az_m), Vector2(bx_m, bz_m), length)
+	for w in inner_cut:
+		var a: Vector2 = w.start - origin
+		var b: Vector2 = w.end - origin
+		var length: float = a.distance_to(b)
+		if length < MIN_WALL_LENGTH:
+			continue
+		_spawn_inner_wall(a, b, length)
 
 
 func _spawn_outer_wall(a: Vector2, b: Vector2, length: float, thickness: float) -> void:
@@ -432,22 +387,22 @@ func _add_wall_segment(
 # 기둥 (grid 교점)
 # ---------------------------------------------------------------------------
 
-func _create_columns(grid: Dictionary, pt_to_m: float, ox_pt: float, oy_pt: float) -> void:
+func _create_columns(data: SiteData, origin: Vector2) -> void:
 	_columns_node = Node3D.new()
 	_columns_node.name = "Columns"
 	add_child(_columns_node)
 
+	var grid: Dictionary = data.raw_extra.get("grid", {})
 	var gx: Dictionary = grid.get("x", {})
 	var gy: Dictionary = grid.get("y", {})
 	if gx.is_empty() or gy.is_empty():
 		return
+	var pt_to_m: float = data.metadata.unit_scale_to_meter
 
 	for label_x in gx.keys():
-		var x_pt: float = float(gx[label_x])
-		var x_m: float = (x_pt - ox_pt) * pt_to_m
+		var x_m: float = float(gx[label_x]) * pt_to_m - origin.x
 		for label_y in gy.keys():
-			var y_pt: float = float(gy[label_y])
-			var z_m: float = (y_pt - oy_pt) * pt_to_m
+			var z_m: float = float(gy[label_y]) * pt_to_m - origin.y
 
 			var body: StaticBody3D = StaticBody3D.new()
 			body.name = "Column_%s%s" % [label_y, label_x]
@@ -473,12 +428,13 @@ func _create_columns(grid: Dictionary, pt_to_m: float, ox_pt: float, oy_pt: floa
 # 코어 마커 (STAIRS/ELEVATOR) — 위험 요소 배치 지점 후보
 # ---------------------------------------------------------------------------
 
-func _create_core_markers(cores: Array, pt_to_m: float, ox_pt: float, oy_pt: float) -> void:
+func _create_core_markers(data: SiteData, origin: Vector2) -> void:
 	_cores_node = Node3D.new()
 	_cores_node.name = "Cores"
 	add_child(_cores_node)
 
-	for raw in cores:
+	var pt_to_m: float = data.metadata.unit_scale_to_meter
+	for raw in data.raw_extra.get("cores", []):
 		if not (raw is Dictionary):
 			continue
 		var core: Dictionary = raw
@@ -487,8 +443,8 @@ func _create_core_markers(cores: Array, pt_to_m: float, ox_pt: float, oy_pt: flo
 			continue
 		var cx_pt: float = (float(bbox[0]) + float(bbox[2])) * 0.5
 		var cy_pt: float = (float(bbox[1]) + float(bbox[3])) * 0.5
-		var x_m: float = (cx_pt - ox_pt) * pt_to_m
-		var z_m: float = (cy_pt - oy_pt) * pt_to_m
+		var x_m: float = cx_pt * pt_to_m - origin.x
+		var z_m: float = cy_pt * pt_to_m - origin.y
 		var label: String = core.get("label", "UNKNOWN")
 
 		var visual: Node3D

@@ -13,6 +13,10 @@ extends Resource
 @export var columns: Array[ColumnData] = []
 @export var windows: Array[WindowData] = []
 
+## site-specific 보조 데이터 (v1 parliament의 grid, cores 등 공통 schema에 들지 않는 것).
+## site.gd가 자기 site의 raw_extra만 알면 됨.
+@export var raw_extra: Dictionary = {}
+
 
 func wall_count() -> int:
 	return outer_walls.size() + inner_walls.size()
