@@ -30,20 +30,20 @@ const NORMAL_TEXTURE_SIZE: int = 256
 # ---------------------------------------------------------------------------
 
 ## 일반 콘크리트 (기둥/보/벽체/슬래브) — 텍스처 원본 톤 거의 그대로
-const TINT_CONCRETE: Color = Color(1.0, 0.98, 0.95)
+const TINT_CONCRETE: Color = Color(0.82, 0.78, 0.72)
 
-## 바닥 콘크리트 — 약간 어둡고 따뜻한 톤
-const TINT_FLOOR: Color = Color(0.78, 0.76, 0.72)
+## 바닥 콘크리트 — 작업 흙먼지 / warm 회색
+const TINT_FLOOR: Color = Color(0.62, 0.58, 0.52)
 
-## 철근/구조물 — 약간 밝게
-const TINT_REBAR: Color = Color(1.1, 1.08, 1.05)
+## 철근/구조물 — 살짝 밝게
+const TINT_REBAR: Color = Color(0.95, 0.92, 0.88)
 
-## 명도 분기 — 오브젝트 구분용 (외벽 0.75 / 내벽 0.65 / 기둥·천장 0.55)
-## hazard(crack) 가시성을 위해 표면 명도는 0.55~0.75 범위로 제한.
-const TINT_OUTER_WALL: Color = Color(1.00, 0.98, 0.95)  # 외벽: 외부 노출, 가장 밝음
-const TINT_INNER_WALL: Color = Color(0.87, 0.85, 0.82)  # 내벽: 중간
-const TINT_COLUMN: Color = Color(0.73, 0.72, 0.70)      # 기둥: 짙어 구조 강조
-const TINT_CEILING: Color = Color(0.73, 0.72, 0.70)     # 천장: 그림자 영역
+## 명도 분기 — 오브젝트 구분용 + warm 톤다운 (사용자: "전체 너무 흰색")
+## hazard(crack=0.3 albedo) 대비 유지를 위해 표면 명도는 0.55~0.85 범위.
+const TINT_OUTER_WALL: Color = Color(0.85, 0.80, 0.74)   # 외벽: 노출, 비교적 밝지만 warm
+const TINT_INNER_WALL: Color = Color(0.72, 0.68, 0.62)   # 내벽: 중간 warm 회색
+const TINT_COLUMN: Color = Color(0.60, 0.58, 0.54)       # 기둥: 짙어 구조 강조
+const TINT_CEILING: Color = Color(0.55, 0.52, 0.48)      # 천장 빔: 가장 어두운 음영
 
 
 # ---------------------------------------------------------------------------

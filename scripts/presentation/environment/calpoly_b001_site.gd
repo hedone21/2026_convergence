@@ -49,10 +49,21 @@ const ROOM_LABEL_HEIGHT: float = 2.2
 const ROOM_LABEL_FONT_SIZE: int = 48
 const ROOM_LABEL_PIXEL_SIZE: float = 0.008
 
+## 천장 빔 그리드 — 통판 ceiling 대신 격자 빔으로 외부 sky 노출
+## (사용자: "천장이 맵 전체를 가려 답답함")
+const BEAM_SPAN: float = 6.0          # 빔 간 간격 (m)
+const BEAM_WIDTH: float = 0.35        # 빔 두께 (m)
+const BEAM_HEIGHT: float = 0.45       # 빔 높이 (m)
+const WORK_LIGHT_SPAN: float = 12.0   # 작업등 간 간격 (m, sparse 배치)
+const WORK_LIGHT_RANGE: float = 9.0   # 작업등 omni_range (m)
+const WORK_LIGHT_ENERGY: float = 2.5
+const WORK_LIGHT_DROP: float = 0.35   # 천장에서 매달린 길이 (m)
+
 var _walls_node: Node3D
 var _columns_node: Node3D
 var _windows_node: Node3D
 var _labels_node: Node3D
+var _ceiling_node: Node3D
 var _surfaces: Array = []
 var _spawn_bounds: AABB = AABB()
 
@@ -121,7 +132,7 @@ func _build_from_floor(data: SiteData) -> void:
 
 	_create_floor_slab(slab_size, Vector3.ZERO)
 	if show_ceiling:
-		_create_ceiling_slab(slab_size, Vector3.ZERO)
+		_create_ceiling_structure(bb_min, bb_max, origin)
 
 	# door hinge/axis/span으로 wall cut → 출입구 생성
 	var door_slots: Array = _build_door_slots(data.doors)
@@ -236,13 +247,61 @@ func _create_floor_slab(size: Vector3, center: Vector3) -> void:
 	})
 
 
-func _create_ceiling_slab(size: Vector3, center: Vector3) -> void:
+## 통판 ceiling 대신 격자 빔 + 작업등.
+## 빔이 차지하는 비율 BEAM_WIDTH/BEAM_SPAN ≈ 6% → 천장 94%가 sky로 열림.
+## 작업등은 sparse 배치(WORK_LIGHT_SPAN), warm tone, shadow off로 성능 보호.
+func _create_ceiling_structure(bb_min: Vector2, bb_max: Vector2, origin: Vector2) -> void:
+	_ceiling_node = _new_group("CeilingStructure")
+	var size_x: float = bb_max.x - bb_min.x
+	var size_z: float = bb_max.y - bb_min.y
+	var center_x: float = (bb_max.x + bb_min.x) * 0.5 - origin.x
+	var center_z: float = (bb_max.y + bb_min.y) * 0.5 - origin.y
+	var beam_y: float = STRUCTURE_HEIGHT + BEAM_HEIGHT * 0.5
+
+	# X 방향(긴) 빔 — z축 따라 BEAM_SPAN 간격으로 배치
+	var beam_count_z: int = max(1, int(size_z / BEAM_SPAN))
+	for i: int in range(beam_count_z + 1):
+		var t: float = float(i) / float(beam_count_z) - 0.5
+		var z: float = center_z + t * size_z
+		_spawn_beam(Vector3(size_x, BEAM_HEIGHT, BEAM_WIDTH), Vector3(center_x, beam_y, z))
+
+	# Z 방향(긴) 빔 — x축 따라 BEAM_SPAN 간격으로 배치
+	var beam_count_x: int = max(1, int(size_x / BEAM_SPAN))
+	for i: int in range(beam_count_x + 1):
+		var t: float = float(i) / float(beam_count_x) - 0.5
+		var x: float = center_x + t * size_x
+		_spawn_beam(Vector3(BEAM_WIDTH, BEAM_HEIGHT, size_z), Vector3(x, beam_y, center_z))
+
+	# 작업등 — sparse 격자 셀 중앙에 1개씩
+	var light_count_x: int = max(1, int(size_x / WORK_LIGHT_SPAN))
+	var light_count_z: int = max(1, int(size_z / WORK_LIGHT_SPAN))
+	var light_y: float = STRUCTURE_HEIGHT - WORK_LIGHT_DROP
+	for ix: int in range(light_count_x):
+		for iz: int in range(light_count_z):
+			var tx: float = (float(ix) + 0.5) / float(light_count_x) - 0.5
+			var tz: float = (float(iz) + 0.5) / float(light_count_z) - 0.5
+			var lx: float = center_x + tx * size_x
+			var lz: float = center_z + tz * size_z
+			_spawn_work_light(Vector3(lx, light_y, lz))
+
+
+func _spawn_beam(size: Vector3, pos: Vector3) -> void:
 	var body: StaticBody3D = StaticBody3D.new()
-	body.name = "CeilingSlab"
-	add_child(body)
 	body.add_child(_make_box_mesh(size, _mat_ceiling))
 	body.add_child(_make_box_collision(size))
-	body.position = Vector3(center.x, STRUCTURE_HEIGHT + SLAB_THICKNESS * 0.5, center.z)
+	body.position = pos
+	_ceiling_node.add_child(body)
+
+
+func _spawn_work_light(pos: Vector3) -> void:
+	var light: OmniLight3D = OmniLight3D.new()
+	light.position = pos
+	light.light_color = Color(1.0, 0.85, 0.62)  # warm 작업등 (~3500K)
+	light.light_energy = WORK_LIGHT_ENERGY
+	light.omni_range = WORK_LIGHT_RANGE
+	light.omni_attenuation = 1.4
+	light.shadow_enabled = false  # 다수 작업등 성능 보호
+	_ceiling_node.add_child(light)
 
 
 ## DoorData → 내부 slot 표현으로 변환. axis가 ZERO인 v1 데이터는 skip.
@@ -353,3 +412,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		show_room_labels = not show_room_labels
 		_labels_node.visible = show_room_labels
 		print("[CalPolyB001Site] room labels: %s" % ("ON" if show_room_labels else "OFF"))
+	elif event.keycode == KEY_C and _ceiling_node:
+		show_ceiling = not show_ceiling
+		_ceiling_node.visible = show_ceiling
+		print("[CalPolyB001Site] ceiling: %s" % ("ON" if show_ceiling else "OFF"))
