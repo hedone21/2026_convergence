@@ -5,6 +5,11 @@
 [node name="CalPolyB001Site" type="Node3D"]
 script = ExtResource("1_site")
 
+[node name="LightmapGI" type="LightmapGI" parent="."]
+quality = 2
+bounces = 2
+use_denoiser = true
+
 [node name="ReflectionProbe" type="ReflectionProbe" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 1.5, 20)
 size = Vector3(40, 6, 40)
