@@ -29,6 +29,13 @@ var _hazard_rules: HazardRules = HazardRules.new()
 ## (사용자: "위험 요소가 눈에 잘 띄지 않아")
 const CRACK_MODULATE: Color = Color(0.08, 0.06, 0.05, 1.0)
 
+## Decal 사이즈 계수 — crack_length(m) 기준 (X, Z) 평면 투영 영역.
+## 이전 0.6/0.4 → 2.5배 확대 (사용자: "crack 자체가 여전히 안 보임").
+const DECAL_X_FACTOR: float = 1.5
+const DECAL_Z_FACTOR: float = 1.0
+const DECAL_Y_DEPTH: float = 0.5  # 표면 투영 깊이 (Y축)
+const DECAL_FADE: float = 0.15    # upper/lower fade (이전 0.3)
+
 
 func _ready() -> void:
 	hazard_type = "crack"
@@ -60,11 +67,11 @@ func _apply_difficulty() -> void:
 	var color_blend: float = params["color_blend"]
 
 	# Decal 크기 조정 — difficulty에 따라 스케일 변화
-	var base_extents_x: float = crack_length * 0.6
-	var base_extents_z: float = crack_length * 0.4
+	var base_extents_x: float = crack_length * DECAL_X_FACTOR
+	var base_extents_z: float = crack_length * DECAL_Z_FACTOR
 	_crack_decal.size = Vector3(
 		base_extents_x * visual_scale,
-		0.5,  # Y축 투영 깊이 (콘크리트 표면에 투영)
+		DECAL_Y_DEPTH,
 		base_extents_z * visual_scale
 	)
 
@@ -108,14 +115,14 @@ func _build_visual() -> void:
 	_crack_decal.texture_normal = _texture_generator.create_crack_normal_texture()
 
 	# Decal 기본 크기 (난이도 적용 전)
-	_crack_decal.size = Vector3(crack_length * 0.6, 0.5, crack_length * 0.4)
+	_crack_decal.size = Vector3(crack_length * DECAL_X_FACTOR, DECAL_Y_DEPTH, crack_length * DECAL_Z_FACTOR)
 
 	# Decal 색상 + 투명도
 	_crack_decal.modulate = CRACK_MODULATE
 
 	# Decal 설정 — 표면에 투영
-	_crack_decal.upper_fade = 0.3
-	_crack_decal.lower_fade = 0.3
+	_crack_decal.upper_fade = DECAL_FADE
+	_crack_decal.lower_fade = DECAL_FADE
 	_crack_decal.normal_fade = 0.5
 
 	# 표면에 살짝 떠있도록 (정확한 표면 투영을 위해)
@@ -132,7 +139,7 @@ func _rebuild_visual() -> void:
 		_crack_decal.texture_normal = _texture_generator.create_crack_normal_texture()
 
 		# 크기 갱신
-		_crack_decal.size = Vector3(crack_length * 0.6, 0.5, crack_length * 0.4)
+		_crack_decal.size = Vector3(crack_length * DECAL_X_FACTOR, DECAL_Y_DEPTH, crack_length * DECAL_Z_FACTOR)
 
 		_apply_difficulty()
 
