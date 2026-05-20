@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://ccalpoly_b001_001"]
+
+[ext_resource type="Script" path="res://scripts/presentation/environment/calpoly_b001_site.gd" id="1_site"]
+
+[node name="CalPolyB001Site" type="Node3D"]
+script = ExtResource("1_site")

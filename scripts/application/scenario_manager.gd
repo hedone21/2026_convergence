@@ -20,8 +20,8 @@ signal hazards_placed
 var current_scenario: ScenarioData = null
 
 ## 기본 시나리오 경로
-## SPEC-ENV-003: Parliament Village South Hall 도면 기반 사이트 사용
-var default_scenario_path: String = "res://resources/scenarios/mvp_parliament.json"
+## SPEC-ENV-004 (TBD): Cal Poly Building 001 DXF 도면 기반 — DXF→v2 파이프라인 검증용
+var default_scenario_path: String = "res://resources/scenarios/mvp_calpoly_b001.json"
 
 ## SPEC-SCN-002: 랜덤 시드 (0이면 시스템 시간 기반)
 var random_seed: int = 0
@@ -231,8 +231,13 @@ func _load_site() -> void:
 	var site_scene: PackedScene = load(site_scene_path) as PackedScene
 	if site_scene:
 		var site_instance: Node3D = site_scene.instantiate() as Node3D
+		# SPEC-ENV-004 (TBD): 다층 사이트는 시나리오의 site_floor를 _ready 전에 inject
+		if current_scenario and "floor_to_show" in site_instance:
+			site_instance.set("floor_to_show", current_scenario.site_floor)
 		site_container.add_child(site_instance)
-		print("[ScenarioManager] Site loaded: %s" % site_type)
+		print("[ScenarioManager] Site loaded: %s (floor=%d)" % [
+			site_type, current_scenario.site_floor if current_scenario else 1
+		])
 	else:
 		push_error("[ScenarioManager] Failed to load site scene: %s" % site_scene_path)
 

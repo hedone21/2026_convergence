@@ -13,6 +13,9 @@ extends Resource
 ## 현장 유형 키 (예: "building_frame")
 @export var site_type: String = "building_frame"
 
+## SPEC-ENV-004 (TBD): 다층 사이트의 표시 층 (1부터). 단층 사이트는 무시.
+@export var site_floor: int = 1
+
 ## 시간 제한 (초)
 @export var time_limit_seconds: int = 300
 
@@ -36,6 +39,7 @@ static func from_dict(data: Dictionary) -> ScenarioData:
 	var sd: ScenarioData = ScenarioData.new()
 	sd.scenario_id = data.get("scenario_id", "")
 	sd.site_type = data.get("site_type", "building_frame")
+	sd.site_floor = int(data.get("site_floor", 1))
 	sd.time_limit_seconds = int(data.get("time_limit_seconds", 300))
 	sd.random_placement = data.get("random_placement", false)
 	sd.random_seed = int(data.get("random_seed", 0))
@@ -75,6 +79,7 @@ func to_dict() -> Dictionary:
 	return {
 		"scenario_id": scenario_id,
 		"site_type": site_type,
+		"site_floor": site_floor,
 		"time_limit_seconds": time_limit_seconds,
 		"random_placement": random_placement,
 		"random_seed": random_seed,

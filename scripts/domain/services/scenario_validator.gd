@@ -9,7 +9,8 @@ extends RefCounted
 
 ## 허용되는 현장 유형 목록
 ## SPEC-ENV-003: parliament_village (Texas Woman's University South Hall 평면도 기반)
-var VALID_SITE_TYPES: Array[String] = ["building_frame", "parliament_village"]
+## SPEC-ENV-004 (TBD): calpoly_b001 (Cal Poly Building 001 DXF 도면 기반)
+var VALID_SITE_TYPES: Array[String] = ["building_frame", "parliament_village", "calpoly_b001"]
 
 ## 허용되는 위험 요소 유형 목록
 var VALID_HAZARD_TYPES: Array[String] = ["crack"]
@@ -32,6 +33,13 @@ func validate(data: Dictionary) -> Array[String]:
 		errors.append("site_type이 문자열이 아닙니다")
 	elif not (data["site_type"] as String) in VALID_SITE_TYPES:
 		errors.append("지원하지 않는 site_type: %s" % data["site_type"])
+
+	# SPEC-ENV-004 (TBD): site_floor (optional, default 1)
+	if data.has("site_floor"):
+		if not (data["site_floor"] is int or data["site_floor"] is float):
+			errors.append("site_floor가 정수가 아닙니다")
+		elif int(data["site_floor"]) < 1 or int(data["site_floor"]) > 20:
+			errors.append("site_floor는 1~20 범위여야 합니다: %s" % str(data["site_floor"]))
 
 	if not data.has("time_limit_seconds"):
 		errors.append("필수 필드 누락: time_limit_seconds")

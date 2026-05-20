@@ -5,6 +5,9 @@
 # Test output data
 data/sessions/
 
+# 임시 작업/진단 산출물 (재생성 가능)
+_workspace/
+
 # OS
 .DS_Store
 Thumbs.db
