@@ -241,6 +241,7 @@ def convert(dxf_path: Path, out_path: Path) -> dict:
         "elevators": [],
         "rooms": [],
         "slabs": [],
+        "boundary_polygon": [],
     }
 
     # 2차: A-FOOTPRINT LWPOLYLINE → outer_walls (직접 외곽선)
@@ -265,6 +266,7 @@ def convert(dxf_path: Path, out_path: Path) -> dict:
                 })
 
     # 2.5차: AREA-GROSS LWPOLYLINE → 외/내 분류 기준 (실제 벽 아님, 면적 경계)
+    # boundary_polygon에도 보존 (validator V3에서 외벽 cycle 정합성 검증용)
     gross_edges_m: list = []
     for e in msp.query("LWPOLYLINE"):
         base = e.dxf.layer.split("$")[-1] if "$" in e.dxf.layer else e.dxf.layer
@@ -275,6 +277,10 @@ def convert(dxf_path: Path, out_path: Path) -> dict:
                     (m(a[0]), m(a[1])),
                     (m(b[0]), m(b[1])),
                 ))
+            categories["boundary_polygon"].append({
+                "polygon": [[m(p[0]), m(p[1])] for p in pts],
+                "source": {"dxf_layer": e.dxf.layer, "dxf_type": "LWPOLYLINE"},
+            })
 
     # 3차: A-WALL LINE + LWPOLYLINE → segment 수집 → 외/내 분류 → 각각 collinear merge
     wall_segs_m: list = []
