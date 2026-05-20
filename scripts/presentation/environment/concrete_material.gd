@@ -80,6 +80,25 @@ func create_ceiling_material() -> StandardMaterial3D:
 	return _build_material(TINT_CEILING, 1.05, Vector3(3.5, 3.5, 3.5))
 
 
+## SPEC-GFX-001 (TBD): 벽 trim sheet 머티리얼.
+## 상/중/하 차등 단일 sheet (assets/textures/trim_sheets/concrete_trim.png).
+## 벽 mesh의 V축에 sheet의 zone이 매핑되도록 UV scale을 Y=1.0, X=2.0로.
+const TRIM_SHEET_PATH: String = "res://assets/textures/trim_sheets/concrete_trim.png"
+
+
+func create_wall_trim_material() -> StandardMaterial3D:
+	var mat: StandardMaterial3D = StandardMaterial3D.new()
+	var trim_tex: Texture2D = load(TRIM_SHEET_PATH) as Texture2D
+	if trim_tex != null:
+		mat.albedo_texture = trim_tex
+	mat.albedo_color = TINT_INNER_WALL
+	mat.roughness = 0.85
+	mat.metallic = 0.0
+	mat.uv1_scale = Vector3(2.0, 1.0, 1.0)  # 가로 반복, 세로 1회 (상/중/하 zone)
+	mat.uv1_triplanar = false
+	return mat
+
+
 # ---------------------------------------------------------------------------
 # 내부 구현
 # ---------------------------------------------------------------------------
