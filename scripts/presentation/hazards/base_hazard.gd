@@ -31,9 +31,20 @@ signal state_changed(new_state: HazardState)
 ## 현재 상태
 var state: HazardState = HazardState.UNDISCOVERED
 
+## warning marker (hazard 위에 떠 있는 안전 표지등)
+var _warning_marker: MeshInstance3D = null
+
 ## 마킹 레이 전용 충돌 레이어 (비트 5 = 레이어 6)
 ## 마킹 레이의 collision_mask가 이 레이어와 일치해야 탐지됨
 const HAZARD_COLLISION_LAYER: int = 32  # 비트 5 (2^5 = 32)
+
+## warning marker 시각 파라미터.
+## 사용자: "위험 요소가 눈에 잘 띄지 않아" — 멀리서도 보이는 safety beacon.
+const MARKER_HEIGHT_M: float = 0.65
+const MARKER_RADIUS: float = 0.06
+const MARKER_COLOR: Color = Color(1.0, 0.85, 0.0)  # OSHA caution yellow
+const MARKER_EMISSION_ENERGY: float = 2.5
+const MARKER_COLOR_DISCOVERED: Color = Color(0.0, 1.0, 0.25)
 
 
 func _ready() -> void:
@@ -43,7 +54,30 @@ func _ready() -> void:
 	monitorable = true
 	monitoring = false
 
+	_build_warning_marker()
 	_apply_difficulty()
+
+
+## hazard 위에 띄우는 OSHA caution 색 emissive 구.
+## 발견 전: yellow. 발견 후: green (discover()에서 변경).
+func _build_warning_marker() -> void:
+	_warning_marker = MeshInstance3D.new()
+	_warning_marker.name = "WarningMarker"
+	var sphere: SphereMesh = SphereMesh.new()
+	sphere.radius = MARKER_RADIUS
+	sphere.height = MARKER_RADIUS * 2.0
+	_warning_marker.mesh = sphere
+
+	var mat: StandardMaterial3D = StandardMaterial3D.new()
+	mat.albedo_color = MARKER_COLOR
+	mat.emission_enabled = true
+	mat.emission = MARKER_COLOR
+	mat.emission_energy_multiplier = MARKER_EMISSION_ENERGY
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_warning_marker.material_override = mat
+
+	_warning_marker.position = Vector3(0.0, MARKER_HEIGHT_M, 0.0)
+	add_child(_warning_marker)
 
 
 ## SPEC-HAZ-001: 위험 요소를 발견 상태로 전환한다.
@@ -54,9 +88,21 @@ func discover() -> bool:
 		return false
 
 	state = HazardState.DISCOVERED
+	_recolor_marker_discovered()
 	_show_discovered_feedback()
 	state_changed.emit(HazardState.DISCOVERED)
 	return true
+
+
+## 발견 시 marker 색상을 OSHA safe green으로 전환.
+func _recolor_marker_discovered() -> void:
+	if _warning_marker == null:
+		return
+	var mat: StandardMaterial3D = _warning_marker.material_override as StandardMaterial3D
+	if mat == null:
+		return
+	mat.albedo_color = MARKER_COLOR_DISCOVERED
+	mat.emission = MARKER_COLOR_DISCOVERED
 
 
 ## SPEC-HAZ-001: 발견 여부를 반환한다.

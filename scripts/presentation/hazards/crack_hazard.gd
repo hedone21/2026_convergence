@@ -25,7 +25,9 @@ var _texture_generator: CrackTextureGenerator = CrackTextureGenerator.new()
 var _hazard_rules: HazardRules = HazardRules.new()
 
 ## 크랙 기본 색상 (Decal modulate)
-const CRACK_MODULATE: Color = Color(0.3, 0.25, 0.2, 1.0)
+## warm 콘크리트(albedo 0.55~0.85)와 대비를 위해 짙은 흙갈색-검정 톤.
+## (사용자: "위험 요소가 눈에 잘 띄지 않아")
+const CRACK_MODULATE: Color = Color(0.08, 0.06, 0.05, 1.0)
 
 
 func _ready() -> void:
@@ -68,7 +70,7 @@ func _apply_difficulty() -> void:
 
 	# Decal modulate — 투명도로 난이도 표현
 	var blended_color: Color = CRACK_MODULATE.lerp(
-		Color(0.75, 0.73, 0.70, 0.0),  # 배경 콘크리트색 + 완전 투명
+		Color(0.60, 0.56, 0.50, 0.0),  # warm 콘크리트 톤으로 fade
 		color_blend
 	)
 	blended_color.a = clampf(opacity, 0.0, 1.0)

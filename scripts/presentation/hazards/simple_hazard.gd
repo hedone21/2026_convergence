@@ -6,26 +6,31 @@ extends BaseHazard
 ## BaseHazard 상속. tscn에 따라 hazard_kind를 다르게 설정하여 시각/크기 차별화.
 ## crack 외 단순 시각 위험요소를 공통 코드로 다룸.
 
+## OSHA 컬러 코딩 + 채도 강화 (사용자: "위험 요소가 눈에 잘 띄지 않아")
+##   red    = danger (즉시 위험: 추락/전기)
+##   orange = warning (경고: 부상 위험)
+##   yellow = caution (주의: 미끄러짐/걸림)
+##   blue   = mandatory information (액체/누수 안내)
 const TYPE_CONFIG: Dictionary = {
 	"spill": {
-		"color": Color(0.3, 0.6, 1.0), "shape": "puddle",
-		"size": Vector3(1.0, 0.05, 1.0),
+		"color": Color(0.15, 0.45, 0.95), "shape": "puddle",
+		"size": Vector3(1.2, 0.06, 1.2),
 	},
 	"debris": {
-		"color": Color(0.6, 0.4, 0.2), "shape": "box",
-		"size": Vector3(0.5, 0.3, 0.5),
+		"color": Color(0.95, 0.75, 0.10), "shape": "box",  # caution yellow
+		"size": Vector3(0.6, 0.36, 0.6),
 	},
 	"unguarded_edge": {
-		"color": Color(1.0, 0.0, 0.5), "shape": "box",
-		"size": Vector3(2.0, 0.1, 0.2),
+		"color": Color(0.95, 0.10, 0.05), "shape": "box",  # danger red
+		"size": Vector3(2.4, 0.12, 0.24),
 	},
 	"exposed_rebar": {
-		"color": Color(1.0, 0.5, 0.0), "shape": "cylinder",
-		"size": Vector3(0.04, 1.0, 0.04),
+		"color": Color(1.0, 0.45, 0.0), "shape": "cylinder",  # warning orange
+		"size": Vector3(0.045, 1.2, 0.045),
 	},
 	"wet_floor": {
-		"color": Color(0.0, 0.8, 1.0), "shape": "puddle",
-		"size": Vector3(1.5, 0.02, 1.5),
+		"color": Color(0.15, 0.80, 0.95), "shape": "puddle",
+		"size": Vector3(1.8, 0.025, 1.8),
 	},
 }
 
@@ -60,7 +65,7 @@ func _build_visual() -> void:
 	mat.albedo_color = cfg["color"]
 	mat.emission_enabled = true
 	mat.emission = cfg["color"]
-	mat.emission_energy_multiplier = 0.4
+	mat.emission_energy_multiplier = 1.4  # 시인성 강화 (이전 0.4)
 	mesh_inst.material_override = mat
 	add_child(mesh_inst)
 

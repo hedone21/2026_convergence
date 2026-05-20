@@ -98,8 +98,40 @@ func _run_capture() -> void:
 	# Batch 2: 천장 없음
 	await _capture_batch(camera, _ensure_dir("no_ceiling/"))
 
+	# Batch 3: hazard closeup — 각 hazard 1.5m 거리에서 1장씩
+	await _capture_hazard_closeups(camera, _ensure_dir("hazards/"))
+
 	print("[ScreenshotCapturer] Done. Quitting.")
 	get_tree().quit()
+
+
+## HazardContainer 하위 각 hazard 1.5m 후방·1.2m 위에서 캡처.
+func _capture_hazard_closeups(camera: Camera3D, out_dir: String) -> void:
+	var main_scene: Node = get_tree().current_scene
+	if main_scene == null:
+		return
+	var hazard_container: Node = main_scene.get_node_or_null("HazardContainer")
+	if hazard_container == null:
+		print("[ScreenshotCapturer] HazardContainer 없음 — closeup skip")
+		return
+	var hazards: Array = hazard_container.get_children()
+	for i: int in hazards.size():
+		var h: Node = hazards[i]
+		if not (h is Node3D):
+			continue
+		var hp: Vector3 = (h as Node3D).global_position
+		camera.global_position = hp + Vector3(0.0, 1.2, 1.5)
+		camera.look_at(hp + Vector3(0.0, 0.3, 0.0))
+		for _i: int in range(SHUTTER_FRAMES):
+			await get_tree().process_frame
+		var img: Image = get_viewport().get_texture().get_image()
+		var label: String = "hazard_%02d_%s.png" % [i + 1, h.name]
+		var path: String = out_dir + label
+		var err: int = img.save_png(path)
+		if err == OK:
+			print("[ScreenshotCapturer] Saved %s" % ProjectSettings.globalize_path(path))
+		else:
+			push_error("[ScreenshotCapturer] save_png failed (%d): %s" % [err, path])
 
 
 func _capture_batch(camera: Camera3D, out_dir: String) -> void:
@@ -121,7 +153,8 @@ func _capture_batch(camera: Camera3D, out_dir: String) -> void:
 			push_error("[ScreenshotCapturer] save_png failed (%d): %s" % [err, path])
 
 
-## SiteContainer 하위에서 "CeilingSlab" 이름 노드를 찾는다.
+## SiteContainer 하위에서 ceiling 노드를 찾는다.
+## 이전 "CeilingSlab"(통판) + 신규 "CeilingStructure"(빔 격자) 모두 인식.
 func _find_ceiling_node() -> Node:
 	var main_scene: Node = get_tree().current_scene
 	if main_scene == null:
@@ -130,7 +163,8 @@ func _find_ceiling_node() -> Node:
 	if site_container == null:
 		return null
 	for child: Node in site_container.get_children():
-		var ceiling: Node = child.get_node_or_null("CeilingSlab")
-		if ceiling != null:
-			return ceiling
+		for name_: String in ["CeilingStructure", "CeilingSlab"]:
+			var ceiling: Node = child.get_node_or_null(name_)
+			if ceiling != null:
+				return ceiling
 	return null
