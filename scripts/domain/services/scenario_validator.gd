@@ -13,7 +13,15 @@ extends RefCounted
 var VALID_SITE_TYPES: Array[String] = ["building_frame", "parliament_village", "calpoly_b001"]
 
 ## 허용되는 위험 요소 유형 목록
-var VALID_HAZARD_TYPES: Array[String] = ["crack"]
+## SPEC-HAZ-003: 위험 요소 종류 확장 — 5종 추가 (spill/debris/unguarded_edge/exposed_rebar/wet_floor)
+var VALID_HAZARD_TYPES: Array[String] = [
+	"crack",
+	"spill",
+	"debris",
+	"unguarded_edge",
+	"exposed_rebar",
+	"wet_floor",
+]
 
 
 ## 시나리오 데이터를 검증한다.
