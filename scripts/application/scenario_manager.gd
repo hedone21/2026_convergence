@@ -16,6 +16,9 @@ signal scenario_load_failed(error: String)
 ## SPEC-SCN-002: 위험 요소 배치 완료
 signal hazards_placed
 
+## SPEC-ENV-004 (TBD): 런타임 floor 전환 발생
+signal floor_changed(floor_n: int)
+
 ## 현재 로드된 시나리오
 var current_scenario: ScenarioData = null
 
@@ -106,6 +109,22 @@ func load_scenario(path: String) -> ScenarioData:
 func load_default_scenario() -> ScenarioData:
 	print("[ScenarioManager] Loading default scenario: %s" % default_scenario_path)
 	return load_scenario(default_scenario_path)
+
+
+## SPEC-ENV-004 (TBD): 현재 시나리오의 floor만 바꿔 site 재로드 + hazard 재배치.
+## 다층 도면 시각/시뮬 검증용. 시나리오 파일은 그대로 두고 site_floor만 in-memory 변경.
+func change_floor(floor_n: int) -> void:
+	if current_scenario == null:
+		push_warning("[ScenarioManager] change_floor: 현재 시나리오 없음")
+		return
+	if floor_n < 1:
+		return
+	if current_scenario.site_floor == floor_n:
+		return
+	current_scenario.site_floor = floor_n
+	print("[ScenarioManager] change_floor: %d" % floor_n)
+	apply_scenario()
+	floor_changed.emit(floor_n)
 
 
 ## SPEC-SCN-001: 시나리오 데이터를 검증한다 (ScenarioValidator에 위임).

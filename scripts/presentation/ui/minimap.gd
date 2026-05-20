@@ -5,8 +5,15 @@ extends Control
 ##
 ## 토글: M 키 (기본 표시)
 
-const FLOOR_JSON_TEMPLATE: String = "res://data/parliament_village/floor_%02d.json"
+## site_type별 floor JSON 경로 템플릿. zero-pad 여부 다름 (v1 vs v2 데이터 명명 차이).
+const FLOOR_JSON_TEMPLATES: Dictionary = {
+	"parliament_village": "res://data/parliament_village/floor_%02d.json",
+	"calpoly_b001":       "res://data/calpoly_b001/floor_%d.json",
+}
+const DEFAULT_SITE_TYPE: String = "parliament_village"
 const TOGGLE_KEYCODE: int = KEY_M
+## SPEC-ENV-004 (TBD): 다층 전환 단축키. KEY_1~KEY_5 → floor 1~5.
+const FLOOR_KEYCODES: Array[int] = [KEY_1, KEY_2, KEY_3, KEY_4, KEY_5]
 
 ## 미니맵 외곽 padding (m)
 const BBOX_PADDING_M: float = 2.0
@@ -37,10 +44,14 @@ var _font: Font = ThemeDB.fallback_font
 
 
 func _ready() -> void:
+	_sync_with_scenario()
 	_load_floor_data()
 	_compute_draw_rect()
 	queue_redraw()
 	set_process(true)
+	if ScenarioManager:
+		ScenarioManager.floor_changed.connect(_on_floor_changed)
+		ScenarioManager.scenario_loaded.connect(_on_scenario_loaded)
 
 
 func _process(_delta: float) -> void:
@@ -53,10 +64,44 @@ func _input(event: InputEvent) -> void:
 		var key_event: InputEventKey = event
 		if key_event.keycode == TOGGLE_KEYCODE:
 			visible = not visible
+			return
+		var idx: int = FLOOR_KEYCODES.find(key_event.keycode)
+		if idx >= 0 and ScenarioManager:
+			ScenarioManager.change_floor(idx + 1)
+
+
+## ScenarioManager의 시그널로 동기화
+func _on_floor_changed(floor_n: int) -> void:
+	floor_to_show = floor_n
+	_load_floor_data()
+	_compute_draw_rect()
+	queue_redraw()
+
+
+func _on_scenario_loaded(data: ScenarioData) -> void:
+	floor_to_show = data.site_floor
+	_load_floor_data()
+	_compute_draw_rect()
+	queue_redraw()
+
+
+func _sync_with_scenario() -> void:
+	if ScenarioManager and ScenarioManager.current_scenario:
+		floor_to_show = ScenarioManager.current_scenario.site_floor
+
+
+func _site_type() -> String:
+	if ScenarioManager and ScenarioManager.current_scenario:
+		return ScenarioManager.current_scenario.site_type
+	return DEFAULT_SITE_TYPE
 
 
 func _load_floor_data() -> void:
-	var path: String = FLOOR_JSON_TEMPLATE % floor_to_show
+	var site_type: String = _site_type()
+	var template: String = FLOOR_JSON_TEMPLATES.get(
+		site_type, FLOOR_JSON_TEMPLATES[DEFAULT_SITE_TYPE]
+	)
+	var path: String = template % floor_to_show
 	_site_data = SiteDataParser.parse_from_path(path)
 	if _site_data == null:
 		return
@@ -180,3 +225,8 @@ func _draw() -> void:
 			# 8m 앞 위치를 같은 방식으로 픽셀 변환
 			var ahead: Vector2 = _world_to_pixel(pos.x + fwd_xz.x * 8.0, pos.z + fwd_xz.y * 8.0)
 			draw_line(dot, ahead, COLOR_PLAYER_HEADING, 1.5)
+
+	# Floor 라벨 (좌상단). 1~5 키로 전환.
+	var floor_label: String = "Floor %d  [1-5]" % floor_to_show
+	draw_string(_font, Vector2(8, 18), floor_label,
+		HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(1.0, 0.95, 0.55, 0.95))
