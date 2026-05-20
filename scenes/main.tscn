@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3 uid="uid://cmain_scene_001"]
 
-[ext_resource type="Texture2D" uid="uid://ckayd5vd5eosm" path="res://assets/hdri/kloppenheim_07_puresky_2k.hdr" id="1_hdri"]
+[ext_resource type="Texture2D" path="res://assets/hdri/kloppenheim_07_puresky_4k.hdr" id="1_hdri"]
 [ext_resource type="Script" path="res://tools/screenshot_capturer.gd" id="2_capture"]
 [ext_resource type="PackedScene" uid="uid://cminimap_001" path="res://scenes/ui/minimap.tscn" id="3_minimap"]
 [ext_resource type="Script" path="res://scripts/tools/site_dump.gd" id="4_dump"]
@@ -12,7 +12,7 @@ energy_multiplier = 1.5
 
 [sub_resource type="Sky" id="Sky_001"]
 sky_material = SubResource("PanoramaSkyMaterial_001")
-radiance_size = 4
+radiance_size = 5
 
 [sub_resource type="Environment" id="Environment_001"]
 background_mode = 2
