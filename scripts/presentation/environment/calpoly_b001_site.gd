@@ -57,7 +57,8 @@ var _surfaces: Array = []
 var _spawn_bounds: AABB = AABB()
 
 var _concrete_material: ConcreteMaterial = ConcreteMaterial.new()
-var _mat_wall: StandardMaterial3D = null
+var _mat_wall_inner: StandardMaterial3D = null
+var _mat_wall_outer: StandardMaterial3D = null
 var _mat_floor: StandardMaterial3D = null
 var _mat_ceiling: StandardMaterial3D = null
 var _mat_column: StandardMaterial3D = null
@@ -87,7 +88,8 @@ func get_site_type() -> String:
 
 
 func _init_materials() -> void:
-	_mat_wall = _concrete_material.create_inner_wall_material()
+	_mat_wall_inner = _concrete_material.create_inner_wall_material()
+	_mat_wall_outer = _concrete_material.create_outer_wall_material()
 	_mat_floor = _concrete_material.create_floor_material()
 	_mat_ceiling = _concrete_material.create_ceiling_material()
 	_mat_column = _concrete_material.create_column_material()
@@ -152,9 +154,9 @@ func _build_from_floor(data: Dictionary) -> void:
 
 	_walls_node = _new_group("Walls")
 	for w in outer_cut:
-		_spawn_wall_segment(w, origin, _walls_node)
+		_spawn_wall_segment(w, origin, _walls_node, _mat_wall_outer)
 	for w in inner_cut:
-		_spawn_wall_segment(w, origin, _walls_node)
+		_spawn_wall_segment(w, origin, _walls_node, _mat_wall_inner)
 
 	_columns_node = _new_group("Columns")
 	for c in cats.get("columns", []):
@@ -197,7 +199,7 @@ func _spawn_wall_segment(
 
 	var body: StaticBody3D = StaticBody3D.new()
 	var size: Vector3 = Vector3(length, STRUCTURE_HEIGHT, WALL_THICKNESS)
-	body.add_child(_make_box_mesh(size, mat if mat else _mat_wall))
+	body.add_child(_make_box_mesh(size, mat if mat else _mat_wall_inner))
 	body.add_child(_make_box_collision(size))
 	body.position = Vector3(mid.x, STRUCTURE_HEIGHT * 0.5, mid.y)
 	body.rotation = Vector3(0.0, -ang, 0.0)
