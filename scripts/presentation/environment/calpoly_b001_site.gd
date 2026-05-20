@@ -12,6 +12,8 @@ extends BaseSite
 @export var floor_to_show: int = 1
 @export var show_ceiling: bool = true
 @export var show_windows: bool = true
+## room 라벨 (방 번호) 3D billboard 표시. L 키로 런타임 토글.
+@export var show_room_labels: bool = true
 
 const FLOOR_JSON_TEMPLATE: String = "res://data/calpoly_b001/floor_%d.json"
 
@@ -42,9 +44,15 @@ const DOOR_HINGE_PERP_MAX_M: float = 1.00
 ## 이보다 짧고 cut 영역 안에 mid가 있으면 axis 평행 검사 없이 제거.
 const DOOR_INSIDE_WALL_MAX_M: float = 0.5
 
+## room 라벨 표시 높이 (m) — 사람 눈높이 약간 위.
+const ROOM_LABEL_HEIGHT: float = 2.2
+const ROOM_LABEL_FONT_SIZE: int = 48
+const ROOM_LABEL_PIXEL_SIZE: float = 0.008
+
 var _walls_node: Node3D
 var _columns_node: Node3D
 var _windows_node: Node3D
+var _labels_node: Node3D
 var _surfaces: Array = []
 var _spawn_bounds: AABB = AABB()
 
@@ -158,6 +166,11 @@ func _build_from_floor(data: Dictionary) -> void:
 		for w in cats.get("windows", []):
 			_spawn_window_segment(w, origin)
 
+	_labels_node = _new_group("RoomLabels")
+	_labels_node.visible = show_room_labels
+	for r in cats.get("rooms", []):
+		_spawn_room_label(r, origin)
+
 
 func _new_group(name_: String) -> Node3D:
 	var n: Node3D = Node3D.new()
@@ -189,6 +202,26 @@ func _spawn_wall_segment(
 	body.position = Vector3(mid.x, STRUCTURE_HEIGHT * 0.5, mid.y)
 	body.rotation = Vector3(0.0, -ang, 0.0)
 	parent.add_child(body)
+
+
+func _spawn_room_label(r: Dictionary, origin: Vector2) -> void:
+	var label_text: String = str(r.get("label", ""))
+	if label_text.is_empty():
+		return
+	var c_arr: Array = r.get("centroid", [])
+	if c_arr.size() != 2:
+		return
+	var c: Vector2 = Vector2(float(c_arr[0]) - origin.x, float(c_arr[1]) - origin.y)
+	var lbl: Label3D = Label3D.new()
+	lbl.text = label_text
+	lbl.font_size = ROOM_LABEL_FONT_SIZE
+	lbl.pixel_size = ROOM_LABEL_PIXEL_SIZE
+	lbl.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	lbl.outline_size = 6
+	lbl.modulate = Color(1.0, 1.0, 1.0)
+	lbl.outline_modulate = Color(0.0, 0.0, 0.0)
+	lbl.position = Vector3(c.x, ROOM_LABEL_HEIGHT, c.y)
+	_labels_node.add_child(lbl)
 
 
 func _spawn_window_segment(w: Dictionary, origin: Vector2) -> void:
@@ -354,3 +387,13 @@ func _make_box_collision(size: Vector3) -> CollisionShape3D:
 	bs.size = size
 	cs.shape = bs
 	return cs
+
+
+## L 키: room 라벨 가시성 토글 (desktop 모드).
+func _unhandled_input(event: InputEvent) -> void:
+	if not (event is InputEventKey) or not event.pressed or event.echo:
+		return
+	if event.keycode == KEY_L and _labels_node:
+		show_room_labels = not show_room_labels
+		_labels_node.visible = show_room_labels
+		print("[CalPolyB001Site] room labels: %s" % ("ON" if show_room_labels else "OFF"))
