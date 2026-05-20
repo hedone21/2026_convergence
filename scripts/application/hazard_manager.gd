@@ -16,6 +16,9 @@ signal hazard_discovered(hazard: BaseHazard)
 ## SPEC-INP-002: 오탐 (위험 요소가 아닌 곳 마킹)
 signal false_positive(position: Vector3, direction: Vector3)
 
+## SPEC-INP-002: 마킹 마커가 배치됨 (HazardMarkPlaced) — Vec3 + Unix epoch ms + 카테고리
+signal hazard_mark_placed(marker_position: Vector3, timestamp_ms: int, category: String)
+
 ## SPEC-HAZ-001: 모든 위험 요소가 발견됨
 signal all_hazards_discovered
 
@@ -100,6 +103,22 @@ func attempt_mark_hazard(hazard: BaseHazard, hit_position: Vector3) -> MarkingRe
 	result.is_correct = changed
 
 	return result
+
+
+## SPEC-INP-002: 마커 노드를 spawn하고 hazard_mark_placed 시그널을 발행한다.
+## category — 적중한 hazard.hazard_type 또는 "false_positive".
+## 반환: 생성된 HazardMarker (실패 시 null).
+func place_marker(pos: Vector3, category: String) -> HazardMarker:
+	var ts: int = Time.get_ticks_msec()
+	var marker: HazardMarker = HazardMarker.new()
+	marker.place(pos, ts, category)
+	var parent: Node = hazard_container
+	if parent == null:
+		var scene: Node = get_tree().current_scene if get_tree() != null else null
+		parent = scene if scene != null else self
+	parent.add_child(marker)
+	hazard_mark_placed.emit(pos, ts, category)
+	return marker
 
 
 ## SPEC-INP-002: 오탐을 기록한다.

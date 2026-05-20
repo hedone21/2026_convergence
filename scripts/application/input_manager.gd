@@ -115,11 +115,13 @@ func _on_game_ready() -> void:
 		_connect_rig(GameManager.current_rig)
 
 
-## SPEC-INP-002: MarkingSystem.mark_succeeded → HazardManager 연결
+## SPEC-INP-002: MarkingSystem.mark_succeeded → HazardManager 연결 + 시각 마커 spawn
 func _on_mark_succeeded(hazard: BaseHazard, hit_position: Vector3) -> void:
 	HazardManager.attempt_mark_hazard(hazard, hit_position)
+	HazardManager.place_marker(hit_position, hazard.hazard_type)
 
 
-## SPEC-INP-002: MarkingSystem.mark_failed → HazardManager 오탐 기록
+## SPEC-INP-002: MarkingSystem.mark_failed → HazardManager 오탐 기록 + 시각 마커 spawn
 func _on_mark_failed(hit_position: Vector3, ray_direction: Vector3) -> void:
 	HazardManager.record_false_positive(hit_position, ray_direction)
+	HazardManager.place_marker(hit_position, "false_positive")
