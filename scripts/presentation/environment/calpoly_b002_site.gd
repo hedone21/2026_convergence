@@ -49,6 +49,12 @@ var _columns_node: Node3D
 var _windows_node: Node3D
 var _labels_node: Node3D
 var _ceiling_node: Node3D
+
+## prop 배치 시 회피용
+var _wall_segments: Array = []
+const PROP_WALL_MARGIN: float = 0.4
+const PROP_HAZARD_RADIUS: float = 1.5
+const PROP_RETRY_COUNT: int = 20
 var _surfaces: Array = []
 var _spawn_bounds: AABB = AABB()
 
@@ -146,6 +152,117 @@ func _build_from_floor(data: SiteData) -> void:
 	for r in data.rooms:
 		_spawn_room_label(r, origin)
 
+	_spawn_props_async(bb_min, bb_max, origin)
+
+
+func _spawn_props_async(bb_min: Vector2, bb_max: Vector2, origin: Vector2) -> void:
+	for _i: int in 10:
+		await get_tree().process_frame
+	var hazard_positions: Array = _collect_hazard_positions()
+	print("[CalPolyB002Site] props 배치: walls=%d, hazards=%d" % [
+		_wall_segments.size(), hazard_positions.size()
+	])
+	_spawn_props(bb_min, bb_max, origin, hazard_positions)
+
+
+func _collect_hazard_positions() -> Array:
+	var positions: Array = []
+	var main_scene: Node = get_tree().current_scene
+	if main_scene == null:
+		return positions
+	var container: Node = main_scene.get_node_or_null("HazardContainer")
+	if container == null:
+		return positions
+	for h: Node in container.get_children():
+		if h is Node3D:
+			positions.append((h as Node3D).global_position)
+	return positions
+
+
+func _spawn_props(bb_min: Vector2, bb_max: Vector2, _origin: Vector2, hazard_positions: Array) -> void:
+	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+	rng.seed = 7777
+	var size_x: float = bb_max.x - bb_min.x
+	var size_z: float = bb_max.y - bb_min.y
+	var props_root: Node3D = _new_group("SiteProps")
+	var factory: SiteProps = SiteProps.new()
+
+	for i: int in 8:
+		factory.spawn_safety_cone(props_root, _safe_floor_pos(rng, size_x, size_z, 0.0, hazard_positions))
+	for i: int in 4:
+		factory.spawn_work_lamp(props_root, _safe_floor_pos(rng, size_x, size_z, 0.0, hazard_positions))
+	for i: int in 2:
+		factory.spawn_material_wood(props_root, _safe_floor_pos(rng, size_x, size_z, 0.0, hazard_positions))
+	for i: int in 2:
+		factory.spawn_material_rebar(props_root, _safe_floor_pos(rng, size_x, size_z, 0.0, hazard_positions))
+	for i: int in 2:
+		factory.spawn_material_cement(props_root, _safe_floor_pos(rng, size_x, size_z, 0.0, hazard_positions))
+	for i: int in 3:
+		var a: Vector3 = _safe_floor_pos(rng, size_x, size_z, 0.45, hazard_positions)
+		var dir: float = rng.randf() * TAU
+		var len: float = 2.5 + rng.randf() * 2.0
+		var b: Vector3 = a + Vector3(cos(dir) * len, 0.0, sin(dir) * len)
+		factory.spawn_hazard_tape(props_root, a, b)
+	for i: int in 4:
+		var a: Vector3 = _safe_floor_pos(rng, size_x, size_z, STRUCTURE_HEIGHT - 0.1, hazard_positions)
+		var b: Vector3 = a + Vector3(0.0, 0.0, 4.0 + rng.randf() * 3.0)
+		factory.spawn_cable_hanging(props_root, a, b)
+	for i: int in 2:
+		var a: Vector3 = _safe_floor_pos(rng, size_x, size_z, STRUCTURE_HEIGHT - 0.4, hazard_positions)
+		var b: Vector3 = a + Vector3(5.0 + rng.randf() * 4.0, 0.0, 0.0)
+		factory.spawn_duct(props_root, a, b)
+
+
+func _safe_floor_pos(
+	rng: RandomNumberGenerator, size_x: float, size_z: float, height: float,
+	hazard_positions: Array
+) -> Vector3:
+	for _attempt: int in PROP_RETRY_COUNT:
+		var p: Vector3 = _rand_floor_pos(rng, size_x, size_z, height)
+		if _is_pos_blocked_by_wall(p):
+			continue
+		if _is_pos_near_hazard(p, hazard_positions):
+			continue
+		return p
+	return _rand_floor_pos(rng, size_x, size_z, height)
+
+
+func _rand_floor_pos(rng: RandomNumberGenerator, size_x: float, size_z: float, height: float) -> Vector3:
+	var px: float = (rng.randf() - 0.5) * size_x * 0.7
+	var pz: float = (rng.randf() - 0.5) * size_z * 0.7
+	return Vector3(px, height, pz)
+
+
+func _is_pos_blocked_by_wall(p: Vector3) -> bool:
+	var p2: Vector2 = Vector2(p.x, p.z)
+	var half_thick: float = WALL_THICKNESS * 0.5 + PROP_WALL_MARGIN
+	for seg: Dictionary in _wall_segments:
+		var s: Vector2 = seg["start"] as Vector2
+		var e: Vector2 = seg["end"] as Vector2
+		var ab: Vector2 = e - s
+		var L: float = ab.length()
+		if L < 0.001:
+			continue
+		var u_dir: Vector2 = ab / L
+		var u: float = (p2 - s).dot(u_dir)
+		if u < -PROP_WALL_MARGIN or u > L + PROP_WALL_MARGIN:
+			continue
+		var perp: Vector2 = Vector2(-u_dir.y, u_dir.x)
+		var v: float = absf((p2 - s).dot(perp))
+		if v < half_thick:
+			return true
+	return false
+
+
+func _is_pos_near_hazard(p: Vector3, hazard_positions: Array) -> bool:
+	var p2: Vector2 = Vector2(p.x, p.z)
+	for hp_v: Variant in hazard_positions:
+		var hp: Vector3 = hp_v as Vector3
+		var d: float = Vector2(hp.x, hp.z).distance_to(p2)
+		if d < PROP_HAZARD_RADIUS:
+			return true
+	return false
+
 
 func _new_group(name_: String) -> Node3D:
 	var n: Node3D = Node3D.new()
@@ -163,6 +280,7 @@ func _spawn_wall_box(
 	var length: float = s.distance_to(e)
 	if length < MIN_WALL_LENGTH:
 		return
+	_wall_segments.append({"start": s, "end": e})
 	var mid: Vector2 = (s + e) * 0.5
 	var ang: float = atan2(e.y - s.y, e.x - s.x)
 
