@@ -112,6 +112,62 @@ def _polygon_edges(pts: list[tuple[float, float]]):
         yield a, b
 
 
+def _merge_collinear_segments(
+    segs: list[tuple[tuple[float, float], tuple[float, float]]],
+    angle_tol_deg: float = 1.5,
+    perp_tol_m: float = 0.05,
+    gap_tol_m: float = 0.10,
+) -> list[tuple[tuple[float, float], tuple[float, float]]]:
+    """평행+collinear+인접 segment를 단일 segment로 합침.
+
+    angle [0, π) bin + line offset bin으로 클러스터링 → 각 클러스터에서 t-coord 정렬 후
+    gap_tol_m 이내면 chain. wall이 짧은 segment 다발로 분해된 DXF 데이터 정상화 용도.
+    좌표 단위: m (scale 적용 후 호출).
+    """
+    import math as _m
+    if not segs:
+        return []
+    groups: dict = {}
+    for s, e in segs:
+        dx, dy = e[0] - s[0], e[1] - s[1]
+        L = _m.hypot(dx, dy)
+        if L < 1e-6:
+            continue
+        ang = _m.atan2(dy, dx)
+        if ang < 0:
+            ang += _m.pi
+        if ang >= _m.pi - 1e-9:
+            ang -= _m.pi
+        cos_a, sin_a = _m.cos(ang), _m.sin(ang)
+        d_off = -sin_a * s[0] + cos_a * s[1]
+        ang_bin = round(_m.degrees(ang) / angle_tol_deg)
+        d_bin = round(d_off / perp_tol_m)
+        key = (ang_bin, d_bin)
+        t1 = cos_a * s[0] + sin_a * s[1]
+        t2 = cos_a * e[0] + sin_a * e[1]
+        t_lo, t_hi = (t1, t2) if t1 <= t2 else (t2, t1)
+        groups.setdefault(key, []).append((t_lo, t_hi, ang, d_off))
+
+    def _emit(t_lo, t_hi, ang, d_off):
+        cos_a, sin_a = _m.cos(ang), _m.sin(ang)
+        ps = (cos_a * t_lo - sin_a * d_off, sin_a * t_lo + cos_a * d_off)
+        pe = (cos_a * t_hi - sin_a * d_off, sin_a * t_hi + cos_a * d_off)
+        return (ps, pe)
+
+    merged: list = []
+    for items in groups.values():
+        items.sort(key=lambda x: x[0])
+        cur_lo, cur_hi, ang, d = items[0]
+        for t_lo, t_hi, _ang, _d in items[1:]:
+            if t_lo <= cur_hi + gap_tol_m:
+                cur_hi = max(cur_hi, t_hi)
+            else:
+                merged.append(_emit(cur_lo, cur_hi, ang, d))
+                cur_lo, cur_hi = t_lo, t_hi
+        merged.append(_emit(cur_lo, cur_hi, ang, d))
+    return merged
+
+
 def convert(dxf_path: Path, out_path: Path) -> dict:
     doc = ezdxf.readfile(dxf_path)
     msp = doc.modelspace()
@@ -156,18 +212,32 @@ def convert(dxf_path: Path, out_path: Path) -> dict:
                     "source": {"dxf_layer": e.dxf.layer, "dxf_type": "LWPOLYLINE_EDGE"},
                 })
 
-    # 3차: A-WALL LINE → inner_walls
+    # 3차: A-WALL LINE → inner_walls (DXF는 짧은 segment 다발로 들어오므로 collinear merge)
+    inner_raw_m: list = []
     for e in msp.query("LINE"):
         if _layer_kind(e.dxf.layer) == "wall":
             s, t = e.dxf.start, e.dxf.end
-            cx, cy = (s[0] + t[0]) / 2, (s[1] + t[1]) / 2
-            categories["inner_walls"].append({
-                "id": _make_id("W", cx, cy),
-                "start": [m(s[0]), m(s[1])],
-                "end": [m(t[0]), m(t[1])],
-                "side": "inner",
-                "source": {"dxf_layer": e.dxf.layer, "dxf_type": "LINE"},
-            })
+            inner_raw_m.append((
+                (m(s[0]), m(s[1])),
+                (m(t[0]), m(t[1])),
+            ))
+    inner_raw_count = len(inner_raw_m)
+    inner_merged = _merge_collinear_segments(
+        inner_raw_m,
+        angle_tol_deg=1.5,
+        perp_tol_m=0.05,
+        gap_tol_m=0.10,
+    )
+    for (s_m, e_m) in inner_merged:
+        cx_m = (s_m[0] + e_m[0]) * 0.5
+        cy_m = (s_m[1] + e_m[1]) * 0.5
+        categories["inner_walls"].append({
+            "id": _make_id("W", cx_m / scale, cy_m / scale),
+            "start": [round(s_m[0], 4), round(s_m[1], 4)],
+            "end": [round(e_m[0], 4), round(e_m[1], 4)],
+            "side": "inner",
+            "source": {"dxf_layer": "A-WALL", "dxf_type": "LINE_MERGED"},
+        })
 
     # 4차: A-OPENING ARC → doors
     for e in msp.query("ARC"):
@@ -335,6 +405,15 @@ def convert(dxf_path: Path, out_path: Path) -> dict:
     result = {
         "metadata": {
             "schema_version": "2.0",
+            "inner_walls_merge": {
+                "raw": inner_raw_count,
+                "merged": len(inner_merged),
+                "params": {
+                    "angle_tol_deg": 1.5,
+                    "perp_tol_m": 0.05,
+                    "gap_tol_m": 0.10,
+                },
+            },
             "source": {
                 "format": "DXF",
                 "path": str(dxf_path),
