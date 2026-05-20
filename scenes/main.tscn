@@ -1,9 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://cmain_scene_001"]
+[gd_scene load_steps=8 format=3 uid="uid://cmain_scene_001"]
 
 [ext_resource type="Texture2D" uid="uid://ckayd5vd5eosm" path="res://assets/hdri/kloppenheim_07_puresky_2k.hdr" id="1_hdri"]
 [ext_resource type="Script" path="res://tools/screenshot_capturer.gd" id="2_capture"]
 [ext_resource type="PackedScene" uid="uid://cminimap_001" path="res://scenes/ui/minimap.tscn" id="3_minimap"]
 [ext_resource type="Script" path="res://scripts/tools/site_dump.gd" id="4_dump"]
+[ext_resource type="PackedScene" uid="uid://cresult_screen_001" path="res://scenes/ui/result_screen.tscn" id="5_result"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_001"]
 panorama = ExtResource("1_hdri")
@@ -90,6 +91,8 @@ directional_shadow_fade_start = 0.85
 [node name="HazardContainer" type="Node3D" parent="."]
 
 [node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="ResultScreen" parent="UILayer" instance=ExtResource("5_result")]
 
 [node name="Minimap" parent="." instance=ExtResource("3_minimap")]
 

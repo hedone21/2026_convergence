@@ -492,7 +492,9 @@
 - **예외 처리**:
   - 시뮬레이션 중 사용자가 강제 종료 요청 -> 현재까지의 데이터를 저장 후 결과 상태로 전환
 - **대안 동작**: 없음
-- **비고**: 상태 패턴(State Pattern) 기반 구현 권장.
+- **비고**:
+  - 상태 패턴(State Pattern) 기반 구현 권장.
+  - 결과 화면 UI: `scenes/ui/result_screen.tscn` + `scripts/presentation/ui/result_screen.gd`. SessionManager.session_ended 시그널 구독, RESULT 진입 시 발견율/경과시간/평균 반응시간을 표시. main.tscn UILayer에 인스턴스화.
 
 ---
 
