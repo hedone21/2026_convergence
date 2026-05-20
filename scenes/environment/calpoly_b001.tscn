@@ -4,3 +4,28 @@
 
 [node name="CalPolyB001Site" type="Node3D"]
 script = ExtResource("1_site")
+
+[node name="ReflectionProbe" type="ReflectionProbe" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 1.5, 20)
+size = Vector3(40, 6, 40)
+update_mode = 1
+ambient_mode = 1
+intensity = 0.8
+
+[node name="WorkLight_01" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 2.5, 12)
+light_color = Color(1.0, 0.92, 0.78, 1)
+light_energy = 4.0
+light_temperature = 4000
+omni_range = 12.0
+omni_attenuation = 1.5
+shadow_enabled = true
+
+[node name="WorkLight_02" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 2.5, 28)
+light_color = Color(1.0, 0.92, 0.78, 1)
+light_energy = 4.0
+light_temperature = 4000
+omni_range = 12.0
+omni_attenuation = 1.5
+shadow_enabled = true
