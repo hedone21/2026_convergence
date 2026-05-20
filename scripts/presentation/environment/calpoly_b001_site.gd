@@ -67,8 +67,8 @@ var _mat_window: StandardMaterial3D = null
 
 func _ready() -> void:
 	_init_materials()
-	var data: Dictionary = _load_floor_json(floor_to_show)
-	if data.is_empty():
+	var data: SiteData = _load_floor_data(floor_to_show)
+	if data == null:
 		push_error("[CalPolyB001Site] floor %d 로드 실패" % floor_to_show)
 		return
 	_build_from_floor(data)
@@ -99,31 +99,14 @@ func _init_materials() -> void:
 	_mat_window.roughness = 0.1
 
 
-func _load_floor_json(n: int) -> Dictionary:
+func _load_floor_data(n: int) -> SiteData:
 	var path: String = FLOOR_JSON_TEMPLATE % n
-	if not FileAccess.file_exists(path):
-		push_error("[CalPolyB001Site] floor JSON not found: %s" % path)
-		return {}
-	var f: FileAccess = FileAccess.open(path, FileAccess.READ)
-	var text: String = f.get_as_text()
-	f.close()
-	var parsed: Variant = JSON.parse_string(text)
-	if not (parsed is Dictionary):
-		push_error("[CalPolyB001Site] JSON parse 실패: %s" % path)
-		return {}
-	return parsed
+	return SiteDataParser.parse_from_path(path)
 
 
-func _build_from_floor(data: Dictionary) -> void:
-	var cats: Dictionary = data.get("categories", {})
-	var meta: Dictionary = data.get("metadata", {})
-	var bbox: Array = meta.get("bbox_m", [[0.0, 0.0], [0.0, 0.0]])
-	if bbox.size() != 2:
-		push_error("[CalPolyB001Site] bbox_m 형식 오류")
-		return
-
-	var bb_min: Vector2 = Vector2(float(bbox[0][0]), float(bbox[0][1]))
-	var bb_max: Vector2 = Vector2(float(bbox[1][0]), float(bbox[1][1]))
+func _build_from_floor(data: SiteData) -> void:
+	var bb_min: Vector2 = data.metadata.bbox_min
+	var bb_max: Vector2 = data.metadata.bbox_max
 
 	# site origin = bbox center → (0,0) 중심 배치
 	var origin: Vector2 = (bb_min + bb_max) * 0.5
@@ -141,36 +124,33 @@ func _build_from_floor(data: Dictionary) -> void:
 		_create_ceiling_slab(slab_size, Vector3.ZERO)
 
 	# door hinge/axis/span으로 wall cut → 출입구 생성
-	var door_slots: Array = _build_door_slots(cats.get("doors", []))
-	var outer_raw: Array = cats.get("outer_walls", [])
-	var inner_raw: Array = cats.get("inner_walls", [])
-	var outer_cut: Array = _cut_walls_at_doors(outer_raw, door_slots)
-	var inner_cut: Array = _cut_walls_at_doors(inner_raw, door_slots)
+	var door_slots: Array = _build_door_slots(data.doors)
+	var outer_cut: Array[WallData] = _cut_walls_at_doors(data.outer_walls, door_slots)
+	var inner_cut: Array[WallData] = _cut_walls_at_doors(data.inner_walls, door_slots)
 	print("[CalPolyB001Site] door cut: outer %d→%d, inner %d→%d (doors=%d)" % [
-		outer_raw.size(), outer_cut.size(),
-		inner_raw.size(), inner_cut.size(),
+		data.outer_walls.size(), outer_cut.size(),
+		data.inner_walls.size(), inner_cut.size(),
 		door_slots.size()
 	])
 
 	_walls_node = _new_group("Walls")
 	for w in outer_cut:
-		_spawn_wall_segment(w, origin, _walls_node, _mat_wall_outer)
+		_spawn_wall_box(w.start, w.end, origin, _walls_node, _mat_wall_outer)
 	for w in inner_cut:
-		_spawn_wall_segment(w, origin, _walls_node, _mat_wall_inner)
+		_spawn_wall_box(w.start, w.end, origin, _walls_node, _mat_wall_inner)
 
 	_columns_node = _new_group("Columns")
-	for c in cats.get("columns", []):
-		if c.has("start") and c.has("end"):
-			_spawn_wall_segment(c, origin, _columns_node, _mat_column)
+	for c in data.columns:
+		_spawn_wall_box(c.start, c.end, origin, _columns_node, _mat_column)
 
 	if show_windows:
 		_windows_node = _new_group("Windows")
-		for w in cats.get("windows", []):
+		for w in data.windows:
 			_spawn_window_segment(w, origin)
 
 	_labels_node = _new_group("RoomLabels")
 	_labels_node.visible = show_room_labels
-	for r in cats.get("rooms", []):
+	for r in data.rooms:
 		_spawn_room_label(r, origin)
 
 
@@ -181,16 +161,14 @@ func _new_group(name_: String) -> Node3D:
 	return n
 
 
-func _spawn_wall_segment(
-	w: Dictionary, origin: Vector2, parent: Node3D,
-	mat: StandardMaterial3D = null
+## start/end (사이트 좌표 m, origin 미차감) + mat을 받아 STRUCTURE_HEIGHT box를 spawn.
+## WallData / ColumnData 모두에서 호출.
+func _spawn_wall_box(
+	start_w: Vector2, end_w: Vector2, origin: Vector2,
+	parent: Node3D, mat: StandardMaterial3D
 ) -> void:
-	var s_arr: Array = w.get("start", [])
-	var e_arr: Array = w.get("end", [])
-	if s_arr.size() != 2 or e_arr.size() != 2:
-		return
-	var s: Vector2 = Vector2(float(s_arr[0]) - origin.x, float(s_arr[1]) - origin.y)
-	var e: Vector2 = Vector2(float(e_arr[0]) - origin.x, float(e_arr[1]) - origin.y)
+	var s: Vector2 = start_w - origin
+	var e: Vector2 = end_w - origin
 	var length: float = s.distance_to(e)
 	if length < MIN_WALL_LENGTH:
 		return
@@ -199,23 +177,19 @@ func _spawn_wall_segment(
 
 	var body: StaticBody3D = StaticBody3D.new()
 	var size: Vector3 = Vector3(length, STRUCTURE_HEIGHT, WALL_THICKNESS)
-	body.add_child(_make_box_mesh(size, mat if mat else _mat_wall_inner))
+	body.add_child(_make_box_mesh(size, mat))
 	body.add_child(_make_box_collision(size))
 	body.position = Vector3(mid.x, STRUCTURE_HEIGHT * 0.5, mid.y)
 	body.rotation = Vector3(0.0, -ang, 0.0)
 	parent.add_child(body)
 
 
-func _spawn_room_label(r: Dictionary, origin: Vector2) -> void:
-	var label_text: String = str(r.get("label", ""))
-	if label_text.is_empty():
+func _spawn_room_label(r: RoomData, origin: Vector2) -> void:
+	if r.label.is_empty():
 		return
-	var c_arr: Array = r.get("centroid", [])
-	if c_arr.size() != 2:
-		return
-	var c: Vector2 = Vector2(float(c_arr[0]) - origin.x, float(c_arr[1]) - origin.y)
+	var c: Vector2 = r.centroid - origin
 	var lbl: Label3D = Label3D.new()
-	lbl.text = label_text
+	lbl.text = r.label
 	lbl.font_size = ROOM_LABEL_FONT_SIZE
 	lbl.pixel_size = ROOM_LABEL_PIXEL_SIZE
 	lbl.billboard = BaseMaterial3D.BILLBOARD_ENABLED
@@ -226,13 +200,9 @@ func _spawn_room_label(r: Dictionary, origin: Vector2) -> void:
 	_labels_node.add_child(lbl)
 
 
-func _spawn_window_segment(w: Dictionary, origin: Vector2) -> void:
-	var s_arr: Array = w.get("start", [])
-	var e_arr: Array = w.get("end", [])
-	if s_arr.size() != 2 or e_arr.size() != 2:
-		return
-	var s: Vector2 = Vector2(float(s_arr[0]) - origin.x, float(s_arr[1]) - origin.y)
-	var e: Vector2 = Vector2(float(e_arr[0]) - origin.x, float(e_arr[1]) - origin.y)
+func _spawn_window_segment(w: WindowData, origin: Vector2) -> void:
+	var s: Vector2 = w.start - origin
+	var e: Vector2 = w.end - origin
 	var length: float = s.distance_to(e)
 	if length < MIN_WALL_LENGTH:
 		return
@@ -275,53 +245,37 @@ func _create_ceiling_slab(size: Vector3, center: Vector3) -> void:
 	body.position = Vector3(center.x, STRUCTURE_HEIGHT + SLAB_THICKNESS * 0.5, center.z)
 
 
-## door dict (hinge, axis, span) → 내부 slot 표현으로 변환.
-func _build_door_slots(doors: Array) -> Array:
+## DoorData → 내부 slot 표현으로 변환. axis가 ZERO인 v1 데이터는 skip.
+func _build_door_slots(doors: Array[DoorData]) -> Array:
 	var slots: Array = []
 	for d in doors:
-		if not (d is Dictionary):
+		if d.axis.length_squared() < 0.001 or d.span_m <= 0.0:
 			continue
-		if not (d.has("hinge") and d.has("axis") and d.has("span_m")):
-			continue
-		var h: Array = d["hinge"]
-		var a: Array = d["axis"]
-		if h.size() != 2 or a.size() != 2:
-			continue
-		var axis: Vector2 = Vector2(float(a[0]), float(a[1])).normalized()
-		var span: float = float(d["span_m"]) + DOOR_CUT_PADDING_M * 2.0
 		slots.append({
-			"hinge": Vector2(float(h[0]), float(h[1])),
-			"axis": axis,
-			"span": span,
+			"hinge": d.hinge,
+			"axis": d.axis.normalized(),
+			"span": d.span_m + DOOR_CUT_PADDING_M * 2.0,
 		})
 	return slots
 
 
 ## door slot으로 wall segment를 자른다.
 ## 각 slot은 wall과 평행하고 가까우면, wall 따라 hinge ± span/2 영역 제거.
-func _cut_walls_at_doors(walls: Array, slots: Array) -> Array:
+func _cut_walls_at_doors(walls: Array[WallData], slots: Array) -> Array[WallData]:
 	if slots.is_empty():
 		return walls
-	var result: Array = []
+	var result: Array[WallData] = []
 	for w in walls:
-		var s_arr: Array = w.get("start", [])
-		var e_arr: Array = w.get("end", [])
-		if s_arr.size() != 2 or e_arr.size() != 2:
-			result.append(w)
-			continue
-		var segments: Array = [[
-			Vector2(float(s_arr[0]), float(s_arr[1])),
-			Vector2(float(e_arr[0]), float(e_arr[1]))
-		]]
+		var segments: Array = [[w.start, w.end]]
 		for slot: Dictionary in slots:
 			var new_segs: Array = []
 			for seg: Array in segments:
 				_clip_segment_by_slot(seg[0], seg[1], slot, new_segs)
 			segments = new_segs
 		for seg: Array in segments:
-			var nw: Dictionary = w.duplicate(true)
-			nw["start"] = [seg[0].x, seg[0].y]
-			nw["end"] = [seg[1].x, seg[1].y]
+			var nw: WallData = w.duplicate(true)
+			nw.start = seg[0]
+			nw.end = seg[1]
 			result.append(nw)
 	return result
 
