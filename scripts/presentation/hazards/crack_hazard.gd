@@ -33,7 +33,9 @@ const CRACK_MODULATE: Color = Color(0.08, 0.06, 0.05, 1.0)
 ## 사실성 우선: 2.5x 확대(스티커 느낌) 원복 → 자연 크기.
 const DECAL_X_FACTOR: float = 1.0
 const DECAL_Z_FACTOR: float = 0.7
-const DECAL_Y_DEPTH: float = 0.5
+## y_depth는 hazard가 floor 위로 떠 있을 때(예: y=0.5) decal AABB가 floor까지
+## 닿도록 충분히 크게 잡는다. 2.5m이면 hazard_y ≤ 1.25에서 항상 floor 닿음.
+const DECAL_Y_DEPTH: float = 2.5
 const DECAL_FADE: float = 0.3
 
 
@@ -127,6 +129,9 @@ func _build_visual() -> void:
 
 	# 표면에 살짝 떠있도록 (정확한 표면 투영을 위해)
 	_crack_decal.position.y = 0.01
+
+	# Decal cull_mask 분리 — floor mesh에만 투영, wall/ceiling 잠식 차단.
+	_crack_decal.cull_mask = BaseSite.FLOOR_DECAL_LAYER
 
 	add_child(_crack_decal)
 

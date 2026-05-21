@@ -1,6 +1,11 @@
 class_name BaseSite
 extends Node3D
 
+## Decal 투영 분리용 visibility layer 비트.
+## floor mesh는 1 | FLOOR_DECAL_LAYER를 layers로 설정.
+## floor 전용 Decal은 cull_mask = FLOOR_DECAL_LAYER 단독 → wall/ceiling 투영 차단.
+const FLOOR_DECAL_LAYER: int = 1 << 10  ## bit 10 (1024)
+
 ## SPEC-ENV-001, SPEC-ENV-003: 현장 추상 베이스 클래스
 ##
 ## 모든 건설 현장 유형의 공통 인터페이스를 정의한다.
@@ -25,3 +30,9 @@ func get_spawn_bounds() -> AABB:
 func get_site_type() -> String:
 	push_error("BaseSite.get_site_type() must be overridden")
 	return ""
+
+
+## 위치가 벽/기둥 등 구조물 안에 있어서 spawn 차단해야 하는지.
+## 기본 false. 회전된 OBB 검사가 필요한 site에서 override.
+func is_position_blocked(_pos: Vector3) -> bool:
+	return false

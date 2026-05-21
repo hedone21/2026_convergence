@@ -286,6 +286,11 @@ func _rand_floor_pos(rng: RandomNumberGenerator, size_x: float, size_z: float, h
 	return Vector3(px, height, pz)
 
 
+## BaseSite override — scenario_manager가 hazard spawn 시 호출.
+func is_position_blocked(pos: Vector3) -> bool:
+	return _is_pos_blocked_by_wall(pos)
+
+
 ## 회전된 wall OBB에 점이 들어가는지 검사.
 func _is_pos_blocked_by_wall(p: Vector3) -> bool:
 	var p2: Vector2 = Vector2(p.x, p.z)
@@ -388,7 +393,10 @@ func _create_floor_slab(size: Vector3, center: Vector3) -> void:
 	var body: StaticBody3D = StaticBody3D.new()
 	body.name = "FloorSlab"
 	add_child(body)
-	body.add_child(_make_box_mesh(size, _mat_floor))
+	var floor_mesh: MeshInstance3D = _make_box_mesh(size, _mat_floor)
+	# Decal cull_mask 분리 — floor 전용 decal만 받도록.
+	floor_mesh.layers = 1 | FLOOR_DECAL_LAYER
+	body.add_child(floor_mesh)
 	body.add_child(_make_box_collision(size))
 	body.position = Vector3(center.x, -SLAB_THICKNESS * 0.5, center.z)
 	_surfaces.append({
@@ -399,6 +407,32 @@ func _create_floor_slab(size: Vector3, center: Vector3) -> void:
 			Vector3(size.x, SLAB_THICKNESS, size.z)
 		)
 	})
+
+	# 슬래브 외곽 0.5m 띠 4개 — unguarded_edge 우선 매칭용.
+	# y_top = 0(slab 상단), aabb 두께는 SLAB_THICKNESS 유지(y_top 계산 호환).
+	var edge_w: float = 0.5
+	var x_min: float = center.x - size.x * 0.5
+	var z_min: float = center.z - size.z * 0.5
+	var edges: Array = [
+		# West
+		AABB(Vector3(x_min, -SLAB_THICKNESS, z_min + edge_w),
+			Vector3(edge_w, SLAB_THICKNESS, size.z - edge_w * 2.0)),
+		# East
+		AABB(Vector3(x_min + size.x - edge_w, -SLAB_THICKNESS, z_min + edge_w),
+			Vector3(edge_w, SLAB_THICKNESS, size.z - edge_w * 2.0)),
+		# North
+		AABB(Vector3(x_min, -SLAB_THICKNESS, z_min),
+			Vector3(size.x, SLAB_THICKNESS, edge_w)),
+		# South
+		AABB(Vector3(x_min, -SLAB_THICKNESS, z_min + size.z - edge_w),
+			Vector3(size.x, SLAB_THICKNESS, edge_w)),
+	]
+	for e in edges:
+		_surfaces.append({
+			"node": body,
+			"surface_type": "edge",
+			"aabb": e
+		})
 
 
 ## 통판 ceiling 대신 격자 빔 + 작업등.

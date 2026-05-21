@@ -177,16 +177,20 @@ func generate_random_placement(config: Dictionary, site: BaseSite) -> Array[Haza
 	for i: int in range(hazard_count):
 		var placed: bool = false
 
+		# 위험 요소 유형을 attempt 루프 밖에서 선택 (surface 필터링 위해)
+		var hazard_type: String = types[rng.randi() % types.size()] as String
+		# unguarded_edge는 edge surface 우선 (없으면 fallback to all)
+		var candidate_surfaces: Array = _filter_surfaces_for_hazard(surfaces, hazard_type)
+
 		for attempt: int in range(max_attempts_per_hazard):
 			# 유효 표면에서 랜덤 위치 생성
 			var position: Vector3 = _generate_random_position_on_surface(
-				rng, surfaces, bounds
+				rng, candidate_surfaces, bounds
 			)
 
-			# SPEC-SCN-002: 최소 간격 검증
-			if _check_min_spacing(position, placed_positions, min_spacing):
-				# 위험 요소 유형 선택
-				var hazard_type: String = types[rng.randi() % types.size()] as String
+			# SPEC-SCN-002: 최소 간격 검증 + 벽/기둥 OBB 회피
+			if _check_min_spacing(position, placed_positions, min_spacing) \
+					and not site.is_position_blocked(position):
 
 				# 난이도 랜덤 생성
 				var difficulty: float = rng.randf_range(diff_min, diff_max)
@@ -334,6 +338,28 @@ func _generate_random_position_on_surface(
 
 	# 표면 유형에 따라 적절한 위치 생성
 	match surface_type:
+		"floor":
+			## 바닥 상단면(y = aabb.position.y + aabb.size.y)에 안착.
+			## 이전: default case로 떨어져 AABB 내부 random Y → hazard가 바닥에 묻힘.
+			var x: float = rng.randf_range(
+				aabb.position.x + 0.5, aabb.position.x + aabb.size.x - 0.5
+			)
+			var z: float = rng.randf_range(
+				aabb.position.z + 0.5, aabb.position.z + aabb.size.z - 0.5
+			)
+			var y_top: float = aabb.position.y + aabb.size.y
+			return Vector3(x, y_top, z)
+		"edge":
+			## 슬래브 외곽 띠(edge). AABB가 가늘고 긴 띠 모양이므로 그 내부 무작위.
+			## y는 띠 상단(원본 바닥 상단)에 고정.
+			var x: float = rng.randf_range(
+				aabb.position.x, aabb.position.x + aabb.size.x
+			)
+			var z: float = rng.randf_range(
+				aabb.position.z, aabb.position.z + aabb.size.z
+			)
+			var y_top: float = aabb.position.y + aabb.size.y
+			return Vector3(x, y_top, z)
 		"column":
 			# 기둥 표면 — AABB 표면 위에 배치
 			var side: int = rng.randi() % 4  # 0=+x, 1=-x, 2=+z, 3=-z
@@ -383,6 +409,37 @@ func _check_min_spacing(
 		if position.distance_to(p) < min_spacing:
 			return false
 	return true
+
+
+## hazard_type에 따라 candidate surfaces를 필터링한다.
+## unguarded_edge → edge 표면 우선, 없으면 floor fallback.
+## debris/spill/wet_floor → floor만.
+## 그 외 → 모두.
+func _filter_surfaces_for_hazard(surfaces: Array, hazard_type: String) -> Array:
+	if surfaces.is_empty():
+		return surfaces
+	match hazard_type:
+		"unguarded_edge":
+			var edges: Array = surfaces.filter(
+				func(s: Dictionary) -> bool: return s.get("surface_type", "") == "edge"
+			)
+			if not edges.is_empty():
+				return edges
+			# fallback: edge가 없으면 floor
+			return surfaces.filter(
+				func(s: Dictionary) -> bool: return s.get("surface_type", "") == "floor"
+			)
+		"debris", "spill", "wet_floor", "exposed_rebar", "crack":
+			var floors: Array = surfaces.filter(
+				func(s: Dictionary) -> bool: return s.get("surface_type", "") == "floor"
+			)
+			if not floors.is_empty():
+				return floors
+			return surfaces
+		_:
+			return surfaces
+
+
 
 
 ## 현재 씬에서 BaseSite를 찾는다.

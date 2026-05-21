@@ -43,8 +43,42 @@ func _build_visual() -> void:
 			_build_spill_decal()
 
 
+## 메시 hazard 아래에 어두운 그라데이션 contact shadow (fake AO).
+## 떠 보이는 이질감 제거용 — 떠 있는 메시와 바닥 사이를 어둡게 칠한다.
+func _build_contact_shadow(radius: float) -> void:
+	var decal: Decal = Decal.new()
+	decal.name = "ContactShadow"
+	decal.size = Vector3(radius * 2.0, 0.4, radius * 2.0)
+	decal.upper_fade = 0.3
+	decal.lower_fade = 0.3
+	decal.modulate = Color(0.0, 0.0, 0.0, 0.55)
+	decal.texture_albedo = _make_contact_shadow_texture()
+	decal.cull_mask = BaseSite.FLOOR_DECAL_LAYER
+	decal.position = Vector3(0.0, 0.04, 0.0)
+	add_child(decal)
+
+
+## radial fade texture — 중심 짙은 검정, 가장자리 투명.
+func _make_contact_shadow_texture() -> ImageTexture:
+	var size: int = 128
+	var img: Image = Image.create(size, size, false, Image.FORMAT_RGBA8)
+	var cx: float = size * 0.5
+	var cy: float = size * 0.5
+	var r_max: float = size * 0.48
+	for y in size:
+		for x in size:
+			var dx: float = float(x) - cx
+			var dy: float = float(y) - cy
+			var d: float = sqrt(dx * dx + dy * dy) / r_max
+			var a: float = clampf(1.0 - d, 0.0, 1.0)
+			a = pow(a, 1.8)
+			img.set_pixel(x, y, Color(0.0, 0.0, 0.0, a))
+	return ImageTexture.create_from_image(img)
+
+
 ## debris: 콘크리트 파편 더미. 5개 box 무작위 배치/회전/스케일.
 func _build_debris_pile() -> void:
+	_build_contact_shadow(0.55)
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = hash(hazard_id) if hazard_id != "" else 12345
 	var mat: StandardMaterial3D = _load_concrete_material()
@@ -72,6 +106,7 @@ func _build_debris_pile() -> void:
 
 ## exposed_rebar: 녹슨 철근 4개 묶음, 약간씩 기울어진 배치 + 끝부분 안전 캡.
 func _build_rebar_bundle() -> void:
+	_build_contact_shadow(0.30)
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = hash(hazard_id + "rebar") if hazard_id != "" else 67890
 	var mat: StandardMaterial3D = _load_rust_material()
@@ -123,13 +158,15 @@ func _build_spill_decal() -> void:
 	decal.lower_fade = 0.3
 	decal.modulate = Color(0.10, 0.07, 0.05, 0.95)
 	decal.texture_albedo = _make_puddle_texture(Color(0.06, 0.05, 0.04))
+	decal.cull_mask = BaseSite.FLOOR_DECAL_LAYER
 	decal.position = Vector3(0.0, 0.02, 0.0)
 	add_child(decal)
 
 
-## wet_floor: 푸른 반투명 물웅덩이 Decal.
-## peer-eval 피드백: 이전 채도 높은 cyan(0.62, 0.78, 0.92) → 채도 낮은 회청.
-## 바닥 텍스쳐가 비치는 인상을 위해 alpha도 0.55→0.35.
+## wet_floor: 푸른 반투명 물웅덩이.
+## Decal로 albedo tinting + 그 위에 얇은 PlaneMesh(반사도 0.05 + ripple normal)로
+## 물 표면 반사를 살린다. Decal만으로는 floor material의 roughness를 못 바꾸므로
+## 광택은 PlaneMesh가 담당. 위로 0.025m 떠 있어 z-fight 회피.
 func _build_wet_floor_decal() -> void:
 	var decal: Decal = Decal.new()
 	decal.name = "WetFloorDecal"
@@ -138,12 +175,78 @@ func _build_wet_floor_decal() -> void:
 	decal.lower_fade = 0.3
 	decal.modulate = Color(0.50, 0.56, 0.62, 0.35)
 	decal.texture_albedo = _make_puddle_texture(Color(0.38, 0.45, 0.52))
+	decal.cull_mask = BaseSite.FLOOR_DECAL_LAYER
 	decal.position = Vector3(0.0, 0.02, 0.0)
 	add_child(decal)
+
+	# 반사도 0.05 평면 mesh — 광택/굴절 효과.
+	var puddle: MeshInstance3D = MeshInstance3D.new()
+	puddle.name = "WetFloorSurface"
+	var plane: PlaneMesh = PlaneMesh.new()
+	plane.size = Vector2(1.7, 1.7)
+	puddle.mesh = plane
+	puddle.material_override = _make_wet_floor_surface_material()
+	puddle.position = Vector3(0.0, 0.025, 0.0)
+	add_child(puddle)
+
+
+## 물웅덩이 표면 머티리얼 — roughness 0.05, ripple normal.
+func _make_wet_floor_surface_material() -> StandardMaterial3D:
+	var mat: StandardMaterial3D = StandardMaterial3D.new()
+	mat.albedo_color = Color(0.32, 0.38, 0.44, 0.55)
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	# roughness 0.05는 거의 거울이라 sky/구조물 반사가 흰색으로 번짐.
+	# 0.18은 약한 광택을 유지하면서 반사를 분산시켜 자연스럽다.
+	mat.roughness = 0.18
+	mat.metallic = 0.0
+	mat.normal_enabled = true
+	mat.normal_texture = _make_ripple_normal_texture()
+	mat.normal_scale = 0.35
+	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	return mat
+
+
+## FastNoiseLite 기반 water ripple normal map (procedural).
+func _make_ripple_normal_texture() -> ImageTexture:
+	var size: int = 128
+	var noise: FastNoiseLite = FastNoiseLite.new()
+	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
+	noise.frequency = 0.06
+	noise.fractal_octaves = 2
+	noise.seed = 7777
+	# height field
+	var heights: PackedFloat32Array = PackedFloat32Array()
+	heights.resize(size * size)
+	for y in size:
+		for x in size:
+			heights[y * size + x] = noise.get_noise_2d(float(x), float(y))
+	# height → normal (central differences)
+	var img: Image = Image.create(size, size, false, Image.FORMAT_RGB8)
+	var strength: float = 1.8
+	for y in size:
+		for x in size:
+			var xl: int = (x - 1 + size) % size
+			var xr: int = (x + 1) % size
+			var yu: int = (y - 1 + size) % size
+			var yd: int = (y + 1) % size
+			var dx: float = (heights[y * size + xr] - heights[y * size + xl]) * strength
+			var dy: float = (heights[yd * size + x] - heights[yu * size + x]) * strength
+			var nx: float = -dx
+			var ny: float = -dy
+			var nz: float = 1.0
+			var inv_len: float = 1.0 / sqrt(nx * nx + ny * ny + nz * nz)
+			nx *= inv_len
+			ny *= inv_len
+			nz *= inv_len
+			# encode -1..1 → 0..1
+			var c: Color = Color(nx * 0.5 + 0.5, ny * 0.5 + 0.5, nz * 0.5 + 0.5)
+			img.set_pixel(x, y, c)
+	return ImageTexture.create_from_image(img)
 
 
 ## unguarded_edge: caution tape + 양 끝 콘크리트 stanchion.
 func _build_unguarded_edge_marker() -> void:
+	_build_contact_shadow(1.3)
 	var tape_w: float = 2.4
 	var tape: BoxMesh = BoxMesh.new()
 	tape.size = Vector3(tape_w, 0.08, 0.02)

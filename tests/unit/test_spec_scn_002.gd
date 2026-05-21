@@ -203,6 +203,141 @@ func test_hazard_id_format() -> void:
 		assert_false(hd.hazard_id.is_empty(), "hazard_id가 비어있지 않음")
 
 
+## TEST-SCN-002-FLOOR: floor surface_type → 상단 Y 안착.
+## hazard가 AABB 내부 random Y로 떨어지면 floor에 묻힘. 상단 Y에 고정되어야 한다.
+func test_floor_surface_places_on_top() -> void:
+	var manager: Node = _get_scenario_manager()
+	if manager == null:
+		pending("ScenarioManager Autoload 없음")
+		return
+
+	## floor surface 1개만 가진 Mock site — y_top = 0.0 (slab AABB y=-0.25, size.y=0.25).
+	var floor_site: BaseSite = _FloorOnlySite.new()
+	add_child_autoqfree(floor_site)
+
+	var config: Dictionary = {
+		"hazard_count": 10,
+		"types": ["debris"],
+		"min_spacing": 0.5,
+		"difficulty_range": [0.3, 0.7],
+	}
+	manager.random_seed = 9999
+	var result: Array[HazardData] = manager.generate_random_placement(config, floor_site)
+
+	assert_eq(result.size(), 10, "10개 모두 배치")
+	for i: int in range(result.size()):
+		# floor 상단 = aabb.position.y + aabb.size.y = -0.25 + 0.25 = 0.0
+		assert_almost_eq(result[i].position.y, 0.0, 0.001,
+			"hazard[%d] Y가 floor 상단 0.0에 안착 (실제=%f)" % [i, result[i].position.y])
+
+
+## floor surface 1개만 등록한 Mock — floor-안착 테스트용.
+class _FloorOnlySite extends BaseSite:
+	func get_spawn_bounds() -> AABB:
+		return AABB(Vector3(-10, -1, -10), Vector3(20, 5, 20))
+
+	func get_valid_surfaces() -> Array:
+		return [{
+			"node": self,
+			"surface_type": "floor",
+			"aabb": AABB(Vector3(-10, -0.25, -10), Vector3(20, 0.25, 20))
+		}]
+
+	func get_site_type() -> String:
+		return "test_floor_only"
+
+
+## TEST-SCN-002-EDGE: edge surface_type → unguarded_edge가 edge 우선 매칭.
+func test_edge_surface_prefers_unguarded_edge() -> void:
+	var manager: Node = _get_scenario_manager()
+	if manager == null:
+		pending("ScenarioManager Autoload 없음")
+		return
+
+	var site: BaseSite = _EdgeAndFloorSite.new()
+	add_child_autoqfree(site)
+
+	var config: Dictionary = {
+		"hazard_count": 5,
+		"types": ["unguarded_edge"],
+		"min_spacing": 0.5,
+		"difficulty_range": [0.3, 0.7],
+	}
+	manager.random_seed = 5555
+	var result: Array[HazardData] = manager.generate_random_placement(config, site)
+
+	assert_gt(result.size(), 0, "최소 1개 배치")
+	## edge AABB: x ∈ [-10, -9] (서쪽 띠) 또는 x ∈ [9, 10] (동쪽 띠).
+	## floor AABB: x ∈ [-10, 10]. edge가 우선 매칭되면 모든 x가 edge 범위 안.
+	var on_edge: int = 0
+	for hd: HazardData in result:
+		var on_west: bool = hd.position.x <= -9.0
+		var on_east: bool = hd.position.x >= 9.0
+		if on_west or on_east:
+			on_edge += 1
+	assert_eq(on_edge, result.size(),
+		"모든 unguarded_edge가 edge surface에 매칭 (%d/%d)" % [on_edge, result.size()])
+
+
+class _EdgeAndFloorSite extends BaseSite:
+	func get_spawn_bounds() -> AABB:
+		return AABB(Vector3(-10, -1, -10), Vector3(20, 5, 20))
+
+	func get_valid_surfaces() -> Array:
+		return [
+			{"node": self, "surface_type": "floor",
+				"aabb": AABB(Vector3(-10, -0.25, -10), Vector3(20, 0.25, 20))},
+			{"node": self, "surface_type": "edge",
+				"aabb": AABB(Vector3(-10, -0.25, -10), Vector3(1.0, 0.25, 20))},
+			{"node": self, "surface_type": "edge",
+				"aabb": AABB(Vector3(9, -0.25, -10), Vector3(1.0, 0.25, 20))},
+		]
+
+	func get_site_type() -> String:
+		return "test_edge"
+
+
+## TEST-SCN-002-BLOCK: site.is_position_blocked → 차단 위치에 spawn 안 됨.
+func test_is_position_blocked_respected() -> void:
+	var manager: Node = _get_scenario_manager()
+	if manager == null:
+		pending("ScenarioManager Autoload 없음")
+		return
+
+	var site: BaseSite = _BlockedZoneSite.new()
+	add_child_autoqfree(site)
+
+	var config: Dictionary = {
+		"hazard_count": 8,
+		"types": ["debris"],
+		"min_spacing": 0.3,
+		"difficulty_range": [0.3, 0.7],
+	}
+	manager.random_seed = 3131
+	var result: Array[HazardData] = manager.generate_random_placement(config, site)
+
+	## 차단 영역 X ∈ [-2, 2] — 모든 hazard가 그 밖.
+	for hd: HazardData in result:
+		assert_true(absf(hd.position.x) > 2.0 - 0.01,
+			"hazard X=%f 차단 영역(|x|<=2) 밖" % hd.position.x)
+
+
+class _BlockedZoneSite extends BaseSite:
+	func get_spawn_bounds() -> AABB:
+		return AABB(Vector3(-10, -1, -10), Vector3(20, 5, 20))
+
+	func get_valid_surfaces() -> Array:
+		return [{"node": self, "surface_type": "floor",
+			"aabb": AABB(Vector3(-10, -0.25, -10), Vector3(20, 0.25, 20))}]
+
+	func get_site_type() -> String:
+		return "test_blocked"
+
+	## X 중앙 ±2m 영역을 spawn 차단 (시뮬: 가운데에 가로 벽).
+	func is_position_blocked(pos: Vector3) -> bool:
+		return absf(pos.x) <= 2.0
+
+
 ## TEST-SCN-002-7: _check_min_spacing 내부 함수 검증
 func test_check_min_spacing_logic() -> void:
 	var manager: Node = _get_scenario_manager()
