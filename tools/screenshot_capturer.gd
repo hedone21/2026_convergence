@@ -36,6 +36,19 @@ var _angles: Array = [
 	{"name": "08_offset_north","pos": Vector3(0.0, 1.7, 8.0),   "rot_y": 180.0,  "pitch": 0.0},
 ]
 
+## 외부 시점 캡처 앵글 — 사이트 BBox 바깥에서 건물을 본다.
+## Phase 5b: 비계/거푸집/안전망/caution stand 외관 확인용.
+var _exterior_angles: Array = [
+	{"name": "01_north_30m",   "pos": Vector3(0.0, 1.7, -30.0),  "rot_y": 0.0,    "pitch": 0.0},
+	{"name": "02_east_30m",    "pos": Vector3(30.0, 1.7, 0.0),   "rot_y": -90.0,  "pitch": 0.0},
+	{"name": "03_south_30m",   "pos": Vector3(0.0, 1.7, 30.0),   "rot_y": 180.0,  "pitch": 0.0},
+	{"name": "04_west_30m",    "pos": Vector3(-30.0, 1.7, 0.0),  "rot_y": 90.0,   "pitch": 0.0},
+	{"name": "05_ne_iso",      "pos": Vector3(35.0, 12.0, -35.0),"rot_y": -45.0,  "pitch": -15.0},
+	{"name": "06_sw_iso",      "pos": Vector3(-35.0, 12.0, 35.0),"rot_y": 135.0,  "pitch": -15.0},
+	{"name": "07_north_low",   "pos": Vector3(0.0, 0.9, -18.0),  "rot_y": 0.0,    "pitch": 8.0},
+	{"name": "08_iso_high_ext","pos": Vector3(45.0, 28.0, 45.0), "rot_y": -135.0, "pitch": -30.0},
+]
+
 
 func _ready() -> void:
 	if not _has_flag():
@@ -98,8 +111,62 @@ func _run_capture() -> void:
 	# Batch 2: 천장 없음
 	await _capture_batch(camera, _ensure_dir("no_ceiling/"))
 
+	# Batch 3: hazard closeup — 각 hazard 1.5m 거리에서 1장씩
+	await _capture_hazard_closeups(camera, _ensure_dir("hazards/"))
+
+	# Batch 4: 외부 시점 — 사이트 BBox 외부에서 비계/외관 캡처
+	await _capture_exterior(camera, _ensure_dir("exterior/"))
+
 	print("[ScreenshotCapturer] Done. Quitting.")
 	get_tree().quit()
+
+
+## 외부 시점 캡처 batch — _exterior_angles 8개.
+func _capture_exterior(camera: Camera3D, out_dir: String) -> void:
+	for angle in _exterior_angles:
+		camera.global_position = angle["pos"] as Vector3
+		camera.global_rotation_degrees = Vector3(
+			angle["pitch"] as float, angle["rot_y"] as float, 0.0
+		)
+		for _i: int in range(SHUTTER_FRAMES):
+			await get_tree().process_frame
+		var img: Image = get_viewport().get_texture().get_image()
+		var path: String = out_dir + (angle["name"] as String) + ".png"
+		var err: int = img.save_png(path)
+		if err == OK:
+			print("[ScreenshotCapturer] Saved %s" % ProjectSettings.globalize_path(path))
+		else:
+			push_error("[ScreenshotCapturer] save_png failed (%d): %s" % [err, path])
+
+
+## HazardContainer 하위 각 hazard 1.5m 후방·1.2m 위에서 캡처.
+func _capture_hazard_closeups(camera: Camera3D, out_dir: String) -> void:
+	var main_scene: Node = get_tree().current_scene
+	if main_scene == null:
+		return
+	var hazard_container: Node = main_scene.get_node_or_null("HazardContainer")
+	if hazard_container == null:
+		print("[ScreenshotCapturer] HazardContainer 없음 — closeup skip")
+		return
+	var hazards: Array = hazard_container.get_children()
+	for i: int in hazards.size():
+		var h: Node = hazards[i]
+		if not (h is Node3D):
+			continue
+		var hp: Vector3 = (h as Node3D).global_position
+		# closeup: hazard 근접 0.9m 후방 + 낮은 시선으로 각 hazard 단독 식별 강화
+		camera.global_position = hp + Vector3(0.0, 0.6, 0.9)
+		camera.look_at(hp + Vector3(0.0, 0.2, 0.0))
+		for _i: int in range(SHUTTER_FRAMES):
+			await get_tree().process_frame
+		var img: Image = get_viewport().get_texture().get_image()
+		var label: String = "hazard_%02d_%s.png" % [i + 1, h.name]
+		var path: String = out_dir + label
+		var err: int = img.save_png(path)
+		if err == OK:
+			print("[ScreenshotCapturer] Saved %s" % ProjectSettings.globalize_path(path))
+		else:
+			push_error("[ScreenshotCapturer] save_png failed (%d): %s" % [err, path])
 
 
 func _capture_batch(camera: Camera3D, out_dir: String) -> void:
@@ -121,7 +188,8 @@ func _capture_batch(camera: Camera3D, out_dir: String) -> void:
 			push_error("[ScreenshotCapturer] save_png failed (%d): %s" % [err, path])
 
 
-## SiteContainer 하위에서 "CeilingSlab" 이름 노드를 찾는다.
+## SiteContainer 하위에서 ceiling 노드를 찾는다.
+## 이전 "CeilingSlab"(통판) + 신규 "CeilingStructure"(빔 격자) 모두 인식.
 func _find_ceiling_node() -> Node:
 	var main_scene: Node = get_tree().current_scene
 	if main_scene == null:
@@ -130,7 +198,8 @@ func _find_ceiling_node() -> Node:
 	if site_container == null:
 		return null
 	for child: Node in site_container.get_children():
-		var ceiling: Node = child.get_node_or_null("CeilingSlab")
-		if ceiling != null:
-			return ceiling
+		for name_: String in ["CeilingStructure", "CeilingSlab"]:
+			var ceiling: Node = child.get_node_or_null(name_)
+			if ceiling != null:
+				return ceiling
 	return null

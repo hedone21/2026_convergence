@@ -5,7 +5,7 @@
   "site_floor": 1,
   "time_limit_seconds": 600,
   "random_placement": true,
-  "random_seed": 0,
+  "random_seed": 12345,
   "random_config": {
     "hazard_count": 5,
     "types": ["crack"],

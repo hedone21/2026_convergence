@@ -31,7 +31,8 @@ const PRESETS: Dictionary = {
 	},
 }
 
-const DEFAULT_PRESET: String = "noon"
+## 기본 시간대 — Phase 5b 한국 공사장 dusk 분위기 적용.
+const DEFAULT_PRESET: String = "dusk"
 
 
 ## SPEC-GFX-004: 시간대 프리셋을 DirectionalLight3D에 적용.

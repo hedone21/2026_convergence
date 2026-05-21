@@ -25,7 +25,16 @@ var _texture_generator: CrackTextureGenerator = CrackTextureGenerator.new()
 var _hazard_rules: HazardRules = HazardRules.new()
 
 ## 크랙 기본 색상 (Decal modulate)
-const CRACK_MODULATE: Color = Color(0.3, 0.25, 0.2, 1.0)
+## warm 콘크리트(albedo 0.55~0.85)와 대비를 위해 짙은 흙갈색-검정 톤.
+## (사용자: "위험 요소가 눈에 잘 띄지 않아")
+const CRACK_MODULATE: Color = Color(0.08, 0.06, 0.05, 1.0)
+
+## Decal 사이즈 계수 — crack_length(m) 기준 (X, Z) 평면 투영 영역.
+## 사실성 우선: 2.5x 확대(스티커 느낌) 원복 → 자연 크기.
+const DECAL_X_FACTOR: float = 1.0
+const DECAL_Z_FACTOR: float = 0.7
+const DECAL_Y_DEPTH: float = 0.5
+const DECAL_FADE: float = 0.3
 
 
 func _ready() -> void:
@@ -58,17 +67,17 @@ func _apply_difficulty() -> void:
 	var color_blend: float = params["color_blend"]
 
 	# Decal 크기 조정 — difficulty에 따라 스케일 변화
-	var base_extents_x: float = crack_length * 0.6
-	var base_extents_z: float = crack_length * 0.4
+	var base_extents_x: float = crack_length * DECAL_X_FACTOR
+	var base_extents_z: float = crack_length * DECAL_Z_FACTOR
 	_crack_decal.size = Vector3(
 		base_extents_x * visual_scale,
-		0.5,  # Y축 투영 깊이 (콘크리트 표면에 투영)
+		DECAL_Y_DEPTH,
 		base_extents_z * visual_scale
 	)
 
 	# Decal modulate — 투명도로 난이도 표현
 	var blended_color: Color = CRACK_MODULATE.lerp(
-		Color(0.75, 0.73, 0.70, 0.0),  # 배경 콘크리트색 + 완전 투명
+		Color(0.60, 0.56, 0.50, 0.0),  # warm 콘크리트 톤으로 fade
 		color_blend
 	)
 	blended_color.a = clampf(opacity, 0.0, 1.0)
@@ -106,14 +115,14 @@ func _build_visual() -> void:
 	_crack_decal.texture_normal = _texture_generator.create_crack_normal_texture()
 
 	# Decal 기본 크기 (난이도 적용 전)
-	_crack_decal.size = Vector3(crack_length * 0.6, 0.5, crack_length * 0.4)
+	_crack_decal.size = Vector3(crack_length * DECAL_X_FACTOR, DECAL_Y_DEPTH, crack_length * DECAL_Z_FACTOR)
 
 	# Decal 색상 + 투명도
 	_crack_decal.modulate = CRACK_MODULATE
 
 	# Decal 설정 — 표면에 투영
-	_crack_decal.upper_fade = 0.3
-	_crack_decal.lower_fade = 0.3
+	_crack_decal.upper_fade = DECAL_FADE
+	_crack_decal.lower_fade = DECAL_FADE
 	_crack_decal.normal_fade = 0.5
 
 	# 표면에 살짝 떠있도록 (정확한 표면 투영을 위해)
@@ -130,7 +139,7 @@ func _rebuild_visual() -> void:
 		_crack_decal.texture_normal = _texture_generator.create_crack_normal_texture()
 
 		# 크기 갱신
-		_crack_decal.size = Vector3(crack_length * 0.6, 0.5, crack_length * 0.4)
+		_crack_decal.size = Vector3(crack_length * DECAL_X_FACTOR, DECAL_Y_DEPTH, crack_length * DECAL_Z_FACTOR)
 
 		_apply_difficulty()
 
@@ -166,7 +175,7 @@ func _build_discovered_indicator() -> void:
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.emission_enabled = true
 	mat.emission = Color(0.0, 1.0, 0.3)
-	mat.emission_energy_multiplier = 0.5
+	mat.emission_energy_multiplier = 0.3
 	mesh_instance.material_override = mat
 
 	mesh_instance.position = Vector3(0.0, 0.3, 0.0)
