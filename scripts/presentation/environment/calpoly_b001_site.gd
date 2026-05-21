@@ -177,6 +177,31 @@ func _build_from_floor(data: SiteData) -> void:
 	# hazard 빌드 대기 후 props 배치 (회피 로직 위해)
 	_spawn_props_async(bb_min, bb_max, origin)
 
+	# Phase 5b: 외부 강관비계 (KOSHA), 안전망 drape, caution stand.
+	_build_exterior_scaffolding(bb_min, bb_max, origin)
+
+
+func _build_exterior_scaffolding(bb_min: Vector2, bb_max: Vector2, origin: Vector2) -> void:
+	var local_min: Vector2 = bb_min - origin
+	var local_max: Vector2 = bb_max - origin
+	var scaff: ScaffoldingGenerator = ScaffoldingGenerator.new()
+	scaff.name = "Scaffolding"
+	add_child(scaff)
+	scaff.setup(local_min, local_max, FLOOR_HEIGHT)
+	scaff.build()
+
+	var drape: SafetyMeshDrape = SafetyMeshDrape.new()
+	drape.name = "SafetyMeshDrape"
+	add_child(drape)
+	drape.setup(local_min, local_max, FLOOR_HEIGHT)
+	drape.build()
+
+	var sign_root: CautionStandSign = CautionStandSign.new()
+	sign_root.name = "CautionStands"
+	add_child(sign_root)
+	sign_root.setup(local_min, local_max)
+	sign_root.build()
+
 
 ## hazard가 ScenarioManager에서 spawn되길 기다린 후 props 배치.
 ## site._build_from_floor 이후 다음 frame들에서 HazardManager가 hazard를 채움.
@@ -412,6 +437,43 @@ func _create_ceiling_structure(bb_min: Vector2, bb_max: Vector2, origin: Vector2
 			var lx: float = center_x + tx * size_x
 			var lz: float = center_z + tz * size_z
 			_spawn_work_light(Vector3(lx, light_y, lz))
+
+	# Phase 5b: 빔 격자 사이에 빨간 거푸집 합판 panel 오버레이 (한국 공사장 reference).
+	# 80% cell은 panel, 20%는 비워두어 미완공 느낌.
+	_overlay_formwork_red_panels(size_x, size_z, center_x, center_z, beam_y, beam_count_x, beam_count_z)
+
+
+## Phase 5b: 빔 격자 cell마다 formwork_red panel 배치.
+func _overlay_formwork_red_panels(
+	size_x: float, size_z: float, center_x: float, center_z: float,
+	beam_y: float, beam_count_x: int, beam_count_z: int
+) -> void:
+	var formwork_mat: StandardMaterial3D = _concrete_material.create_formwork_red_material()
+	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+	rng.seed = 9173
+	var panel_h: float = 0.05
+	var panel_y: float = beam_y - BEAM_HEIGHT * 0.5 - panel_h * 0.5
+	for ix: int in range(beam_count_x):
+		for iz: int in range(beam_count_z):
+			if rng.randf() > 0.8:
+				continue
+			var tx: float = (float(ix) + 0.5) / float(beam_count_x) - 0.5
+			var tz: float = (float(iz) + 0.5) / float(beam_count_z) - 0.5
+			var px: float = center_x + tx * size_x
+			var pz: float = center_z + tz * size_z
+			var pw: float = (size_x / float(beam_count_x)) * 0.88
+			var pd: float = (size_z / float(beam_count_z)) * 0.88
+			var panel: MeshInstance3D = MeshInstance3D.new()
+			panel.name = "FormworkRedPanel_%d_%d" % [ix, iz]
+			var bm: BoxMesh = BoxMesh.new()
+			bm.size = Vector3(pw, panel_h, pd)
+			panel.mesh = bm
+			panel.material_override = formwork_mat
+			panel.position = Vector3(px, panel_y, pz)
+			panel.rotation = Vector3(
+				rng.randf_range(-0.05, 0.05), 0.0, rng.randf_range(-0.05, 0.05)
+			)
+			_ceiling_node.add_child(panel)
 
 
 func _spawn_beam(size: Vector3, pos: Vector3) -> void:
