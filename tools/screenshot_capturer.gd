@@ -95,6 +95,9 @@ func _run_capture() -> void:
 	camera.top_level = true
 	camera.current = true
 
+	# Batch 0: 정문 spawn 위치 확인 — PlayerRig 위치에서 정면 1장.
+	await _capture_entrance(camera, _ensure_dir("entrance/"))
+
 	# Batch 1: 천장 있음 (현재 시나리오 그대로)
 	await _capture_batch(camera, _ensure_dir("with_ceiling/"))
 
@@ -126,6 +129,37 @@ func _run_capture() -> void:
 
 	print("[ScreenshotCapturer] Done. Quitting.")
 	get_tree().quit()
+
+
+## 정문 spawn 위치 캡처. PlayerRig 위치 + eye height 1.7m, 정면 + 양옆.
+func _capture_entrance(camera: Camera3D, out_dir: String) -> void:
+	var main_scene: Node = get_tree().current_scene
+	if main_scene == null:
+		return
+	var player_rig: Node3D = main_scene.get_node_or_null("PlayerRig") as Node3D
+	if player_rig == null:
+		return
+	var p: Vector3 = player_rig.global_position
+	var yaw_deg: float = rad_to_deg(player_rig.rotation.y)
+	var angles: Array = [
+		{"name": "01_inside_facing",  "pos": Vector3(p.x, p.y + 1.7, p.z), "rot_y": yaw_deg,        "pitch": 0.0},
+		{"name": "02_inside_pitch_up","pos": Vector3(p.x, p.y + 1.7, p.z), "rot_y": yaw_deg,        "pitch": 15.0},
+		{"name": "03_left_glance",    "pos": Vector3(p.x, p.y + 1.7, p.z), "rot_y": yaw_deg + 45.0, "pitch": 0.0},
+		{"name": "04_right_glance",   "pos": Vector3(p.x, p.y + 1.7, p.z), "rot_y": yaw_deg - 45.0, "pitch": 0.0},
+		{"name": "05_look_back",      "pos": Vector3(p.x, p.y + 1.7, p.z), "rot_y": yaw_deg + 180.0,"pitch": 0.0},
+	]
+	for angle in angles:
+		camera.global_position = angle["pos"] as Vector3
+		camera.global_rotation_degrees = Vector3(
+			angle["pitch"] as float, angle["rot_y"] as float, 0.0
+		)
+		for _i: int in range(SHUTTER_FRAMES):
+			await get_tree().process_frame
+		var img: Image = get_viewport().get_texture().get_image()
+		var path: String = out_dir + (angle["name"] as String) + ".png"
+		var err: int = img.save_png(path)
+		if err == OK:
+			print("[ScreenshotCapturer] Saved %s" % ProjectSettings.globalize_path(path))
 
 
 ## 외부 시점 캡처 batch — _exterior_angles 8개.

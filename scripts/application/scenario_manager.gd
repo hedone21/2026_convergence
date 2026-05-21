@@ -270,8 +270,27 @@ func _load_site() -> void:
 		print("[ScenarioManager] Site loaded: %s (floor=%d)" % [
 			site_type, current_scenario.site_floor if current_scenario else 1
 		])
+		# 정문 안쪽으로 PlayerRig 이동.
+		if site_instance is BaseSite:
+			_position_player_rig(main_scene, site_instance as BaseSite)
 	else:
 		push_error("[ScenarioManager] Failed to load site scene: %s" % site_scene_path)
+
+
+## site의 정문 위치로 PlayerRig를 이동시킨다.
+func _position_player_rig(main_scene: Node, site: BaseSite) -> void:
+	var player_rig: Node3D = main_scene.get_node_or_null("PlayerRig") as Node3D
+	if player_rig == null:
+		return
+	var pos: Vector3 = site.get_start_position()
+	if pos == Vector3.ZERO:
+		# site가 start_position 미설정 — origin 유지.
+		return
+	player_rig.position = pos
+	player_rig.rotation.y = site.get_start_rotation_y()
+	print("[ScenarioManager] PlayerRig moved to entrance: (%.2f, %.2f, %.2f) rot_y=%.2f deg" % [
+		pos.x, pos.y, pos.z, rad_to_deg(player_rig.rotation.y)
+	])
 
 
 ## SPEC-SCN-001, SPEC-SCN-002: 시나리오를 씬에 적용한다.

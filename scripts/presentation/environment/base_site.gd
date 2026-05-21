@@ -36,3 +36,16 @@ func get_site_type() -> String:
 ## 기본 false. 회전된 OBB 검사가 필요한 site에서 override.
 func is_position_blocked(_pos: Vector3) -> bool:
 	return false
+
+
+## 플레이어가 spawn해야 할 시작 지점 (정문 안쪽 등).
+## 기본 (0, 0, 0). 사이트별로 정문 위치를 계산하여 override.
+## 반환: site 로컬 좌표 Vector3. y는 floor 위(예: 0.0).
+func get_start_position() -> Vector3:
+	return Vector3.ZERO
+
+
+## 시작 시 플레이어가 바라봐야 할 방향 (radians, Y축 회전).
+## 기본 0.0. 정문에서 건물 내부를 향하도록 site별 override.
+func get_start_rotation_y() -> float:
+	return 0.0
