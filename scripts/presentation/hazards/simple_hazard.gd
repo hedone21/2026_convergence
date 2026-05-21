@@ -70,11 +70,12 @@ func _build_debris_pile() -> void:
 		add_child(inst)
 
 
-## exposed_rebar: 녹슨 철근 4개 묶음, 약간씩 기울어진 배치.
+## exposed_rebar: 녹슨 철근 4개 묶음, 약간씩 기울어진 배치 + 끝부분 안전 캡.
 func _build_rebar_bundle() -> void:
 	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 	rng.seed = hash(hazard_id + "rebar") if hazard_id != "" else 67890
 	var mat: StandardMaterial3D = _load_rust_material()
+	var cap_mat: StandardMaterial3D = _make_rebar_cap_material()
 	var heights: Array = [1.20, 1.40, 1.05, 1.30]
 	for i in 4:
 		var cyl: CylinderMesh = CylinderMesh.new()
@@ -85,13 +86,32 @@ func _build_rebar_bundle() -> void:
 		inst.mesh = cyl
 		inst.material_override = mat
 		var angle: float = (float(i) / 4.0) * TAU
-		inst.position = Vector3(cos(angle) * 0.05, heights[i] * 0.5, sin(angle) * 0.05)
+		var rebar_pos: Vector3 = Vector3(cos(angle) * 0.05, heights[i] * 0.5, sin(angle) * 0.05)
+		inst.position = rebar_pos
 		inst.rotation = Vector3(
 			rng.randf_range(-0.06, 0.06),
 			0.0,
 			rng.randf_range(-0.06, 0.06)
 		)
 		add_child(inst)
+		# 안전 캡 — sphere, 어두운 채도 다운된 오렌지
+		var cap: MeshInstance3D = MeshInstance3D.new()
+		var sm: SphereMesh = SphereMesh.new()
+		sm.radius = 0.05
+		sm.height = 0.10
+		cap.mesh = sm
+		cap.material_override = cap_mat
+		cap.position = Vector3(rebar_pos.x, heights[i] + 0.025, rebar_pos.z)
+		add_child(cap)
+
+
+## 철근 안전 캡 머티리얼 — 채도 다운된 안전 오렌지.
+func _make_rebar_cap_material() -> StandardMaterial3D:
+	var mat: StandardMaterial3D = StandardMaterial3D.new()
+	mat.albedo_color = Color(0.62, 0.34, 0.10)
+	mat.roughness = 0.65
+	mat.metallic = 0.0
+	return mat
 
 
 ## spill: 어두운 유성 누수 Decal. emission 없음, 살짝 반광택.

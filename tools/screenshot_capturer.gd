@@ -36,6 +36,19 @@ var _angles: Array = [
 	{"name": "08_offset_north","pos": Vector3(0.0, 1.7, 8.0),   "rot_y": 180.0,  "pitch": 0.0},
 ]
 
+## 외부 시점 캡처 앵글 — 사이트 BBox 바깥에서 건물을 본다.
+## Phase 5b: 비계/거푸집/안전망/caution stand 외관 확인용.
+var _exterior_angles: Array = [
+	{"name": "01_north_30m",   "pos": Vector3(0.0, 1.7, -30.0),  "rot_y": 0.0,    "pitch": 0.0},
+	{"name": "02_east_30m",    "pos": Vector3(30.0, 1.7, 0.0),   "rot_y": -90.0,  "pitch": 0.0},
+	{"name": "03_south_30m",   "pos": Vector3(0.0, 1.7, 30.0),   "rot_y": 180.0,  "pitch": 0.0},
+	{"name": "04_west_30m",    "pos": Vector3(-30.0, 1.7, 0.0),  "rot_y": 90.0,   "pitch": 0.0},
+	{"name": "05_ne_iso",      "pos": Vector3(35.0, 12.0, -35.0),"rot_y": -45.0,  "pitch": -15.0},
+	{"name": "06_sw_iso",      "pos": Vector3(-35.0, 12.0, 35.0),"rot_y": 135.0,  "pitch": -15.0},
+	{"name": "07_north_low",   "pos": Vector3(0.0, 0.9, -18.0),  "rot_y": 0.0,    "pitch": 8.0},
+	{"name": "08_iso_high_ext","pos": Vector3(45.0, 28.0, 45.0), "rot_y": -135.0, "pitch": -30.0},
+]
+
 
 func _ready() -> void:
 	if not _has_flag():
@@ -101,8 +114,29 @@ func _run_capture() -> void:
 	# Batch 3: hazard closeup — 각 hazard 1.5m 거리에서 1장씩
 	await _capture_hazard_closeups(camera, _ensure_dir("hazards/"))
 
+	# Batch 4: 외부 시점 — 사이트 BBox 외부에서 비계/외관 캡처
+	await _capture_exterior(camera, _ensure_dir("exterior/"))
+
 	print("[ScreenshotCapturer] Done. Quitting.")
 	get_tree().quit()
+
+
+## 외부 시점 캡처 batch — _exterior_angles 8개.
+func _capture_exterior(camera: Camera3D, out_dir: String) -> void:
+	for angle in _exterior_angles:
+		camera.global_position = angle["pos"] as Vector3
+		camera.global_rotation_degrees = Vector3(
+			angle["pitch"] as float, angle["rot_y"] as float, 0.0
+		)
+		for _i: int in range(SHUTTER_FRAMES):
+			await get_tree().process_frame
+		var img: Image = get_viewport().get_texture().get_image()
+		var path: String = out_dir + (angle["name"] as String) + ".png"
+		var err: int = img.save_png(path)
+		if err == OK:
+			print("[ScreenshotCapturer] Saved %s" % ProjectSettings.globalize_path(path))
+		else:
+			push_error("[ScreenshotCapturer] save_png failed (%d): %s" % [err, path])
 
 
 ## HazardContainer 하위 각 hazard 1.5m 후방·1.2m 위에서 캡처.
