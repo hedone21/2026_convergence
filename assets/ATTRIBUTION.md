@@ -64,6 +64,14 @@
 |------|--------|---------|---------|
 | concrete_trim.png | 자체 절차 생성 (procedural noise) | CC0 (자체 생성물 권리 포기) | f9857ccb9f5d59e170c5ff14d0b0e07f4a264d2d1e54af443ceb39512e0c1d3c |
 
+### plywood/ — 거푸집 합판
+| File | Source | License | SHA-256 |
+|------|--------|---------|---------|
+| plywood_diff_1k.jpg | https://polyhaven.com/a/plywood | CC0 | 800905650fc6cab2fe7c77c41851f8ea89669f1287ad5ce67c48f435654c0af8 |
+| plywood_nor_gl_1k.jpg | https://polyhaven.com/a/plywood | CC0 | a0d8459eb2586435790225440319586775c9b7dff8441062e077501fd0811e53 |
+| plywood_rough_1k.jpg | https://polyhaven.com/a/plywood | CC0 | c4600551fa90bf1222de07b5d92e09456501f0449a4f315c203770bfcbd97aaf |
+| plywood_ao_1k.jpg | https://polyhaven.com/a/plywood | CC0 | 6256ea39cf78628d333858ae823d226ff730d7a4713c35bdf88caebccbb17f1b |
+
 ---
 
 ## Models (CC0)
@@ -77,7 +85,12 @@
 ## HDRI
 
 ### hdri/
-- 4K HDRI: Polyhaven (https://polyhaven.com), CC0
+| File | Source | License | SHA-256 |
+|------|--------|---------|---------|
+| kloppenheim_07_puresky_4k.hdr | https://polyhaven.com/a/kloppenheim_07_puresky | CC0 | (기존) |
+| kloppenheim_06_puresky_1k.exr | https://polyhaven.com/a/kloppenheim_06_puresky | CC0 (dusk 분위기) | 2a5efb26eca5a90bbc649679a05d7cfadf6dea3c8c9fa265a858b04c0f59a0b1 |
+
+Polyhaven HDRI 4K EXR이 50MB 초과 시 1K로 다운그레이드 정책 적용 (kloppenheim_06_1k = 5.1MB).
 
 ---
 
