@@ -58,6 +58,9 @@ const PROP_RETRY_COUNT: int = 20
 var _surfaces: Array = []
 var _spawn_bounds: AABB = AABB()
 
+var _start_position: Vector3 = Vector3.ZERO
+var _start_rotation_y: float = 0.0
+
 var _concrete_material: ConcreteMaterial = ConcreteMaterial.new()
 var _mat_wall_inner: StandardMaterial3D = null
 var _mat_wall_outer: StandardMaterial3D = null
@@ -87,6 +90,14 @@ func get_spawn_bounds() -> AABB:
 
 func get_site_type() -> String:
 	return "calpoly_b002"
+
+
+func get_start_position() -> Vector3:
+	return _start_position
+
+
+func get_start_rotation_y() -> float:
+	return _start_rotation_y
 
 
 func _init_materials() -> void:
@@ -156,6 +167,68 @@ func _build_from_floor(data: SiteData) -> void:
 
 	# Phase 5b: 외부 강관비계 (KOSHA), 안전망 drape, caution stand.
 	_build_exterior_scaffolding(bb_min, bb_max, origin)
+
+	_compute_start_position(data.doors, data.outer_walls, origin)
+
+
+## 정문 식별 + 시작 지점 계산 (b001과 동일 로직).
+func _compute_start_position(
+	doors: Array, outer_walls: Array, origin: Vector2
+) -> void:
+	const WALL_PROXIMITY_M: float = 0.8
+	const INSIDE_OFFSET_M: float = 2.0
+	var best_door: DoorData = null
+	var best_span: float = -1.0
+	var best_wall_normal: Vector2 = Vector2.ZERO
+	var best_center: Vector2 = Vector2.ZERO
+
+	for door: DoorData in doors:
+		var center: Vector2 = door.hinge
+		var nearest_dist: float = INF
+		var nearest_normal: Vector2 = Vector2.ZERO
+		for wall: WallData in outer_walls:
+			var d: float = _point_to_segment_distance(center, wall.start, wall.end)
+			if d < nearest_dist:
+				nearest_dist = d
+				var ab: Vector2 = wall.end - wall.start
+				if ab.length() > 0.001:
+					var dir: Vector2 = ab.normalized()
+					nearest_normal = Vector2(-dir.y, dir.x)
+		if nearest_dist <= WALL_PROXIMITY_M and door.span_m > best_span:
+			best_span = door.span_m
+			best_door = door
+			best_wall_normal = nearest_normal
+			best_center = center
+
+	if best_door == null:
+		print("[CalPolyB002Site] 외벽 인접 도어 없음 — start_position 기본값")
+		_start_position = Vector3.ZERO
+		_start_rotation_y = 0.0
+		return
+
+	var to_center: Vector2 = (origin - best_center).normalized()
+	var sign: float = 1.0 if best_wall_normal.dot(to_center) > 0.0 else -1.0
+	var inside: Vector2 = best_wall_normal * sign
+
+	var local_xz: Vector2 = best_center - origin + inside * INSIDE_OFFSET_M
+	_start_position = Vector3(local_xz.x, 0.0, local_xz.y)
+	# Godot forward = (sin(y), 0, -cos(y)). forward.x=inside.x, forward.z=inside.y.
+	_start_rotation_y = atan2(inside.x, -inside.y)
+
+	print("[CalPolyB002Site] 정문(span=%.2fm) → start=(%.2f, %.2f, %.2f) rot_y=%.2f deg" % [
+		best_span, _start_position.x, _start_position.y, _start_position.z,
+		rad_to_deg(_start_rotation_y)
+	])
+
+
+func _point_to_segment_distance(p: Vector2, a: Vector2, b: Vector2) -> float:
+	var ab: Vector2 = b - a
+	var L2: float = ab.length_squared()
+	if L2 < 1e-8:
+		return p.distance_to(a)
+	var t: float = clampf((p - a).dot(ab) / L2, 0.0, 1.0)
+	var proj: Vector2 = a + ab * t
+	return p.distance_to(proj)
 
 
 func _build_exterior_scaffolding(bb_min: Vector2, bb_max: Vector2, origin: Vector2) -> void:

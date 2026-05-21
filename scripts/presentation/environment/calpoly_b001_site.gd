@@ -77,6 +77,10 @@ const PROP_RETRY_COUNT: int = 20
 var _surfaces: Array = []
 var _spawn_bounds: AABB = AABB()
 
+## 정문 안쪽 spawn 지점 (site 로컬). _build_from_floor에서 계산.
+var _start_position: Vector3 = Vector3.ZERO
+var _start_rotation_y: float = 0.0
+
 var _concrete_material: ConcreteMaterial = ConcreteMaterial.new()
 var _mat_wall_inner: StandardMaterial3D = null
 var _mat_wall_outer: StandardMaterial3D = null
@@ -106,6 +110,14 @@ func get_spawn_bounds() -> AABB:
 
 func get_site_type() -> String:
 	return "calpoly_b001"
+
+
+func get_start_position() -> Vector3:
+	return _start_position
+
+
+func get_start_rotation_y() -> float:
+	return _start_rotation_y
 
 
 func _init_materials() -> void:
@@ -179,6 +191,76 @@ func _build_from_floor(data: SiteData) -> void:
 
 	# Phase 5b: 외부 강관비계 (KOSHA), 안전망 drape, caution stand.
 	_build_exterior_scaffolding(bb_min, bb_max, origin)
+
+	# 정문 식별 + 시작 지점 계산.
+	_compute_start_position(data.doors, data.outer_walls, origin)
+
+
+## 정문(외벽 인접 + span 최대 도어) 식별 후 안쪽 spawn 지점을 계산.
+## 데이터 좌표 → site 로컬 좌표(origin 차감)로 변환.
+func _compute_start_position(
+	doors: Array, outer_walls: Array, origin: Vector2
+) -> void:
+	const WALL_PROXIMITY_M: float = 0.8  # door centroid → outer wall segment max 거리
+	const INSIDE_OFFSET_M: float = 2.0   # 도어 안쪽 방향 spawn 위치
+	var best_door: DoorData = null
+	var best_span: float = -1.0
+	var best_wall_normal: Vector2 = Vector2.ZERO
+	var best_center: Vector2 = Vector2.ZERO
+
+	for door: DoorData in doors:
+		var center: Vector2 = door.hinge
+		var nearest_dist: float = INF
+		var nearest_normal: Vector2 = Vector2.ZERO
+		for wall: WallData in outer_walls:
+			var d: float = _point_to_segment_distance(center, wall.start, wall.end)
+			if d < nearest_dist:
+				nearest_dist = d
+				# 벽 segment 수직 단위 벡터 (방향은 추후 보정).
+				var ab: Vector2 = wall.end - wall.start
+				if ab.length() > 0.001:
+					var dir: Vector2 = ab.normalized()
+					nearest_normal = Vector2(-dir.y, dir.x)
+		if nearest_dist <= WALL_PROXIMITY_M and door.span_m > best_span:
+			best_span = door.span_m
+			best_door = door
+			best_wall_normal = nearest_normal
+			best_center = center
+
+	if best_door == null:
+		print("[CalPolyB001Site] 외벽 인접 도어 없음 — start_position 기본값(0,0,0)")
+		_start_position = Vector3.ZERO
+		_start_rotation_y = 0.0
+		return
+
+	# 정문에서 안쪽 방향을 결정. 두 normal 후보 중 walls bbox 중앙에 더 가까워지는 쪽.
+	var bb_center: Vector2 = origin  # data 좌표에서 site origin = bbox 중심
+	var to_center: Vector2 = (bb_center - best_center).normalized()
+	var sign: float = 1.0 if best_wall_normal.dot(to_center) > 0.0 else -1.0
+	var inside: Vector2 = best_wall_normal * sign
+
+	# 데이터 좌표에서 site origin 차감.
+	var local_xz: Vector2 = best_center - origin + inside * INSIDE_OFFSET_M
+	_start_position = Vector3(local_xz.x, 0.0, local_xz.y)
+	# Godot forward = (sin(y), 0, -cos(y)). forward.x=inside.x, forward.z=inside.y
+	# → rot_y = atan2(inside.x, -inside.y).
+	_start_rotation_y = atan2(inside.x, -inside.y)
+
+	print("[CalPolyB001Site] 정문(span=%.2fm) → start=(%.2f, %.2f, %.2f) rot_y=%.2f deg" % [
+		best_span, _start_position.x, _start_position.y, _start_position.z,
+		rad_to_deg(_start_rotation_y)
+	])
+
+
+## 점 → 선분 최단 거리 (XZ 평면).
+func _point_to_segment_distance(p: Vector2, a: Vector2, b: Vector2) -> float:
+	var ab: Vector2 = b - a
+	var L2: float = ab.length_squared()
+	if L2 < 1e-8:
+		return p.distance_to(a)
+	var t: float = clampf((p - a).dot(ab) / L2, 0.0, 1.0)
+	var proj: Vector2 = a + ab * t
+	return p.distance_to(proj)
 
 
 func _build_exterior_scaffolding(bb_min: Vector2, bb_max: Vector2, origin: Vector2) -> void:
