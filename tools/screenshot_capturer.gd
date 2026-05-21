@@ -111,8 +111,15 @@ func _run_capture() -> void:
 	# Batch 2: 천장 없음
 	await _capture_batch(camera, _ensure_dir("no_ceiling/"))
 
-	# Batch 3: hazard closeup — 각 hazard 1.5m 거리에서 1장씩
+	# Batch 3: hazard closeup — 발견 전 (warning marker 숨김 상태)
 	await _capture_hazard_closeups(camera, _ensure_dir("hazards/"))
+
+	# Batch 3b: 모든 hazard discover() 호출 후 동일 closeup
+	# 발견 후 marker + 녹색 가이드 링 검증용.
+	_discover_all_hazards()
+	for _i: int in range(TOGGLE_FRAMES):
+		await get_tree().process_frame
+	await _capture_hazard_closeups(camera, _ensure_dir("hazards_discovered/"))
 
 	# Batch 4: 외부 시점 — 사이트 BBox 외부에서 비계/외관 캡처
 	await _capture_exterior(camera, _ensure_dir("exterior/"))
@@ -137,6 +144,23 @@ func _capture_exterior(camera: Camera3D, out_dir: String) -> void:
 			print("[ScreenshotCapturer] Saved %s" % ProjectSettings.globalize_path(path))
 		else:
 			push_error("[ScreenshotCapturer] save_png failed (%d): %s" % [err, path])
+
+
+## HazardContainer 하위 모든 hazard에 discover() 호출 (발견 상태 강제).
+## guide ring + marker recolor 시각 검증용.
+func _discover_all_hazards() -> void:
+	var main_scene: Node = get_tree().current_scene
+	if main_scene == null:
+		return
+	var hazard_container: Node = main_scene.get_node_or_null("HazardContainer")
+	if hazard_container == null:
+		return
+	var count: int = 0
+	for h: Node in hazard_container.get_children():
+		if h.has_method("discover"):
+			if h.call("discover"):
+				count += 1
+	print("[ScreenshotCapturer] Discovered %d hazards" % count)
 
 
 ## HazardContainer 하위 각 hazard 1.5m 후방·1.2m 위에서 캡처.

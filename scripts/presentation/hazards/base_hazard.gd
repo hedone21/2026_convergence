@@ -46,6 +46,14 @@ const MARKER_COLOR: Color = Color(1.0, 0.85, 0.0)  # OSHA caution yellow
 const MARKER_EMISSION_ENERGY: float = 2.5
 const MARKER_COLOR_DISCOVERED: Color = Color(0.0, 1.0, 0.25)
 
+## 발견 후 바닥에 투영되는 녹색 가이드 링.
+const GUIDE_RING_SIZE: float = 1.6
+const GUIDE_RING_INNER_RATIO: float = 0.62  # 안쪽 투명 영역 / outer radius
+const GUIDE_RING_COLOR: Color = Color(0.05, 0.85, 0.22)
+
+## 발견 후 생성되는 가이드 링 Decal (없으면 null)
+var _guide_ring: Decal = null
+
 
 func _ready() -> void:
 	# 일반 물리 충돌은 받지 않고, 마킹 레이 전용 레이어만 설정
@@ -94,9 +102,57 @@ func discover() -> bool:
 	if _warning_marker != null:
 		_warning_marker.visible = true
 	_recolor_marker_discovered()
+	_spawn_guide_ring()
 	_show_discovered_feedback()
 	state_changed.emit(HazardState.DISCOVERED)
 	return true
+
+
+## 발견 시 바닥에 녹색 가이드 링을 투영한다 (Decal).
+## 절차 생성 ring alpha texture — 가운데 투명, 가장자리 녹색.
+func _spawn_guide_ring() -> void:
+	if _guide_ring != null:
+		return
+	_guide_ring = Decal.new()
+	_guide_ring.name = "GuideRing"
+	# y_size를 2.5m로 크게 잡아 hazard가 floor에서 떠 있어도(예: y=0.5)
+	# ring AABB 하단(y_center - 1.25 = -0.75)이 floor에 닿게 한다.
+	_guide_ring.size = Vector3(GUIDE_RING_SIZE, 2.5, GUIDE_RING_SIZE)
+	_guide_ring.upper_fade = 0.3
+	_guide_ring.lower_fade = 0.3
+	_guide_ring.modulate = Color(GUIDE_RING_COLOR.r, GUIDE_RING_COLOR.g, GUIDE_RING_COLOR.b, 0.85)
+	_guide_ring.texture_albedo = _make_guide_ring_texture()
+	_guide_ring.cull_mask = BaseSite.FLOOR_DECAL_LAYER
+	# decal projection 박스 중심이 hazard origin이 되도록 약간만 위로
+	_guide_ring.position = Vector3(0.0, 0.05, 0.0)
+	add_child(_guide_ring)
+
+
+## 가이드 링 절차 텍스쳐. 중앙은 alpha 0, 가장자리에 가까울수록 alpha 1.
+## inner_ratio ~ 1.0 영역만 실제로 보이는 ring 형태.
+func _make_guide_ring_texture() -> ImageTexture:
+	var size: int = 256
+	var img: Image = Image.create(size, size, false, Image.FORMAT_RGBA8)
+	var cx: float = size * 0.5
+	var cy: float = size * 0.5
+	var outer: float = size * 0.48
+	var inner: float = outer * GUIDE_RING_INNER_RATIO
+	var ring_w: float = outer - inner
+	for y in size:
+		for x in size:
+			var dx: float = float(x) - cx
+			var dy: float = float(y) - cy
+			var d: float = sqrt(dx * dx + dy * dy)
+			var a: float = 0.0
+			if d >= inner and d <= outer:
+				# ring 중앙에서 alpha 1, 양쪽 edge에서 0 (smooth)
+				var t: float = (d - inner) / ring_w
+				a = sin(t * PI)  # 0→1→0 부드러운 종 모양
+				a = clampf(a, 0.0, 1.0)
+			var c: Color = GUIDE_RING_COLOR
+			c.a = a
+			img.set_pixel(x, y, c)
+	return ImageTexture.create_from_image(img)
 
 
 ## 발견 시 marker 색상을 OSHA safe green으로 전환.
